@@ -45,7 +45,7 @@ char cadenaTemporal_3[7];
 int periodo = 5000;
 unsigned long TiempoAhora = 0;
 
-/*********  Obejtos globales  *********/
+/*********  Objetos globales  *********/
 SX1278 radio = new Module(10, 2, 9, 3);  // Creo objeto para nuevo modulo Lora
 /* SX1278 has the following connections:
    NSS pin:   10
@@ -131,7 +131,7 @@ void loop() {
   dtostrf(vcc.Read_Volts(), 4, 2, BattVoltage);
   dtostrf(GetTemp(), 3, 1, InternalTemp);
   analogReference(INTERNAL);
-  delay(10);}
+  delay(10);
 
   for (int lap = 0; lap <= 2; lap = lap + 1) {
 
