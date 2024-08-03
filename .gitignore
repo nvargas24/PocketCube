@@ -3,3 +3,12 @@ __pycache__/
 
 # Ignorar todos los archivos pdf
 *.pdf
+
+# Ignorar archivos generados por simulaciones de .asc
+*.log
+*.tmp
+*.bak
+*.aux
+*.out
+*.raw
+*.net
