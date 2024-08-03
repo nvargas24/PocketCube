@@ -40,6 +40,7 @@
 #include "RTClib.h"
 
 /****************** Variables globales ***************/ 
+/*------------------- RTC --------------------*/
 // Creo objeto RTC_DS1307 rtc;
 RTC_DS3231 rtc;
 
@@ -70,17 +71,25 @@ String monthsNames[12] = {
   "Diciembre" 
 };
 
+/*----- Comunicacion master-slave I2C ------*/
+const byte I2C_SLAVE_ADDR = 0x20;
+
+
 /********* Declaracion de funciones internas *********/
 void printDate();
 void configInitialRTC();
+void sendToSlave(DateTime );
+uint16_t requestToSlave();
 
 /****************** Funciones Arduino ****************/
 /**
  * @brief Configuracion inicial
  * @return nothing
  */
-void setup() {
+void setup() 
+{
   Serial.begin(115200); // Frecuencia en baudios para serial
+  Wire.begin();
   delay(1000); 
   configInitialRTC();
 }
@@ -90,10 +99,17 @@ void setup() {
  * @attention solo RTC por el momento
  * @return nothing
  */
-void loop() {
+void loop() 
+{
+  uint16_t rta = 0;   
   // Obtener fecha actual y mostrar por Serial
   DateTime now = rtc.now();
   printDate(now);
+  delay(1000);
+  // Enviar data a slave
+  sendToSlave(now);
+  rta = requestToSlave();
+  Serial.print(rta);
   delay(1000);
 }
 
@@ -124,7 +140,8 @@ void printDate(DateTime date)
  * @brief Verficación conexion con RTC
  * @return nothing
  */
-void configInitialRTC(){
+void configInitialRTC()
+{
   if (!rtc.begin()) {
     Serial.println(F("NO SE ENCUENTRA RTC"));
     while (1);
@@ -134,4 +151,36 @@ void configInitialRTC(){
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));// Fijar a fecha y hora de compilacion
     // rtc.adjust(DateTime(2024, 8, 3, 18, 0, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
   }
+}
+
+/**
+ * @brief Enviar data a slave I2C
+ * @return nothing
+ */
+void sendToSlave(DateTime data)
+{
+  Wire.beginTransmission(I2C_SLAVE_ADDR);
+  Wire.write((byte*)&data, sizeof(data));
+  Wire.endTransmission();
+}
+
+/**
+ * @brief Respuesta de Slave I2C
+ * @return String con mensaje de Slave
+ */
+uint16_t requestToSlave()
+{
+  uint8_t index = 0;  
+  uint16_t response = 0;
+
+  Wire.requestFrom(I2C_SLAVE_ADDR, sizeof(response));
+
+  byte* pointer = (byte*)&response;
+  while (Wire.available())
+  {
+    *(pointer + index) = (byte)Wire.read();
+    index++;
+  }
+
+  return response;
 }
