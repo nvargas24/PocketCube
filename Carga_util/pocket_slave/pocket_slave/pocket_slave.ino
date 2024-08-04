@@ -42,7 +42,7 @@
 /*----- Comunicacion master-slave I2C ------*/
 const byte I2C_SLAVE_ADDR = 0x20;
 long data = 0;
-long response = 200;
+long response = 2340;
 
 /********* Declaracion de funciones internas *********/
 void receiveEvent(int bytes);
@@ -76,14 +76,14 @@ void loop()
 }
 
 /**
- * @brief Bucle de ejecucion de programa principal
- * @attention solo RTC por el momento
+ * @brief Evento de recepcion de data
  * @return nothing
  */
 void receiveEvent(int bytes)
 {
-  data = 0;
-  uint8_t index = 0;
+  uint8_t index = 0;  
+  data = 0; // reseteo siempre para nueva data
+
   while (Wire.available())
   {
     byte* pointer = (byte*)&data;
@@ -93,8 +93,7 @@ void receiveEvent(int bytes)
 }
 
 /**
- * @brief Bucle de ejecucion de programa principal
- * @attention solo RTC por el momento
+ * @brief Evento de respuesta de data a master
  * @return nothing
  */
 void requestEvent()
