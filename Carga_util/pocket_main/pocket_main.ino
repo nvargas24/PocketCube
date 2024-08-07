@@ -73,7 +73,7 @@ String monthsNames[12] = {
 
 /*----- Comunicacion master-slave I2C ------*/
 const byte I2C_SLAVE_ADDR = 0x20;
-char response[40];
+char response[60];
 
 /********* Declaracion de funciones internas *********/
 void printDate();
@@ -189,7 +189,8 @@ void sendToSlave(const char *data)
 void requestFromSlave()
 {
   uint8_t index = 0;  
-
+  
+  // Solcitud a slave
   Wire.requestFrom(I2C_SLAVE_ADDR, sizeof(response));
 
   while (Wire.available() && index < sizeof(response) - 1) {
