@@ -42,9 +42,11 @@
 /*----- Comunicacion master-slave I2C ------*/
 const byte I2C_SLAVE_ADDR = 0x20;
 uint16_t data = 0;
-char response[20] = "  SOY ARDUINO  "; // DateTime+medicion
+char response[40]; // DateTime+medicion
 char receivedStr[20]; // OBS: Ver tamanio de buffer
  
+int meas = 9;
+
 /********* Declaracion de funciones internas *********/
 void receiveEvent(int bytes);
 void requestEvent();
@@ -70,10 +72,9 @@ void setup()
  */
 void loop() 
 {
-  if (data != 0){
-    Serial.println(data);
-    data = 0;
-  }
+  /*lectura de corriente y uso de LTC3105*/
+  meas = 34; // ejemplos random para considerar una lectura 
+  // OBS.: Considerar usar un .JSON si son muchos datos
 }
 
 /**
@@ -100,8 +101,10 @@ void receiveEvent(int bytes)
  */
 void requestEvent()
 {
+  sprintf(response, "Medicion: %d |", meas);
+  strncat(response, receivedStr, sizeof(response)-strlen(response)-1);
+
   Serial.print("SData to Master: ");
   Serial.println(response);
   Wire.write((const uint8_t*)response, strlen(response));
-
 }

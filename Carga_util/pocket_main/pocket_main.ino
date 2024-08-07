@@ -73,14 +73,14 @@ String monthsNames[12] = {
 
 /*----- Comunicacion master-slave I2C ------*/
 const byte I2C_SLAVE_ADDR = 0x20;
-long request_slave = 0; 
+char response[40];
 
 /********* Declaracion de funciones internas *********/
 void printDate();
 void configInitialRTC();
 void sendToSlave(String );
 String datetime2str(DateTime date);
-void requestToSlave();
+void requestFromSlave();
 
 /****************** Funciones Arduino ****************/
 /**
@@ -110,7 +110,7 @@ void loop()
   datetimeStr = datetime2str(now);
   // Enviar data a slave
   sendToSlave(datetimeStr.c_str());
-  requestToSlave();
+  requestFromSlave();
 
   delay(1000);
 }
@@ -186,10 +186,9 @@ void sendToSlave(const char *data)
  * @brief Respuesta de Slave I2C
  * @return String con mensaje de Slave
  */
-void requestToSlave()
+void requestFromSlave()
 {
   uint8_t index = 0;  
-  char response[20];
 
   Wire.requestFrom(I2C_SLAVE_ADDR, sizeof(response));
 
@@ -200,6 +199,6 @@ void requestToSlave()
 
   Serial.print("RData from Slave: ");
   Serial.println(response);
-
- //return response;
 }
+
+
