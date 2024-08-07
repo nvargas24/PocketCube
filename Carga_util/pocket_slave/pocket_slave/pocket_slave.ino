@@ -41,9 +41,10 @@
 /****************** Variables globales ***************/ 
 /*----- Comunicacion master-slave I2C ------*/
 const byte I2C_SLAVE_ADDR = 0x20;
-long data = 0;
-long response = 2340;
-
+uint16_t data = 0;
+long response = 12; // DateTime+medicion
+char receivedStr[20]; // OBS: Ver tamanio de buffer
+ 
 /********* Declaracion de funciones internas *********/
 void receiveEvent(int bytes);
 void requestEvent();
@@ -59,7 +60,7 @@ void setup()
 
   Wire.begin(I2C_SLAVE_ADDR);
   Wire.onReceive(receiveEvent);
-  Wire.onRequest(requestEvent);
+  //Wire.onRequest(requestEvent);
 }
 
 /**
@@ -81,15 +82,16 @@ void loop()
  */
 void receiveEvent(int bytes)
 {
-  uint8_t index = 0;  
-  data = 0; // reseteo siempre para nueva data
+ int index = 0;
 
-  while (Wire.available())
-  {
-    byte* pointer = (byte*)&data;
-    *(pointer + index) = (byte)Wire.read();
-    index++;
+  while (Wire.available() && index < sizeof(receivedStr) - 1) {
+    receivedStr[index++] = Wire.read();
   }
+  receivedStr[index] = '\0'; // Terminar el string
+
+  // Procesar el string recibido
+  Serial.print("RData from Master: ");
+  Serial.println(receivedStr);
 }
 
 /**
@@ -98,5 +100,7 @@ void receiveEvent(int bytes)
  */
 void requestEvent()
 {
-  Wire.write((byte*)&response, sizeof(response));
+  Serial.print("SData to Master: ");
+  Serial.println(response);
+  Wire.write((const uint8_t*)response, sizeof(response));
 }

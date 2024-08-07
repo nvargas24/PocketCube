@@ -73,13 +73,13 @@ String monthsNames[12] = {
 
 /*----- Comunicacion master-slave I2C ------*/
 const byte I2C_SLAVE_ADDR = 0x20;
-long send_data = 1450;
 long request_slave = 0; 
 
 /********* Declaracion de funciones internas *********/
 void printDate();
 void configInitialRTC();
-void sendToSlave(long );
+void sendToSlave(String );
+String datetime2str(DateTime date);
 uint16_t requestToSlave();
 
 /****************** Funciones Arduino ****************/
@@ -102,14 +102,16 @@ void setup()
  */
 void loop() 
 {
+  String datetimeStr;
+
   // Obtener fecha actual y mostrar por Serial
   DateTime now = rtc.now();
-  printDate(now);
-  delay(1000);
+  //printDate(now);
+  datetimeStr = datetime2str(now);
   // Enviar data a slave
-  sendToSlave(send_data);
+  sendToSlave(datetimeStr.c_str());
   request_slave = requestToSlave();
-  Serial.print(request_slave);
+
   delay(1000);
 }
 
@@ -121,19 +123,32 @@ void loop()
 void printDate(DateTime date)
 {
   Serial.print(date.year(), DEC);
-  Serial.print('/');
+  Serial.print('-');
   Serial.print(date.month(), DEC);
-  Serial.print('/');
+  Serial.print('-');
   Serial.print(date.day(), DEC);
-  Serial.print(" (");
-  Serial.print(daysOfTheWeek[date.dayOfTheWeek()]);
-  Serial.print(") ");
+  Serial.print(" ");
   Serial.print(date.hour(), DEC);
   Serial.print(':');
   Serial.print(date.minute(), DEC);
   Serial.print(':');
   Serial.print(date.second(), DEC);
   Serial.println();
+}
+
+/**
+ * @brief Formatear la fecha y hora como "YYYY-MM-DD HH:MM:SS"
+ * @return str de fecha y hora
+ */
+String datetime2str(DateTime date)
+{
+  char datetimeStr[20];
+
+  snprintf(datetimeStr, sizeof(datetimeStr), "%04d-%02d-%02d %02d:%02d:%02d", 
+           date.year(), date.month(), date.day(), 
+           date.hour(), date.minute(), date.second());
+
+  return String(datetimeStr);
 }
 
 /**
@@ -157,10 +172,13 @@ void configInitialRTC()
  * @brief Enviar data a slave I2C
  * @return nothing
  */
-void sendToSlave(long data)
+void sendToSlave(const char *data)
 {
+  Serial.print("Sdata to Slave: ");
+  Serial.println(data);
+
   Wire.beginTransmission(I2C_SLAVE_ADDR);
-  Wire.write((byte*)&data, sizeof(data));
+  Wire.write((const uint8_t *)data, strlen(data));
   Wire.endTransmission();
 }
 
@@ -181,6 +199,9 @@ uint16_t requestToSlave()
     *(pointer + index) = (byte)Wire.read();
     index++;
   }
+
+  Serial.print("RData from Slave: ");
+  Serial.println(response);
 
   return response;
 }
