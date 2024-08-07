@@ -80,7 +80,7 @@ void printDate();
 void configInitialRTC();
 void sendToSlave(String );
 String datetime2str(DateTime date);
-uint16_t requestToSlave();
+void requestToSlave();
 
 /****************** Funciones Arduino ****************/
 /**
@@ -110,7 +110,7 @@ void loop()
   datetimeStr = datetime2str(now);
   // Enviar data a slave
   sendToSlave(datetimeStr.c_str());
-  request_slave = requestToSlave();
+  requestToSlave();
 
   delay(1000);
 }
@@ -186,22 +186,20 @@ void sendToSlave(const char *data)
  * @brief Respuesta de Slave I2C
  * @return String con mensaje de Slave
  */
-uint16_t requestToSlave()
+void requestToSlave()
 {
   uint8_t index = 0;  
-  long response = 0;
+  char response[20];
 
   Wire.requestFrom(I2C_SLAVE_ADDR, sizeof(response));
 
-  byte* pointer = (byte*)&response;
-  while (Wire.available())
-  {
-    *(pointer + index) = (byte)Wire.read();
-    index++;
+  while (Wire.available() && index < sizeof(response) - 1) {
+    response[index++] = Wire.read();
   }
+  response[index] = '\0'; // Terminar el string
 
   Serial.print("RData from Slave: ");
   Serial.println(response);
 
-  return response;
+ //return response;
 }

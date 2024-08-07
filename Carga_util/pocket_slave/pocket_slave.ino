@@ -42,7 +42,7 @@
 /*----- Comunicacion master-slave I2C ------*/
 const byte I2C_SLAVE_ADDR = 0x20;
 uint16_t data = 0;
-long response = 12; // DateTime+medicion
+char response[20] = "  SOY ARDUINO  "; // DateTime+medicion
 char receivedStr[20]; // OBS: Ver tamanio de buffer
  
 /********* Declaracion de funciones internas *********/
@@ -60,7 +60,7 @@ void setup()
 
   Wire.begin(I2C_SLAVE_ADDR);
   Wire.onReceive(receiveEvent);
-  //Wire.onRequest(requestEvent);
+  Wire.onRequest(requestEvent);
 }
 
 /**
@@ -82,7 +82,7 @@ void loop()
  */
 void receiveEvent(int bytes)
 {
- int index = 0;
+  int index = 0;
 
   while (Wire.available() && index < sizeof(receivedStr) - 1) {
     receivedStr[index++] = Wire.read();
@@ -102,5 +102,6 @@ void requestEvent()
 {
   Serial.print("SData to Master: ");
   Serial.println(response);
-  Wire.write((const uint8_t*)response, sizeof(response));
+  Wire.write((const uint8_t*)response, strlen(response));
+
 }
