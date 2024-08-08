@@ -44,36 +44,9 @@
 // Creo objeto RTC_DS1307 rtc;
 RTC_DS3231 rtc;
 
-/* String para identificar dia de la semana */
-String daysOfTheWeek[7] = { 
-  "Domingo", 
-  "Lunes", 
-  "Martes", 
-  "Miercoles", 
-  "Jueves", 
-  "Viernes", 
-  "Sabado" 
-};
-
-/* String para identificar mes */
-String monthsNames[12] = { 
-  "Enero", 
-  "Febrero", 
-  "Marzo", 
-  "Abril", 
-  "Mayo",  
-  "Junio", 
-  "Julio",
-  "Agosto",
-  "Septiembre",
-  "Octubre",
-  "Noviembre",
-  "Diciembre" 
-};
-
 /*----- Comunicacion master-slave I2C ------*/
 const byte I2C_SLAVE_ADDR = 0x20;
-char response[60];
+char response[33];
 
 /********* Declaracion de funciones internas *********/
 void printDate();

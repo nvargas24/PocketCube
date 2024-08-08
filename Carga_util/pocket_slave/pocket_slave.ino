@@ -42,7 +42,7 @@
 /*----- Comunicacion master-slave I2C ------*/
 const byte I2C_SLAVE_ADDR = 0x20;
 uint16_t data = 0;
-char response[40]; // DateTime+medicion
+char response[70]; // DateTime+medicion
 char receivedStr[20]; // OBS: Ver tamanio de buffer
 
 char datetime[20];
@@ -53,8 +53,8 @@ float meas_current = 0.0;
 void receiveEvent(int bytes);
 void requestEvent();
 
-float read_temp();
-float read_current();
+float readTemp();
+float readCurrent();
 
 /****************** Funciones Arduino ****************/
 /**
@@ -112,21 +112,30 @@ void receiveEvent(int bytes)
  */
 void requestEvent()
 {
-  snprintf(response, sizeof(response), "Temp.: %.2f, Current:%.2f, DateTime:%s", meas_temp, meas_current, datetime);
-  Wire.write((const uint8_t*)response, strlen(response));
+  char rta[33];
+  char tempStr[10];
+  char currentStr[10];
+
+  /*Conversion de float a str*/
+  // Necesario ya que arduino no reconoce float para usar en snprintf
+  dtostrf(meas_temp, 5, 2, tempStr);
+  dtostrf(meas_current, 5, 2, currentStr); 
+
+  snprintf(rta, sizeof(rta), "I:%smA,Dt:%s", currentStr, datetime);
+  Wire.write(rta);
 
   Serial.print("SData to Master: ");
-  Serial.println(response);
+  Serial.println(rta);
 }
 
 /* Funciones ejemplos de lectura */
 // conectar algun sensor para testear realtime
-float read_temp()
+float readTemp()
 {
   return 24.7;
 }
 
-float read_current()
+float readCurrent()
 {
-  return 210.34;
+  return 21.34;
 }
