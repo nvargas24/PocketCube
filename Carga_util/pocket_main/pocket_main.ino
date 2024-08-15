@@ -36,7 +36,7 @@
  */
 
 /****** Encabezados *****/
-#include <Wire.h>
+#include <SPI.h>
 #include "RTClib.h"
 
 /****************** Variables globales ***************/ 
@@ -45,7 +45,7 @@
 RTC_DS3231 rtc;
 
 /*----- Comunicacion master-slave I2C ------*/
-const byte I2C_SLAVE_ADDR = 0x20;
+const int SS_PIN = 2; //   ver para ESP32 38 PINES
 char response[33];
 
 /********* Declaracion de funciones internas *********/
@@ -63,7 +63,8 @@ void requestFromSlave();
 void setup() 
 {
   Serial.begin(115200); // Frecuencia en baudios para serial
-  Wire.begin();
+  SPI.begin();
+  pinMode(SS_PIN, OUTPUT);
   delay(1000); 
   configInitialRTC();
 }
@@ -82,7 +83,7 @@ void loop()
   //printDate(now);
   datetimeStr = datetime2str(now);
   // Enviar data a slave
-  sendToSlave(datetimeStr.c_str());
+  sendToSlave(datetimeStr.c_str(), sizeof(datetimeStr.c_str())-1);
   requestFromSlave();
 
   delay(1000);
@@ -145,14 +146,19 @@ void configInitialRTC()
  * @brief Enviar data a slave I2C
  * @return nothing
  */
-void sendToSlave(const char *data)
+void sendToSlave(const char *data, size_t length)
 {
   Serial.print("Sdata to Slave: ");
   Serial.println(data);
 
-  Wire.beginTransmission(I2C_SLAVE_ADDR);
-  Wire.write((const uint8_t *)data, strlen(data));
-  Wire.endTransmission();
+  digitalWrite(SS_PIN, LOW); // Activa el esclavo
+  
+  for (size_t i = 0; i < length; i++) {
+    SPI.transfer(data[i]); // Envía un byte
+    delay(10); // Pequeña pausa para asegurar la sincronización
+  }
+
+  digitalWrite(SS_PIN, HIGH); // Desactiva el esclavo
 }
 
 /**
@@ -162,17 +168,15 @@ void sendToSlave(const char *data)
 void requestFromSlave()
 {
   uint8_t index = 0;  
-  
-  // Solcitud a slave
-  Wire.requestFrom(I2C_SLAVE_ADDR, sizeof(response));
+  size_t length = sizeof(response); 
 
-  while (Wire.available() && index < sizeof(response) - 1) {
-    response[index++] = Wire.read();
+  digitalWrite(SS_PIN, LOW); // Activa el esclavo
+
+  for (size_t i = 0; i < length; i++) {
+    response[i] = SPI.transfer(0x00); // Envía dummy data (0x00) para recibir respuesta
+    delay(10); // Pequeña pausa para asegurar la sincronización
   }
-  response[index] = '\0'; // Terminar el string
 
-  Serial.print("RData from Slave: ");
-  Serial.println(response);
+  digitalWrite(SS_PIN, HIGH); // Desactiva el esclavo
+
 }
-
-
