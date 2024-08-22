@@ -41,7 +41,8 @@
 /****************** Variables globales ***************/ 
 /*----- Comunicacion master-slave I2C ------*/
 char receivedData[20]; // OBS: Ver tamanio de buffer
-char responseData[20];
+char responseData[100] = "HOLA SOY SLAVE Y QUIERO SALUDARTE ESTE DIA ESPECIAL";
+volatile uint8_t responseIndex = 0;
 
 volatile bool dataReceived = false;
 volatile byte index = 0;
@@ -70,6 +71,7 @@ void setup()
   /* SPI */
   pinMode(MISO, OUTPUT);
   //SPI.begin();
+  //SPI.usingInterrupt(digitalPinToInterrupt(10)); // Usar interrupciones para SPI
   SPCR |= _BV(SPE); // Habilita SPI en modo esclavo
   SPI.attachInterrupt();
 }
@@ -86,16 +88,18 @@ ISR(SPI_STC_vect)
     dataReceived = true;
     index = 0; // Resetea el índice
   }
-
-  /* Enviar la medición de temperatura después de recibir el dato
-  if (dataReceived) {
-    while(responseData[index] != '\0') {
-      SPDR = responseData[index++];
-      delay(10); // Pequeña pausa para asegurar la sincronización
-    }
-    index = 0; // Resetea el índice para la próxima transmisión
+  if (receivedByte == 'R') {
+  // Prepara el siguiente byte de la respuesta
+  SPDR = responseString[index++];
+  if (index >= sizeof(responseString) - 1) {
+    index = 0; // Resetea el índice si hemos enviado toda la cadena
   }
-  */
+
+  /* Enviar la medición de temperatura después de recibir el dato */
+  //SPDR = responseData[responseIndex++];
+  //if (responseIndex >= sizeof(responseData)-1) {
+  //  responseIndex = 0;
+  //}
 }
 
 

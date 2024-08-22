@@ -46,7 +46,7 @@ RTC_DS3231 rtc;
 
 /*----- Comunicacion master-slave SPI ------*/
 const int SS_PIN = 5;
-char response[33];
+char response[100];
 
 /********* Declaracion de funciones internas *********/
 /* RTC */
@@ -92,7 +92,7 @@ void loop()
 
   // Comunicacion por SPI
   sendToSlave(datetimeStr.c_str(), datetimeStr.length()); // Enviar data a slave
-  //requestFromSlave(); // Respuesta de slave
+  requestFromSlave(); // Respuesta de slave
 
   delay(1000);
 }
@@ -183,17 +183,16 @@ void sendToSlave(const char *data, size_t len_data)
  * @return String con mensaje de Slave
  */
 void requestFromSlave()
-{
-  uint8_t index = 0;  
+{  
   size_t length = sizeof(response); 
 
-  digitalWrite(SS_PIN, LOW); // Activa el esclavo
+  digitalWrite(SS_PIN, LOW);
 
   for (size_t i = 0; i < length; i++) {
     response[i] = SPI.transfer(0x00); // Envía dummy data (0x00) para recibir respuesta
     delay(10); // Pequeña pausa para asegurar la sincronización
   }
 
-  digitalWrite(SS_PIN, HIGH); // Desactiva el esclavo
-
+  digitalWrite(SS_PIN, HIGH);
+  Serial.println(response);
 }
