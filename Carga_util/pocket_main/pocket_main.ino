@@ -44,15 +44,18 @@
 // Creo objeto RTC_DS1307 rtc;
 RTC_DS3231 rtc;
 
-/*----- Comunicacion master-slave I2C ------*/
-const int SS_PIN = 2; //   ver para ESP32 38 PINES
+/*----- Comunicacion master-slave SPI ------*/
+const int SS_PIN = 5;
 char response[33];
 
 /********* Declaracion de funciones internas *********/
+/* RTC */
 void printDate();
 void configInitialRTC();
-void sendToSlave(String );
 String datetime2str(DateTime date);
+
+/* Data IN/OUT SPI */
+void sendToSlave(String );
 void requestFromSlave();
 
 /****************** Funciones Arduino ****************/
@@ -62,9 +65,14 @@ void requestFromSlave();
  */
 void setup() 
 {
+  /* SPI */
   Serial.begin(115200); // Frecuencia en baudios para serial
-  SPI.begin();
   pinMode(SS_PIN, OUTPUT);
+  SPI.begin();
+  SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0)); 
+  digitalWrite(SS_PIN, HIGH); // Desactivo slave al inicio por si hay basura
+
+  /* RTC */
   delay(1000); 
   configInitialRTC();
 }
@@ -78,13 +86,13 @@ void loop()
 {
   String datetimeStr;
 
-  // Obtener fecha actual y mostrar por Serial
-  DateTime now = rtc.now();
-  //printDate(now);
+  // Obtengo fecha actual y doy formato
+  DateTime now = rtc.now(); 
   datetimeStr = datetime2str(now);
-  // Enviar data a slave
-  sendToSlave(datetimeStr.c_str(), sizeof(datetimeStr.c_str())-1);
-  requestFromSlave();
+
+  // Comunicacion por SPI
+  sendToSlave(datetimeStr.c_str(), datetimeStr.length()); // Enviar data a slave
+  //requestFromSlave(); // Respuesta de slave
 
   delay(1000);
 }
@@ -146,19 +154,28 @@ void configInitialRTC()
  * @brief Enviar data a slave I2C
  * @return nothing
  */
-void sendToSlave(const char *data, size_t length)
+void sendToSlave(const char *data, size_t len_data)
 {
-  Serial.print("Sdata to Slave: ");
-  Serial.println(data);
+  char buffer[len_data+1]; // uso auxiliar para agregar caracter nulo
 
-  digitalWrite(SS_PIN, LOW); // Activa el esclavo
+  // Agrego caracter nulo
+  snprintf(buffer, sizeof(buffer), "%s", data);
+
+  // Muestro data a enviar por serial
+  Serial.print("SEND Slave: ");
+  Serial.print(buffer);
+  Serial.print(", Length:");
+  Serial.println(sizeof(buffer));
+
+  // Inicializo comunicacion con Slave
+  digitalWrite(SS_PIN, LOW); 
   
-  for (size_t i = 0; i < length; i++) {
-    SPI.transfer(data[i]); // Envía un byte
+  for (size_t i = 0; i < sizeof(buffer); i++) {
+    SPI.transfer(buffer[i]);
     delay(10); // Pequeña pausa para asegurar la sincronización
   }
 
-  digitalWrite(SS_PIN, HIGH); // Desactiva el esclavo
+  digitalWrite(SS_PIN, HIGH);
 }
 
 /**

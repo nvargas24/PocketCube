@@ -64,41 +64,38 @@ float readCurrent();
  */
 void setup()
 {
+  /* Serial */
   Serial.begin(115200);
+  
+  /* SPI */
   pinMode(MISO, OUTPUT);
-  SPI.begin();
+  //SPI.begin();
   SPCR |= _BV(SPE); // Habilita SPI en modo esclavo
-  SPCR |= _BV(SPIE); // Habilita la interrupción SPI
+  SPI.attachInterrupt();
 }
 
+/**
+ * @brief Interrupcion al recibir data de Master por SPI
+ * @return nothing
+ */
 ISR(SPI_STC_vect) 
 {
   receivedData[index++] = SPDR; // Lee el byte recibido
-  char date[30];
 
-  if (index >= sizeof(receivedData) || receivedData[index - 1] == '\0') {
+  if (index >= sizeof(receivedData) || receivedData[index-1] == '\0') {
     dataReceived = true;
-    snprintf(date, 30, "%s", dataReceived);
-
     index = 0; // Resetea el índice
   }
 
-  // Enviar la medición de temperatura después de recibir el dato
+  /* Enviar la medición de temperatura después de recibir el dato
   if (dataReceived) {
-    float temperature = readTemp();
-    char tempStr[10];
-    
-    dtostrf(temperature, 6, 2, tempStr); // Convierte el valor de temperatura a cadena con 2 decimales
-    index = 0;
-
-    snprintf(responseData, sizeof(responseData), "%s, %s", date, tempStr);
-
     while(responseData[index] != '\0') {
       SPDR = responseData[index++];
       delay(10); // Pequeña pausa para asegurar la sincronización
     }
     index = 0; // Resetea el índice para la próxima transmisión
   }
+  */
 }
 
 
@@ -109,12 +106,21 @@ ISR(SPI_STC_vect)
  */
 void loop() 
 {
+  float temperature = readTemp();
+  char tempStr[10];
+    
   if (dataReceived) {
+    // Data recibidad de Master
     Serial.print("Mensaje recibido: ");
     Serial.println(receivedData);
+
+    // Data respuesta a Master
+    //dtostrf(temperature, 6, 2, tempStr); // Convierte el valor de temperatura a cadena con 2 decimales
+    //snprintf(responseData, sizeof(responseData), "%s, %s", date, tempStr);
+
     dataReceived = false;
   }
-  // OBS.: Considerar usar un .JSON si son muchos datos
+
 }
 
 /* Funciones ejemplos de lectura */
