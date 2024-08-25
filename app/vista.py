@@ -33,15 +33,17 @@ class Graph_volt(FigureCanvas):
         self.fig.subplots_adjust(left=.12, bottom=.12, right=.98, top=.9) #Ajuste de escala de grafica
         super().__init__(self.fig)
 
-        #self.freq_initial = np.arange(0, SAMPLES_FFT*37, 37)
-        #self.mag_initial = np.zeros(SAMPLES_FFT)
-        
         self.set_graph_fft_style()
-        # Crear la línea inicial
-        #self.line, = self.ax.plot(self.freq_initial, self.mag_initial, picker=5)
 
-        self.test_graph()
-        self.draw()
+        # Listas para cargar datos
+        self.x_data = []
+        self.y_data = []
+
+        # Crear la línea inicial
+        self.line, = self.ax.plot([], [], picker=5)
+
+        #self.test_graph()
+        #self.draw()
 
     def test_graph(self):
         # Generar datos de ejemplo
@@ -61,13 +63,29 @@ class Graph_volt(FigureCanvas):
         # Marcar el punto MPP
         self.ax.scatter(voltaje_mpp, potencia_mpp, color='red', zorder=2, label='MPP')
 
-    def update_graph_fft(self, freq, mag):
+    def update_graph(self, new_y_value):
         """
-        Metodo para actualizar listas de puntos para grafico fft
+        Metodo para actualizar grafico
         """
-        self.set_graph_fft_style()
+        # Generar nuevo valor de datos
+        if self.x_data:
+            next_x = self.x_data[-1] + 1
+        else:
+            next_x = self.xlim_init
 
-        self.line, = self.ax.plot(freq, mag, picker=5)
+        self.x_data.append(next_x)
+        self.y_data.append(new_y_value)
+
+        # Actualizar datos de la línea
+        self.line.set_data(self.x_data, self.y_data)
+
+        # Ajustar los límites si es necesario
+        if next_x >= self.xlim_fin:
+            self.ax.set_xlim(self.xlim_init, next_x + 1)
+        if max(self.y_data) >= self.ylim_fin or min(self.y_data) <= self.ylim_init:
+            self.ax.set_ylim(min(self.y_data) - 1, max(self.y_data) + 1)
+
+        #self.line, = self.ax.plot(freq, mag, picker=5)
         self.draw()
 
     def set_graph_fft_style(self):
@@ -140,3 +158,28 @@ class MainWindow(QMainWindow):
 
         self.ui.lcd_timer.display(f"{0:02d}:{0:02d}:{0:02d}")
         self.ui.lcd_time_rtc.display(f"{0:02d}:{0:02d}:{0:02d}")
+
+        # Callback de botones
+        self.ui.btn_ok_out1.clicked.connect(self.get_value_out1)
+        self.ui.btn_init.clicked.connect(self.init)
+        self.ui.btn_stop.clicked.connect(self.stop)
+
+        # Timer para actualizar grafico
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.get_value_out1)
+
+    def get_value_out1(self):
+        """
+        Obtener valor de spinbox
+        """
+        value_out1 = self.ui.sbox_volt1.value()
+        self.graph1.update_graph(value_out1)
+    
+    def init(self):
+        # Inicio timer con actualizacion de datos cada 1 seg
+        self.timer.start(1000)
+
+    def stop(self):
+        # Finalizo timer
+        self.timer.stop()
+
