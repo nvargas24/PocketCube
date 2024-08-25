@@ -29,11 +29,15 @@ class Graph_volt(FigureCanvas):
         self.ylim_init = -1
         self.ylim_fin = 6
 
+        # Inicializo grilla
+        self.grid_lines_v = []
+        self.grid_lines_h = []
+
         self.fig, self.ax = plt.subplots(1, dpi=80, figsize=(12,12), sharey=True, facecolor="none")
         self.fig.subplots_adjust(left=.12, bottom=.12, right=.98, top=.9) #Ajuste de escala de grafica
         super().__init__(self.fig)
 
-        self.set_graph_fft_style()
+        self.set_graph_style()
 
         # Listas para cargar datos
         self.x_data = []
@@ -79,30 +83,46 @@ class Graph_volt(FigureCanvas):
         # Actualizar datos de la línea
         self.line.set_data(self.x_data, self.y_data)
 
+
         # Ajustar los límites si es necesario
         if next_x >= self.xlim_fin:
-            self.ax.set_xlim(self.xlim_init, next_x + 1)
-        if max(self.y_data) >= self.ylim_fin or min(self.y_data) <= self.ylim_init:
-            self.ax.set_ylim(min(self.y_data) - 1, max(self.y_data) + 1)
+            self.xlim_fin = next_x+1
+        
+        #self.ax.set_xlim(self.xlim_init, self.xlim_fin)
+
+        self.set_graph_style()
 
         #self.line, = self.ax.plot(freq, mag, picker=5)
         self.draw()
 
-    def set_graph_fft_style(self):
+    def set_graph_style(self):
         """
         Metodo que asigna estilo al grafico
         """
+        # Eliminar las líneas de la grilla existentes
+        for line in self.grid_lines_v:
+            line.remove()
+        for line in self.grid_lines_h:
+            line.remove()
+
+        self.grid_lines_v.clear()
+        self.grid_lines_h.clear()
+
         # Establecer límites del eje X e Y
         self.ax.set_xlim(self.xlim_init, self.xlim_fin)
         self.ax.set_ylim(self.ylim_init, self.ylim_fin)
 
         # Creo grilla
-        step_value_fft_x = round((self.xlim_fin-self.xlim_init)/20)
-        step_value_fft_y = round((self.ylim_fin-self.ylim_init)/10)
-        for i in range(self.xlim_init, self.xlim_fin, step_value_fft_x):
-            self.ax.axvline(i, color='grey', linestyle='--', linewidth=0.25)
-        for j in range(self.ylim_init, self.ylim_fin, step_value_fft_y):   
-            self.ax.axhline(j, color='grey', linestyle='--', linewidth=0.25)
+        step_value_x = round((self.xlim_fin-self.xlim_init)/20)
+        step_value_y = round((self.ylim_fin-self.ylim_init)/10)
+
+        for i in range(self.xlim_init, self.xlim_fin, step_value_x):
+            line = self.ax.axvline(i, color='grey', linestyle='--', linewidth=0.25)
+            self.grid_lines_v.append(line)
+
+        for j in range(self.ylim_init, self.ylim_fin, step_value_y):   
+            line = self.ax.axhline(j, color='grey', linestyle='--', linewidth=0.25)
+            self.grid_lines_h.append(line)
 
         # Establece nombres de ejes y tamanio
         matplotlib.rcParams['font.size'] = 2
