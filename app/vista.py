@@ -83,16 +83,12 @@ class Graph_volt(FigureCanvas):
         # Actualizar datos de la línea
         self.line.set_data(self.x_data, self.y_data)
 
-
         # Ajustar los límites si es necesario
         if next_x >= self.xlim_fin:
             self.xlim_fin = next_x+1
         
-        #self.ax.set_xlim(self.xlim_init, self.xlim_fin)
-
         self.set_graph_style()
 
-        #self.line, = self.ax.plot(freq, mag, picker=5)
         self.draw()
 
     def set_graph_style(self):
@@ -183,21 +179,60 @@ class MainWindow(QMainWindow):
         self.ui.btn_ok_out1.clicked.connect(self.get_value_out1)
         self.ui.btn_init.clicked.connect(self.init)
         self.ui.btn_stop.clicked.connect(self.stop)
+        self.ui.btn_ok_setsend1.clicked.connect(self.get_time_send1)
 
-        # Timer para actualizar grafico
+        # Asigno avance por segundos
+        self.ui.set_time_send1.setCurrentSection(QTimeEdit.SecondSection)
+
+        # Inicializar el tiempo a 00:00:00
+        self.time = QTime(0, 0, 0)
+
+        # Timer para actualizar grafico #REEMPLAZAR POR DATA DE TIMER ARDUINO
         self.timer = QTimer()
         self.timer.timeout.connect(self.get_value_out1)
+
+        # Inicializo por defecto envio cada 10 seg
+        self.set_time1 = QTime(0, 0, 10, 0) 
 
     def get_value_out1(self):
         """
         Obtener valor de spinbox
         """
+        # MODO MANUAL PARA CARGAR VALORES
         value_out1 = self.ui.sbox_volt1.value()
         self.graph1.update_graph(value_out1)
-    
+
+        # Mostrar tiempo en display
+        reloj_str = self.time.toString("hh:mm:ss")
+        self.ui.lcd_timer.display(reloj_str)        
+        
+        # Obtengo segundos para setear envios y del time
+        seconds_total_timer = self.to_seconds(self.time)
+        seconds_total_set = self.to_seconds(self.set_time1)
+
+        # Temporizador para enviar datos
+        if (seconds_total_timer % seconds_total_set) == 0:
+            self.ui.label_send1.setText(f"{reloj_str} {value_out1:.02f}")
+
+        self.time = self.time.addMSecs(1000)        
+        
+    def get_time_send1(self):
+        # Reseteo time
+        self.time = QTime(0, 0, 0, 0)
+        # Obtener tiempo para enviar data
+        self.set_time1 = self.ui.set_time_send1.time()
+
+    def to_seconds(self, time):
+        # Convierte a segundos
+        seconds_total = time.hour() * 3600 \
+                        + time.minute() * 60 \
+                        + time.second()
+        return seconds_total
+
     def init(self):
         # Inicio timer con actualizacion de datos cada 1 seg
         self.timer.start(1000)
+
 
     def stop(self):
         # Finalizo timer

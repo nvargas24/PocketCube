@@ -17,7 +17,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(891, 664)
+        MainWindow.resize(891, 657)
         MainWindow.setStyleSheet(u"background-color: rgb(230, 230, 230);")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -158,7 +158,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_10.addLayout(self.horizontalLayout_11)
 
-        self.horizontalLayout_10.setStretch(0, 4)
+        self.horizontalLayout_10.setStretch(0, 5)
         self.horizontalLayout_10.setStretch(1, 5)
 
         self.verticalLayout_6.addLayout(self.horizontalLayout_10)
@@ -189,12 +189,6 @@ class Ui_MainWindow(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_18 = QHBoxLayout()
         self.horizontalLayout_18.setObjectName(u"horizontalLayout_18")
-        self.label_8 = QLabel(self.verticalLayoutWidget)
-        self.label_8.setObjectName(u"label_8")
-        self.label_8.setFont(font1)
-
-        self.horizontalLayout_18.addWidget(self.label_8)
-
         self.lcd_timer = QLCDNumber(self.verticalLayoutWidget)
         self.lcd_timer.setObjectName(u"lcd_timer")
         self.lcd_timer.setLayoutDirection(Qt.RightToLeft)
@@ -208,33 +202,21 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_18.addWidget(self.lcd_timer)
 
-        self.horizontalLayout_18.setStretch(0, 1)
-        self.horizontalLayout_18.setStretch(1, 7)
+        self.horizontalLayout_18.setStretch(0, 7)
 
         self.verticalLayout.addLayout(self.horizontalLayout_18)
 
-        self.horizontalLayout_14 = QHBoxLayout()
-        self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
-        self.verticalLayout_7 = QVBoxLayout()
-        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
-        self.label_4 = QLabel(self.verticalLayoutWidget)
-        self.label_4.setObjectName(u"label_4")
-        font3 = QFont()
-        font3.setPointSize(11)
-        font3.setBold(True)
-        font3.setWeight(75)
-        self.label_4.setFont(font3)
-        self.label_4.setAlignment(Qt.AlignCenter)
-
-        self.verticalLayout_7.addWidget(self.label_4)
-
         self.horizontalLayout_12 = QHBoxLayout()
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_12.addItem(self.horizontalSpacer_3)
+
         self.label_9 = QLabel(self.verticalLayoutWidget)
         self.label_9.setObjectName(u"label_9")
-        font4 = QFont()
-        font4.setPointSize(9)
-        self.label_9.setFont(font4)
+        font3 = QFont()
+        font3.setPointSize(9)
+        self.label_9.setFont(font3)
 
         self.horizontalLayout_12.addWidget(self.label_9)
 
@@ -246,7 +228,8 @@ class Ui_MainWindow(object):
         self.set_time_send1.setStyleSheet(u"background-color: rgb(255, 255, 255);")
         self.set_time_send1.setAlignment(Qt.AlignCenter)
         self.set_time_send1.setProperty("showGroupSeparator", False)
-        self.set_time_send1.setCurrentSection(QDateTimeEdit.SecondSection)
+        self.set_time_send1.setCurrentSection(QDateTimeEdit.HourSection)
+        self.set_time_send1.setTime(QTime(0, 0, 10))
 
         self.horizontalLayout_12.addWidget(self.set_time_send1)
 
@@ -254,22 +237,43 @@ class Ui_MainWindow(object):
         self.btn_ok_setsend1.setObjectName(u"btn_ok_setsend1")
         sizePolicy2.setHeightForWidth(self.btn_ok_setsend1.sizePolicy().hasHeightForWidth())
         self.btn_ok_setsend1.setSizePolicy(sizePolicy2)
-        self.btn_ok_setsend1.setFont(font4)
+        self.btn_ok_setsend1.setFont(font3)
 
         self.horizontalLayout_12.addWidget(self.btn_ok_setsend1)
 
-        self.horizontalLayout_12.setStretch(0, 1)
-        self.horizontalLayout_12.setStretch(1, 3)
-        self.horizontalLayout_12.setStretch(2, 1)
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.verticalLayout_7.addLayout(self.horizontalLayout_12)
+        self.horizontalLayout_12.addItem(self.horizontalSpacer_4)
+
+        self.horizontalLayout_12.setStretch(0, 4)
+        self.horizontalLayout_12.setStretch(1, 1)
+        self.horizontalLayout_12.setStretch(2, 4)
+        self.horizontalLayout_12.setStretch(3, 1)
+        self.horizontalLayout_12.setStretch(4, 4)
+
+        self.verticalLayout.addLayout(self.horizontalLayout_12)
 
         self.line_3 = QFrame(self.verticalLayoutWidget)
         self.line_3.setObjectName(u"line_3")
         self.line_3.setFrameShape(QFrame.HLine)
         self.line_3.setFrameShadow(QFrame.Sunken)
 
-        self.verticalLayout_7.addWidget(self.line_3)
+        self.verticalLayout.addWidget(self.line_3)
+
+        self.horizontalLayout_14 = QHBoxLayout()
+        self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
+        self.verticalLayout_7 = QVBoxLayout()
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.label_4 = QLabel(self.verticalLayoutWidget)
+        self.label_4.setObjectName(u"label_4")
+        font4 = QFont()
+        font4.setPointSize(11)
+        font4.setBold(True)
+        font4.setWeight(75)
+        self.label_4.setFont(font4)
+        self.label_4.setAlignment(Qt.AlignCenter)
+
+        self.verticalLayout_7.addWidget(self.label_4)
 
         self.verticalLayout_5 = QVBoxLayout()
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
@@ -328,7 +332,7 @@ class Ui_MainWindow(object):
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.btn_ok_out1.sizePolicy().hasHeightForWidth())
         self.btn_ok_out1.setSizePolicy(sizePolicy3)
-        self.btn_ok_out1.setFont(font4)
+        self.btn_ok_out1.setFont(font3)
 
         self.horizontalLayout_5.addWidget(self.btn_ok_out1)
 
@@ -356,11 +360,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_17.addWidget(self.label_11)
 
-        self.label_12 = QLabel(self.verticalLayoutWidget)
-        self.label_12.setObjectName(u"label_12")
-        self.label_12.setFont(font5)
+        self.label_send1 = QLabel(self.verticalLayoutWidget)
+        self.label_send1.setObjectName(u"label_send1")
+        self.label_send1.setFont(font5)
 
-        self.horizontalLayout_17.addWidget(self.label_12)
+        self.horizontalLayout_17.addWidget(self.label_send1)
 
         self.horizontalLayout_17.setStretch(0, 1)
         self.horizontalLayout_17.setStretch(1, 2)
@@ -369,10 +373,8 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_7.setStretch(0, 1)
         self.verticalLayout_7.setStretch(1, 2)
-        self.verticalLayout_7.setStretch(2, 1)
-        self.verticalLayout_7.setStretch(3, 2)
-        self.verticalLayout_7.setStretch(4, 10)
-        self.verticalLayout_7.setStretch(5, 1)
+        self.verticalLayout_7.setStretch(2, 10)
+        self.verticalLayout_7.setStretch(3, 1)
 
         self.horizontalLayout_14.addLayout(self.verticalLayout_7)
 
@@ -387,51 +389,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
         self.label_5 = QLabel(self.verticalLayoutWidget)
         self.label_5.setObjectName(u"label_5")
-        self.label_5.setFont(font3)
+        self.label_5.setFont(font4)
         self.label_5.setAlignment(Qt.AlignCenter)
 
         self.verticalLayout_8.addWidget(self.label_5)
-
-        self.horizontalLayout_16 = QHBoxLayout()
-        self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
-        self.label_10 = QLabel(self.verticalLayoutWidget)
-        self.label_10.setObjectName(u"label_10")
-        self.label_10.setFont(font4)
-
-        self.horizontalLayout_16.addWidget(self.label_10)
-
-        self.set_time_send2 = QTimeEdit(self.verticalLayoutWidget)
-        self.set_time_send2.setObjectName(u"set_time_send2")
-        sizePolicy.setHeightForWidth(self.set_time_send2.sizePolicy().hasHeightForWidth())
-        self.set_time_send2.setSizePolicy(sizePolicy)
-        self.set_time_send2.setFont(font1)
-        self.set_time_send2.setStyleSheet(u"background-color: rgb(255, 255, 255);")
-        self.set_time_send2.setAlignment(Qt.AlignCenter)
-        self.set_time_send2.setProperty("showGroupSeparator", False)
-        self.set_time_send2.setCurrentSection(QDateTimeEdit.HourSection)
-
-        self.horizontalLayout_16.addWidget(self.set_time_send2)
-
-        self.btn_ok_setsend2 = QPushButton(self.verticalLayoutWidget)
-        self.btn_ok_setsend2.setObjectName(u"btn_ok_setsend2")
-        sizePolicy2.setHeightForWidth(self.btn_ok_setsend2.sizePolicy().hasHeightForWidth())
-        self.btn_ok_setsend2.setSizePolicy(sizePolicy2)
-        self.btn_ok_setsend2.setFont(font4)
-
-        self.horizontalLayout_16.addWidget(self.btn_ok_setsend2)
-
-        self.horizontalLayout_16.setStretch(0, 1)
-        self.horizontalLayout_16.setStretch(1, 3)
-        self.horizontalLayout_16.setStretch(2, 1)
-
-        self.verticalLayout_8.addLayout(self.horizontalLayout_16)
-
-        self.line_5 = QFrame(self.verticalLayoutWidget)
-        self.line_5.setObjectName(u"line_5")
-        self.line_5.setFrameShape(QFrame.HLine)
-        self.line_5.setFrameShadow(QFrame.Sunken)
-
-        self.verticalLayout_8.addWidget(self.line_5)
 
         self.verticalLayout_9 = QVBoxLayout()
         self.verticalLayout_9.setObjectName(u"verticalLayout_9")
@@ -487,7 +448,7 @@ class Ui_MainWindow(object):
         self.btn_out2.setObjectName(u"btn_out2")
         sizePolicy3.setHeightForWidth(self.btn_out2.sizePolicy().hasHeightForWidth())
         self.btn_out2.setSizePolicy(sizePolicy3)
-        self.btn_out2.setFont(font4)
+        self.btn_out2.setFont(font3)
 
         self.horizontalLayout_9.addWidget(self.btn_out2)
 
@@ -513,11 +474,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_20.addWidget(self.label_13)
 
-        self.label_14 = QLabel(self.verticalLayoutWidget)
-        self.label_14.setObjectName(u"label_14")
-        self.label_14.setFont(font5)
+        self.label_send2 = QLabel(self.verticalLayoutWidget)
+        self.label_send2.setObjectName(u"label_send2")
+        self.label_send2.setFont(font5)
 
-        self.horizontalLayout_20.addWidget(self.label_14)
+        self.horizontalLayout_20.addWidget(self.label_send2)
 
         self.horizontalLayout_20.setStretch(0, 1)
         self.horizontalLayout_20.setStretch(1, 2)
@@ -526,10 +487,8 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.setStretch(0, 1)
         self.verticalLayout_8.setStretch(1, 2)
-        self.verticalLayout_8.setStretch(2, 1)
-        self.verticalLayout_8.setStretch(3, 2)
-        self.verticalLayout_8.setStretch(4, 10)
-        self.verticalLayout_8.setStretch(5, 1)
+        self.verticalLayout_8.setStretch(2, 10)
+        self.verticalLayout_8.setStretch(3, 1)
 
         self.horizontalLayout_14.addLayout(self.verticalLayout_8)
 
@@ -540,7 +499,9 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.horizontalLayout_14)
 
         self.verticalLayout.setStretch(0, 2)
-        self.verticalLayout.setStretch(1, 12)
+        self.verticalLayout.setStretch(1, 1)
+        self.verticalLayout.setStretch(2, 1)
+        self.verticalLayout.setStretch(3, 10)
 
         self.horizontalLayout.addWidget(self.groupBox_master)
 
@@ -729,29 +690,25 @@ class Ui_MainWindow(object):
         self.img_logo1.setText("")
         self.img_logo2.setText("")
         self.groupBox_master.setTitle(QCoreApplication.translate("MainWindow", u"Slave", None))
-        self.label_8.setText(QCoreApplication.translate("MainWindow", u"Time:", None))
-        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Geiger", None))
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"Set:", None))
         self.set_time_send1.setDisplayFormat(QCoreApplication.translate("MainWindow", u"HH:mm:ss", None))
         self.btn_ok_setsend1.setText(QCoreApplication.translate("MainWindow", u"OK", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Geiger", None))
         self.btn_manual_out1.setText(QCoreApplication.translate("MainWindow", u"Manual", None))
         self.btn_test_out1.setText(QCoreApplication.translate("MainWindow", u"Test", None))
         self.radioButton.setText(QCoreApplication.translate("MainWindow", u"Real", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"V", None))
         self.btn_ok_out1.setText(QCoreApplication.translate("MainWindow", u"OK", None))
         self.label_11.setText(QCoreApplication.translate("MainWindow", u"Send:", None))
-        self.label_12.setText("")
+        self.label_send1.setText("")
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"Source", None))
-        self.label_10.setText(QCoreApplication.translate("MainWindow", u"Set:", None))
-        self.set_time_send2.setDisplayFormat(QCoreApplication.translate("MainWindow", u"HH:mm:ss", None))
-        self.btn_ok_setsend2.setText(QCoreApplication.translate("MainWindow", u"OK", None))
         self.rbtn_manual_out2.setText(QCoreApplication.translate("MainWindow", u"Manual", None))
         self.btn_test_out2.setText(QCoreApplication.translate("MainWindow", u"Test", None))
         self.radioButton_2.setText(QCoreApplication.translate("MainWindow", u"Real", None))
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"V", None))
         self.btn_out2.setText(QCoreApplication.translate("MainWindow", u"OK", None))
         self.label_13.setText(QCoreApplication.translate("MainWindow", u"Send:", None))
-        self.label_14.setText("")
+        self.label_send2.setText("")
         self.groupBox_slave.setTitle(QCoreApplication.translate("MainWindow", u"Master", None))
         self.date_rtc.setText(QCoreApplication.translate("MainWindow", u"24-02-2024", None))
         ___qtablewidgetitem = self.table_serial.horizontalHeaderItem(0)
