@@ -29,12 +29,15 @@ class Graph_volt(FigureCanvas):
         self.ylim_init = -1
         self.ylim_fin = 6
 
+        # Indicador en grafico
+        self.flag_send = False
+
         # Inicializo grilla
         self.grid_lines_v = []
         self.grid_lines_h = []
 
-        self.fig, self.ax = plt.subplots(1, dpi=80, figsize=(12,12), sharey=True, facecolor="none")
-        self.fig.subplots_adjust(left=.12, bottom=.12, right=.98, top=.9) #Ajuste de escala de grafica
+        self.fig, self.ax = plt.subplots(1, dpi=82, figsize=(12,12), sharey=True, facecolor="none")
+        self.fig.subplots_adjust(left=.18, bottom=.2, right=.95, top=.95) #Ajuste de escala de grafica
         super().__init__(self.fig)
 
         self.set_graph_style()
@@ -83,6 +86,11 @@ class Graph_volt(FigureCanvas):
         # Actualizar datos de la línea
         self.line.set_data(self.x_data, self.y_data)
 
+        # Marca punto en grafico
+        if self.flag_send:
+            self.ax.scatter(next_x-1, new_y_value, c='red', s=10, alpha=0.8, picker=True, zorder=2)
+            self.flag_send = False
+
         # Ajustar los límites si es necesario
         if next_x >= self.xlim_fin:
             self.xlim_fin = next_x+1
@@ -104,6 +112,12 @@ class Graph_volt(FigureCanvas):
         self.grid_lines_v.clear()
         self.grid_lines_h.clear()
 
+        # Establece nombres de ejes y tamanio
+        matplotlib.rcParams['font.size'] = 10
+        self.ax.set_xlabel("Time[s]", labelpad=1)
+        self.ax.set_ylabel("ADC[V]", labelpad=1)
+        self.ax.tick_params(axis='both', which='both', labelsize=7)
+   
         # Establecer límites del eje X e Y
         self.ax.set_xlim(self.xlim_init, self.xlim_fin)
         self.ax.set_ylim(self.ylim_init, self.ylim_fin)
@@ -120,10 +134,6 @@ class Graph_volt(FigureCanvas):
             line = self.ax.axhline(j, color='grey', linestyle='--', linewidth=0.25)
             self.grid_lines_h.append(line)
 
-        # Establece nombres de ejes y tamanio
-        matplotlib.rcParams['font.size'] = 2
-        self.ax.set_xlabel("Time[s]")
-        self.ax.set_ylabel("V[mV]")
 
         # set colores bordes
         self.ax.spines['bottom'].set_color('0.7')  # Eje x
@@ -142,7 +152,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.setWindowTitle("Simulador - Grupo SyCE UTN-FRH")
 
-        self.setFixedSize(900, 660)
+        self.setFixedSize(930, 700)
         #self.setWindowIcon(QIcon(".\Imagenes\logotipo_simple_utn_haedo.png"))
 
         # Cargo icono a app
@@ -172,7 +182,9 @@ class MainWindow(QMainWindow):
         self.ui.graph_out1.addWidget(self.graph1)
         self.ui.graph_out2.addWidget(self.graph2)
 
+        # Formato de reloj a LCD
         self.ui.lcd_timer.display(f"{0:02d}:{0:02d}:{0:02d}")
+        self.ui.lcd_timer_total.display(f"{0:02d}:{0:02d}:{0:02d}")        
         self.ui.lcd_time_rtc.display(f"{0:02d}:{0:02d}:{0:02d}")
 
         # Callback de botones
@@ -186,44 +198,86 @@ class MainWindow(QMainWindow):
 
         # Inicializar el tiempo a 00:00:00
         self.time = QTime(0, 0, 0)
+        self.time_total = QTime(0, 0, 0)
 
         # Timer para actualizar grafico #REEMPLAZAR POR DATA DE TIMER ARDUINO
         self.timer = QTimer()
-        self.timer.timeout.connect(self.get_value_out1)
+        self.timer.timeout.connect(self.timeout_1seg)
 
         # Inicializo por defecto envio cada 10 seg
         self.set_time1 = QTime(0, 0, 10, 0) 
 
-    def get_value_out1(self):
-        """
-        Obtener valor de spinbox
-        """
-        # MODO MANUAL PARA CARGAR VALORES
-        value_out1 = self.ui.sbox_volt1.value()
-        self.graph1.update_graph(value_out1)
 
-        # Mostrar tiempo en display
+    def timeout_1seg(self):
+        """
+        Acciones a realizar cada vez que pasa un segundo
+        """
+        flag_value = False # Indica que se cumple intervalo de accion
+
+        # Convertir a str QTime
         reloj_str = self.time.toString("hh:mm:ss")
+        reloj_str_total = self.time_total.toString("hh:mm:ss")
+        # Mostrar tiempo en display
         self.ui.lcd_timer.display(reloj_str)        
+        self.ui.lcd_timer_total.display(reloj_str_total)
         
         # Obtengo segundos para setear envios y del time
         seconds_total_timer = self.to_seconds(self.time)
         seconds_total_set = self.to_seconds(self.set_time1)
-
+        
         # Temporizador para enviar datos
         if (seconds_total_timer % seconds_total_set) == 0:
-            self.ui.label_send1.setText(f"{reloj_str} {value_out1:.02f}")
+            flag_value = True
+
+        self.get_value_out1(reloj_str, flag_value)
+        self.get_value_out2(reloj_str, flag_value)
 
         self.time = self.time.addMSecs(1000)        
+        self.time_total = self.time_total.addMSecs(1000)
+
+    def get_value_out1(self, reloj_str, flag=False):
+        """
+        Obteniene valor numerico para grafico 1
+        """
+        # MODO MANUAL PARA CARGAR VALORES
+        value_out1 = self.ui.sbox_volt1.value()
+
+        self.graph1.update_graph(value_out1)
+
+        # Temporizador para enviar datos
+        if flag:
+            self.ui.label_send1.setText(f"{reloj_str} {value_out1:.02f}")
+            self.graph1.flag_send = True # Marca en grafico
+            flag = False
+
+    def get_value_out2(self, reloj_str, flag=False):
+        """
+        Obtener valor numerico para grafico 2
+        """
+        # MODO MANUAL PARA CARGAR VALORES
+        value_out2 = self.ui.sbox_volt2.value()
+
+        self.graph2.update_graph(value_out2)
+
+        # Temporizador para enviar datos
+        if flag:
+            self.ui.label_send2.setText(f"{reloj_str} {value_out2:.02f}")
+            self.graph2.flag_send = True # Marca en grafico
+            flag = False
         
     def get_time_send1(self):
+        """
+        Envio de data si se cumple temporizador
+        """
         # Reseteo time
         self.time = QTime(0, 0, 0, 0)
         # Obtener tiempo para enviar data
         self.set_time1 = self.ui.set_time_send1.time()
 
     def to_seconds(self, time):
-        # Convierte a segundos
+        """
+        Convierte a segundos
+        """
         seconds_total = time.hour() * 3600 \
                         + time.minute() * 60 \
                         + time.second()
