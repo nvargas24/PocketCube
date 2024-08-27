@@ -36,7 +36,7 @@
  */
 
 /****** Encabezados *****/
-#include <SPI.h>
+#include <Wire.h>
 #include "RTClib.h"
 
 /****************** Variables globales ***************/ 
@@ -44,18 +44,15 @@
 // Creo objeto RTC_DS1307 rtc;
 RTC_DS3231 rtc;
 
-/*----- Comunicacion master-slave SPI ------*/
-const int SS_PIN = 5;
-char response[100];
+/*----- Comunicacion master-slave I2C ------*/
+const byte I2C_SLAVE_ADDR = 0x20;
+char response[33];
 
 /********* Declaracion de funciones internas *********/
-/* RTC */
 void printDate();
 void configInitialRTC();
-String datetime2str(DateTime date);
-
-/* Data IN/OUT SPI */
 void sendToSlave(String );
+String datetime2str(DateTime date);
 void requestFromSlave();
 
 /****************** Funciones Arduino ****************/
@@ -65,14 +62,8 @@ void requestFromSlave();
  */
 void setup() 
 {
-  /* SPI */
   Serial.begin(115200); // Frecuencia en baudios para serial
-  pinMode(SS_PIN, OUTPUT);
-  SPI.begin();
-  SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0)); 
-  digitalWrite(SS_PIN, HIGH); // Desactivo slave al inicio por si hay basura
-
-  /* RTC */
+  Wire.begin();
   delay(1000); 
   configInitialRTC();
 }
@@ -86,13 +77,13 @@ void loop()
 {
   String datetimeStr;
 
-  // Obtengo fecha actual y doy formato
-  DateTime now = rtc.now(); 
+  // Obtener fecha actual y mostrar por Serial
+  DateTime now = rtc.now();
+  //printDate(now);
   datetimeStr = datetime2str(now);
-
-  // Comunicacion por SPI
-  sendToSlave(datetimeStr.c_str(), datetimeStr.length()); // Enviar data a slave
-  requestFromSlave(); // Respuesta de slave
+  // Enviar data a slave
+  sendToSlave(datetimeStr.c_str());
+  requestFromSlave();
 
   delay(1000);
 }
@@ -154,28 +145,14 @@ void configInitialRTC()
  * @brief Enviar data a slave I2C
  * @return nothing
  */
-void sendToSlave(const char *data, size_t len_data)
+void sendToSlave(const char *data)
 {
-  char buffer[len_data+1]; // uso auxiliar para agregar caracter nulo
+  Serial.print("Sdata to Slave: ");
+  Serial.println(data);
 
-  // Agrego caracter nulo
-  snprintf(buffer, sizeof(buffer), "%s", data);
-
-  // Muestro data a enviar por serial
-  Serial.print("SEND Slave: ");
-  Serial.print(buffer);
-  Serial.print(", Length:");
-  Serial.println(sizeof(buffer));
-
-  // Inicializo comunicacion con Slave
-  digitalWrite(SS_PIN, LOW); 
-  
-  for (size_t i = 0; i < sizeof(buffer); i++) {
-    SPI.transfer(buffer[i]);
-    delay(10); // Pequeña pausa para asegurar la sincronización
-  }
-
-  digitalWrite(SS_PIN, HIGH);
+  Wire.beginTransmission(I2C_SLAVE_ADDR);
+  Wire.write((const uint8_t *)data, strlen(data));
+  Wire.endTransmission();
 }
 
 /**
@@ -183,16 +160,17 @@ void sendToSlave(const char *data, size_t len_data)
  * @return String con mensaje de Slave
  */
 void requestFromSlave()
-{  
-  size_t length = sizeof(response); 
+{
+  uint8_t index = 0;  
+  
+  // Solcitud a slave
+  Wire.requestFrom(I2C_SLAVE_ADDR, sizeof(response));
 
-  digitalWrite(SS_PIN, LOW);
-
-  for (size_t i = 0; i < length; i++) {
-    response[i] = SPI.transfer(0x00); // Envía dummy data (0x00) para recibir respuesta
-    delay(10); // Pequeña pausa para asegurar la sincronización
+  while (Wire.available() && index < sizeof(response) - 1) {
+    response[index++] = Wire.read();
   }
+  response[index] = '\0'; // Terminar el string
 
-  digitalWrite(SS_PIN, HIGH);
+  Serial.print("RData from Slave: ");
   Serial.println(response);
 }

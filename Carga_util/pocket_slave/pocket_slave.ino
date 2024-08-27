@@ -36,18 +36,16 @@
  */
 
 /****** Encabezados *****/
-#include <SPI.h>
+#include <Wire.h>
 
 /****************** Variables globales ***************/ 
 /*----- Comunicacion master-slave I2C ------*/
-char receivedData[20]; // OBS: Ver tamanio de buffer
-char responseData[100] = "HOLA SOY SLAVE Y QUIERO SALUDARTE ESTE DIA ESPECIAL";
-volatile uint8_t responseIndex = 0;
+const byte I2C_SLAVE_ADDR = 0x20;
+uint16_t data = 0;
+char response[70]; // DateTime+medicion
+char receivedStr[20]; // OBS: Ver tamanio de buffer
 
-volatile bool dataReceived = false;
-volatile byte index = 0;
-
-
+char datetime[20];
 float meas_temp = 0.0;
 float meas_current = 0.0;
 
@@ -65,43 +63,12 @@ float readCurrent();
  */
 void setup()
 {
-  /* Serial */
   Serial.begin(115200);
-  
-  /* SPI */
-  pinMode(MISO, OUTPUT);
-  //SPI.begin();
-  //SPI.usingInterrupt(digitalPinToInterrupt(10)); // Usar interrupciones para SPI
-  SPCR |= _BV(SPE); // Habilita SPI en modo esclavo
-  SPI.attachInterrupt();
+
+  Wire.begin(I2C_SLAVE_ADDR);
+  Wire.onReceive(receiveEvent);
+  Wire.onRequest(requestEvent);
 }
-
-/**
- * @brief Interrupcion al recibir data de Master por SPI
- * @return nothing
- */
-ISR(SPI_STC_vect) 
-{
-  receivedData[index++] = SPDR; // Lee el byte recibido
-
-  if (index >= sizeof(receivedData) || receivedData[index-1] == '\0') {
-    dataReceived = true;
-    index = 0; // Resetea el índice
-  }
-  if (receivedByte == 'R') {
-  // Prepara el siguiente byte de la respuesta
-  SPDR = responseString[index++];
-  if (index >= sizeof(responseString) - 1) {
-    index = 0; // Resetea el índice si hemos enviado toda la cadena
-  }
-
-  /* Enviar la medición de temperatura después de recibir el dato */
-  //SPDR = responseData[responseIndex++];
-  //if (responseIndex >= sizeof(responseData)-1) {
-  //  responseIndex = 0;
-  //}
-}
-
 
 /**
  * @brief Bucle de ejecucion de programa principal
@@ -110,21 +77,55 @@ ISR(SPI_STC_vect)
  */
 void loop() 
 {
-  float temperature = readTemp();
-  char tempStr[10];
-    
-  if (dataReceived) {
-    // Data recibidad de Master
-    Serial.print("Mensaje recibido: ");
-    Serial.println(receivedData);
+  /*lectura de corriente y uso de LTC3105*/
+  // Ejemplos de mediciones 
+  meas_temp = readTemp(); 
+  meas_current = readCurrent();
+  delay(1000);
 
-    // Data respuesta a Master
-    //dtostrf(temperature, 6, 2, tempStr); // Convierte el valor de temperatura a cadena con 2 decimales
-    //snprintf(responseData, sizeof(responseData), "%s, %s", date, tempStr);
+  // OBS.: Considerar usar un .JSON si son muchos datos
+}
 
-    dataReceived = false;
+/**
+ * @brief Evento de recepcion de data
+ * @return nothing
+ */
+void receiveEvent(int bytes)
+{
+  int index = 0;
+
+  while (Wire.available() && index < sizeof(receivedStr) - 1) {
+    receivedStr[index++] = Wire.read();
   }
+  receivedStr[index] = '\0'; // Terminar el string
 
+  // Procesar el string recibido
+  Serial.print("RData from Master: ");
+  Serial.println(receivedStr);
+
+  strcpy(datetime, receivedStr);
+}
+
+/**
+ * @brief Evento de respuesta de data a master
+ * @return nothing
+ */
+void requestEvent()
+{
+  char rta[33];
+  char tempStr[10];
+  char currentStr[10];
+
+  /*Conversion de float a str*/
+  // Necesario ya que arduino no reconoce float para usar en snprintf
+  dtostrf(meas_temp, 5, 2, tempStr);
+  dtostrf(meas_current, 5, 2, currentStr); 
+
+  snprintf(rta, sizeof(rta), "I:%smA,Dt:%s", currentStr, datetime);
+  Wire.write(rta);
+
+  Serial.print("SData to Master: ");
+  Serial.println(rta);
 }
 
 /* Funciones ejemplos de lectura */
