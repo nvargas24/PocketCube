@@ -160,9 +160,9 @@ void configInitialRTC()
  */
 void sendToSlave(const char *data)
 {
-  /* Verificacion de datos a enviar */
+  /* Verificacion de datos a enviar 
   Serial.print("S-Slave: ");
-  Serial.println(data);
+  Serial.println(data); */
 
   /* Envio datos I2C */
   Wire.beginTransmission(I2C_SLAVE_ADDR);

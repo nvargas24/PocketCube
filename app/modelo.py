@@ -17,10 +17,28 @@ import pandas as pd
 #import webbrowser
 #import base64
 import serial.tools.list_ports
+import serial
+import re
+
+class DataProcessor():
+    def filter_port(self, port_full):
+        """
+        Filtra numero de puerto
+        """
+        filter_text = re.search(r"\((.*?)\)", port_full)
+        if filter_text:
+            port_num = filter_text.group(1)
+
+        return port_num
 
 
 class ManagerFile(): pass
 class ManagerDataUart():
+    def __init__(self):
+        self.port_master = None # Num de puerto seleccionado
+        self.port_slave = None # Num de puerto seleccionado
+        self.freq_baud = 115200
+
     def list_port_com(self):
         list_ports = []
 
@@ -29,5 +47,22 @@ class ManagerDataUart():
             list_ports.append(port.description)
         return list_ports
 
+    def send_serial(self, id, value):
+        try:
+            # Configuracion de puerto serial
+            ser = serial.Serial(self.port_master, self.freq_baud)
+            # Estructuro dato a enviar a formato CSV
+            buf = f"{id},{value}"
+            # Envio datos por serial
+            ser.write(buf.encode())
+            ser.close()
+        except ValueError as e:
+            print(f"Error al conectar puerto {self.port}/n")
+            print(e)
+
+
+    def reciv_Serial(self):
+        # Configuracion de puerto serial
+        ser = serial.Serial(self.port_slave, self.freq_baud)
         
 

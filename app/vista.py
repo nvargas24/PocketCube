@@ -166,10 +166,12 @@ class MainWindow(QMainWindow):
         self.ui.img_logo1.setScaledContents(True)
         self.ui.img_logo2.setScaledContents(True)
         
-        # Carga de puertos disponibles en combobox
-        obj_data_uart = ManagerDataUart()
+        # Creo objetos 
+        self.obj_data_uart = ManagerDataUart()
+        self.obj_data_processor = DataProcessor()
 
-        list_ports = obj_data_uart.list_port_com()
+        # Carga de puertos disponibles en combobox
+        list_ports = self.obj_data_uart.list_port_com()
         list_ports.insert(0, " ")
 
         self.ui.cbox_port_master.addItems(list_ports)
@@ -206,7 +208,6 @@ class MainWindow(QMainWindow):
 
         # Inicializo por defecto envio cada 10 seg
         self.set_time1 = QTime(0, 0, 10, 0) 
-
 
     def timeout_1seg(self):
         """
@@ -287,6 +288,14 @@ class MainWindow(QMainWindow):
         # Inicio timer con actualizacion de datos cada 1 seg
         self.timer.start(1000)
 
+        # Asigno puertos
+        port_m = self.ui.cbox_port_master.currentText() # Leo puerto de combobox
+        port_s = self.ui.cbox_port_slave.currentText() # Leo puerto de combobox
+        self.obj_data_uart.port_master = self.obj_data_processor.filter_port(port_m) # Master
+        self.obj_data_uart.port_slave = self.obj_data_processor.filter_port(port_s) # Slave
+
+        # Envio datos por serial
+        self.obj_data_uart.send_serial(1, 1.34)
 
     def stop(self):
         # Finalizo timer
