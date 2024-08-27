@@ -40,19 +40,23 @@
 #include "RTClib.h"
 
 /****************** Variables globales ***************/ 
-/*------------------- RTC --------------------*/
-// Creo objeto RTC_DS1307 rtc;
-RTC_DS3231 rtc;
+/* RTC */
+RTC_DS3231 rtc; // Creo objeto RTC_DS1307 rtc;
+String datetimeStr;  //
 
-/*----- Comunicacion master-slave I2C ------*/
-const byte I2C_SLAVE_ADDR = 0x20;
-char response[33];
+/* I2C */
+const byte I2C_SLAVE_ADDR = 0x20; // Direccion I2C de Slave
+char dataRequest[33]; // Str respuesta de Slave
+char dataSend[33]; // Str a enviar de Master
 
 /********* Declaracion de funciones internas *********/
+/* RTC */
 void printDate();
 void configInitialRTC();
-void sendToSlave(String );
 String datetime2str(DateTime date);
+
+/* I2C */
+void sendToSlave(String );
 void requestFromSlave();
 
 /****************** Funciones Arduino ****************/
@@ -63,9 +67,9 @@ void requestFromSlave();
 void setup() 
 {
   Serial.begin(115200); // Frecuencia en baudios para serial
-  Wire.begin();
+  Wire.begin(); // Inicializo comunicacion I2C
   delay(1000); 
-  configInitialRTC();
+  configInitialRTC(); // Inicializo configuiracion de RTC
 }
 
 /**
@@ -75,15 +79,19 @@ void setup()
  */
 void loop() 
 {
-  String datetimeStr;
+  DateTime now = rtc.now(); // Obtener fecha de RTC
 
-  // Obtener fecha actual y mostrar por Serial
-  DateTime now = rtc.now();
-  //printDate(now);
-  datetimeStr = datetime2str(now);
-  // Enviar data a slave
-  sendToSlave(datetimeStr.c_str());
-  requestFromSlave();
+  /* Serial */
+  // Identificacion por comando en formato CSV
+  // * Valor para DAC:ID,value -> 1,1.23 
+  // * --- 
+
+
+  /* I2C */
+  datetimeStr = datetime2str(now); // Conversion de datetime a Str
+  snprintf(dataSend, datetimeStr.length(), "%s",datetimeStr.c_str()); // Conversion a array
+  sendToSlave(dataSend); // Enviar data a slave
+  requestFromSlave(); // Respuesta de slave
 
   delay(1000);
 }
@@ -130,12 +138,14 @@ String datetime2str(DateTime date)
  */
 void configInitialRTC()
 {
-  if (!rtc.begin()) {
+  /* Verifico deteccion de RTC */
+  if (!rtc.begin()){
     Serial.println(F("NO SE ENCUENTRA RTC"));
     while (1);
   }
-  // Si se ha perdido la corriente, fijar fecha y hora
-  if (rtc.lostPower()) {
+  
+  /* Fijo datetime en caso de desconexion de la alimentacion */
+  if (rtc.lostPower()){
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));// Fijar a fecha y hora de compilacion
     // rtc.adjust(DateTime(2024, 8, 3, 18, 0, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
   }
@@ -147,9 +157,11 @@ void configInitialRTC()
  */
 void sendToSlave(const char *data)
 {
-  Serial.print("Sdata to Slave: ");
+  /* Verificacion de datos a enviar */
+  Serial.print("S-Slave: ");
   Serial.println(data);
 
+  /* Envio datos I2C */
   Wire.beginTransmission(I2C_SLAVE_ADDR);
   Wire.write((const uint8_t *)data, strlen(data));
   Wire.endTransmission();
@@ -163,14 +175,15 @@ void requestFromSlave()
 {
   uint8_t index = 0;  
   
-  // Solcitud a slave
-  Wire.requestFrom(I2C_SLAVE_ADDR, sizeof(response));
+  /* Preparo Master para recibir respuesta de Slave  */
+  Wire.requestFrom(I2C_SLAVE_ADDR, sizeof(dataRequest)); // Solicitud a slave
 
-  while (Wire.available() && index < sizeof(response) - 1) {
-    response[index++] = Wire.read();
+  while (Wire.available() && index < sizeof(dataRequest) - 1) {
+    dataRequest[index++] = Wire.read();
   }
-  response[index] = '\0'; // Terminar el string
+  dataRequest[index] = '\0'; // Terminar el string
 
-  Serial.print("RData from Slave: ");
-  Serial.println(response);
+  /* Verifico datos recibidos */
+  Serial.print("R-Slave: ");
+  Serial.println(dataRequest);
 }
