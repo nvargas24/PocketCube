@@ -38,21 +38,28 @@
 /****** Encabezados *****/
 #include <Wire.h>
 
-/****************** Variables globales ***************/ 
-/*----- Comunicacion master-slave I2C ------*/
-const byte I2C_SLAVE_ADDR = 0x20;
-uint16_t data = 0;
-char response[70]; // DateTime+medicion
-char receivedStr[20]; // OBS: Ver tamanio de buffer
+/*********************** Macros ******************8***/
+#define MAX_DATA_I2C 33
 
+/****************** Variables globales ***************/ 
+/* I2C */
+const byte I2C_SLAVE_ADDR = 0x20;
+char dataRequest[MAX_DATA_I2C];
+char dataReceive[MAX_DATA_I2C];
+
+/* RTC */
 char datetime[20];
+
+/* Meas */
 float meas_temp = 0.0;
 float meas_current = 0.0;
 
 /********* Declaracion de funciones internas *********/
+/* I2C */
 void receiveEvent(int bytes);
 void requestEvent();
 
+/* Meas */
 float readTemp();
 float readCurrent();
 
@@ -63,8 +70,9 @@ float readCurrent();
  */
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(115200); // Frecuencia en baudios para serial
 
+  /* Eventos I2C */
   Wire.begin(I2C_SLAVE_ADDR);
   Wire.onReceive(receiveEvent);
   Wire.onRequest(requestEvent);
@@ -77,13 +85,15 @@ void setup()
  */
 void loop() 
 {
-  /*lectura de corriente y uso de LTC3105*/
-  // Ejemplos de mediciones 
+  /* Serial */
+  // Identificacion por comando en formato CSV
+  // * Valor para DAC:ID,value -> 1,1.23 
+  // ** ID: 1->Meas1, 2->Meas2, 3->RTC
+
+  /* Meas */
   meas_temp = readTemp(); 
   meas_current = readCurrent();
   delay(1000);
-
-  // OBS.: Considerar usar un .JSON si son muchos datos
 }
 
 /**
@@ -94,16 +104,18 @@ void receiveEvent(int bytes)
 {
   int index = 0;
 
-  while (Wire.available() && index < sizeof(receivedStr) - 1) {
-    receivedStr[index++] = Wire.read();
+  /* Preparo Slave para recibir data  */
+  while (Wire.available() && index < sizeof(dataReceive) - 1) {
+    dataReceive[index++] = Wire.read();
   }
-  receivedStr[index] = '\0'; // Terminar el string
+  dataReceive[index] = '\0'; // Terminar el string
 
-  // Procesar el string recibido
-  Serial.print("RData from Master: ");
-  Serial.println(receivedStr);
+  /* Verifico datos recibidos */
+  Serial.print("R-Master: ");
+  Serial.println(dataReceive);
 
-  strcpy(datetime, receivedStr);
+  /* Guardo data recibida en otra variable especifica */
+  strcpy(datetime, dataReceive);
 }
 
 /**
@@ -112,7 +124,6 @@ void receiveEvent(int bytes)
  */
 void requestEvent()
 {
-  char rta[33];
   char tempStr[10];
   char currentStr[10];
 
@@ -121,11 +132,14 @@ void requestEvent()
   dtostrf(meas_temp, 5, 2, tempStr);
   dtostrf(meas_current, 5, 2, currentStr); 
 
-  snprintf(rta, sizeof(rta), "I:%smA,Dt:%s", currentStr, datetime);
-  Wire.write(rta);
+  snprintf(dataRequest, sizeof(dataRequest), "I:%smA,Dt:%s", currentStr, datetime);
 
-  Serial.print("SData to Master: ");
-  Serial.println(rta);
+  /* Verificacion de datos a enviar */
+  Serial.print("S-Master: ");
+  Serial.println(dataRequest);
+
+  /* Envio respuesta por I2C */
+  Wire.write(dataRequest);
 }
 
 /* Funciones ejemplos de lectura */

@@ -39,6 +39,9 @@
 #include <Wire.h>
 #include "RTClib.h"
 
+/*********************** Macros ******************8***/
+#define MAX_DATA_I2C 33
+
 /****************** Variables globales ***************/ 
 /* RTC */
 RTC_DS3231 rtc; // Creo objeto RTC_DS1307 rtc;
@@ -46,8 +49,8 @@ String datetimeStr;  //
 
 /* I2C */
 const byte I2C_SLAVE_ADDR = 0x20; // Direccion I2C de Slave
-char dataRequest[33]; // Str respuesta de Slave
-char dataSend[33]; // Str a enviar de Master
+char dataRequest[MAX_DATA_I2C]; // Str respuesta de Slave
+char dataSend[MAX_DATA_I2C]; // Str a enviar de Master
 
 /********* Declaracion de funciones internas *********/
 /* RTC */
@@ -81,17 +84,17 @@ void loop()
 {
   DateTime now = rtc.now(); // Obtener fecha de RTC
 
+  /* I2C */
+  datetimeStr = datetime2str(now); // Conversion de datetime a Str
+  snprintf(dataSend, datetimeStr.length()+1, "%s", datetimeStr.c_str()); // Conversion a array
+  sendToSlave(dataSend); // Enviar data a slave
+  requestFromSlave(); // Respuesta de slave
+
   /* Serial */
   // Identificacion por comando en formato CSV
   // * Valor para DAC:ID,value -> 1,1.23 
-  // * --- 
+  // ** ID: 1->Meas1, 2->Meas2, 3->RTC
 
-
-  /* I2C */
-  datetimeStr = datetime2str(now); // Conversion de datetime a Str
-  snprintf(dataSend, datetimeStr.length(), "%s",datetimeStr.c_str()); // Conversion a array
-  sendToSlave(dataSend); // Enviar data a slave
-  requestFromSlave(); // Respuesta de slave
 
   delay(1000);
 }
