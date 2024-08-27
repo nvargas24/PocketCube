@@ -17,13 +17,13 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(924, 707)
+        MainWindow.resize(924, 726)
         MainWindow.setStyleSheet(u"background-color: rgb(230, 230, 230);")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayoutWidget_6 = QWidget(self.centralwidget)
         self.verticalLayoutWidget_6.setObjectName(u"verticalLayoutWidget_6")
-        self.verticalLayoutWidget_6.setGeometry(QRect(20, 10, 891, 661))
+        self.verticalLayoutWidget_6.setGeometry(QRect(20, 10, 891, 681))
         self.verticalLayout_6 = QVBoxLayout(self.verticalLayoutWidget_6)
         self.verticalLayout_6.setSpacing(10)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
@@ -43,6 +43,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
         self.horizontalLayout_6 = QHBoxLayout()
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.horizontalLayout_6.setContentsMargins(0, -1, -1, -1)
         self.verticalLayout_3 = QVBoxLayout()
         self.verticalLayout_3.setSpacing(2)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -65,8 +66,8 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.cbox_port_master)
 
-        self.horizontalLayout_2.setStretch(0, 6)
-        self.horizontalLayout_2.setStretch(1, 4)
+        self.horizontalLayout_2.setStretch(0, 1)
+        self.horizontalLayout_2.setStretch(1, 3)
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
 
@@ -85,17 +86,18 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addWidget(self.cbox_port_slave)
 
-        self.horizontalLayout_3.setStretch(0, 6)
-        self.horizontalLayout_3.setStretch(1, 4)
+        self.horizontalLayout_3.setStretch(0, 1)
+        self.horizontalLayout_3.setStretch(1, 3)
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_3)
-
-
-        self.horizontalLayout_6.addLayout(self.verticalLayout_3)
 
         self.horizontalLayout_7 = QHBoxLayout()
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
         self.horizontalLayout_7.setContentsMargins(0, -1, 0, -1)
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_7.addItem(self.horizontalSpacer_5)
+
         self.btn_init = QPushButton(self.verticalLayoutWidget_6)
         self.btn_init.setObjectName(u"btn_init")
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -118,19 +120,30 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_7.addWidget(self.btn_stop)
 
-        self.horizontalLayout_7.setStretch(0, 1)
-        self.horizontalLayout_7.setStretch(1, 1)
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.horizontalLayout_6.addLayout(self.horizontalLayout_7)
+        self.horizontalLayout_7.addItem(self.horizontalSpacer_6)
+
+        self.horizontalLayout_7.setStretch(0, 1)
+        self.horizontalLayout_7.setStretch(1, 2)
+        self.horizontalLayout_7.setStretch(2, 2)
+        self.horizontalLayout_7.setStretch(3, 1)
+
+        self.verticalLayout_3.addLayout(self.horizontalLayout_7)
+
+        self.verticalLayout_3.setStretch(0, 2)
+        self.verticalLayout_3.setStretch(1, 2)
+        self.verticalLayout_3.setStretch(2, 1)
+
+        self.horizontalLayout_6.addLayout(self.verticalLayout_3)
 
         self.horizontalLayout_6.setStretch(0, 1)
-        self.horizontalLayout_6.setStretch(1, 1)
 
         self.horizontalLayout_10.addLayout(self.horizontalLayout_6)
 
         self.horizontalLayout_11 = QHBoxLayout()
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.horizontalLayout_11.setContentsMargins(40, -1, 40, -1)
+        self.horizontalLayout_11.setContentsMargins(20, 10, 20, 10)
         self.img_logo1 = QLabel(self.verticalLayoutWidget_6)
         self.img_logo1.setObjectName(u"img_logo1")
         sizePolicy2 = QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
@@ -138,7 +151,7 @@ class Ui_MainWindow(object):
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.img_logo1.sizePolicy().hasHeightForWidth())
         self.img_logo1.setSizePolicy(sizePolicy2)
-        self.img_logo1.setPixmap(QPixmap(u"../Imagenes/logotipo_diysatellite.jfif.png"))
+        self.img_logo1.setPixmap(QPixmap(u"../Imagenes/logotipo_diysatellite.png"))
         self.img_logo1.setScaledContents(True)
 
         self.horizontalLayout_11.addWidget(self.img_logo1)
@@ -158,7 +171,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_10.addLayout(self.horizontalLayout_11)
 
-        self.horizontalLayout_10.setStretch(0, 5)
+        self.horizontalLayout_10.setStretch(0, 6)
         self.horizontalLayout_10.setStretch(1, 5)
 
         self.verticalLayout_6.addLayout(self.horizontalLayout_10)
@@ -685,7 +698,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_6.addLayout(self.horizontalLayout_15)
 
         self.verticalLayout_6.setStretch(0, 1)
-        self.verticalLayout_6.setStretch(1, 3)
+        self.verticalLayout_6.setStretch(1, 4)
         self.verticalLayout_6.setStretch(2, 1)
         self.verticalLayout_6.setStretch(3, 16)
         self.verticalLayout_6.setStretch(4, 2)

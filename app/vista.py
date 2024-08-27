@@ -152,7 +152,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.setWindowTitle("Simulador - Grupo SyCE UTN-FRH")
 
-        self.setFixedSize(930, 700)
+        self.setFixedSize(930, 720)
         #self.setWindowIcon(QIcon(".\Imagenes\logotipo_simple_utn_haedo.png"))
 
         # Cargo icono a app

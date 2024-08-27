@@ -26,7 +26,8 @@ class ManagerDataUart():
 
         ports = serial.tools.list_ports.comports()
         for port in ports:
-            list_ports.append(port.device)
+            list_ports.append(port.description)
         return list_ports
+
         
 
