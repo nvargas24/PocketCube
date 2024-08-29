@@ -93,6 +93,8 @@ void loop()
   /* Meas */
   meas_temp = readTemp(); 
   meas_current = readCurrent();
+  Serial.print("ADC A1: ");
+  Serial.println(meas_temp);
   delay(1000);
 }
 
@@ -132,10 +134,12 @@ void requestEvent()
   dtostrf(meas_temp, 5, 2, tempStr);
   dtostrf(meas_current, 5, 2, currentStr); 
 
-  snprintf(dataRequest, sizeof(dataRequest), "I:%smA,Dt:%s", currentStr, datetime);
+  snprintf(dataRequest, sizeof(dataRequest), "1,%s", tempStr);
 
-  /* Verificacion de datos a enviar */
+  /* Verificacion de datos a enviar
   Serial.print("S-Master: ");
+  Serial.println(dataRequest);*/
+
   Serial.println(dataRequest);
 
   /* Envio respuesta por I2C */
@@ -146,7 +150,10 @@ void requestEvent()
 // conectar algun sensor para testear realtime
 float readTemp()
 {
-  return 24.7;
+  int adc1Value = analogRead(A1);  // Leer el valor de ADC1 (A1)
+  float voltaje = adc1Value*(5.0/1023);
+
+  return voltaje;
 }
 
 float readCurrent()

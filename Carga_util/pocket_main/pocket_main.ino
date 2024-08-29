@@ -41,6 +41,8 @@
 
 /*********************** Macros ******************8***/
 #define MAX_DATA_I2C 33
+#define PIN_DAC1 25
+#define PIN_DAC2 26
 
 /****************** Variables globales ***************/ 
 /* RTC */
@@ -62,6 +64,9 @@ String datetime2str(DateTime date);
 void sendToSlave(String );
 void requestFromSlave();
 
+/* DAC */
+float value_volt = 0;
+
 /****************** Funciones Arduino ****************/
 /**
  * @brief Configuracion inicial
@@ -82,19 +87,49 @@ void setup()
  */
 void loop() 
 {
-  DateTime now = rtc.now(); // Obtener fecha de RTC
-
-  /* I2C */
-  datetimeStr = datetime2str(now); // Conversion de datetime a Str
-  snprintf(dataSend, datetimeStr.length()+1, "%s", datetimeStr.c_str()); // Conversion a array
-  sendToSlave(dataSend); // Enviar data a slave
-  requestFromSlave(); // Respuesta de slave
+  int value_dac1 = 0;
 
   /* Serial */
   // Identificacion por comando en formato CSV
   // * Valor para DAC:ID,value -> 1,1.23 
   // ** ID: 1->Meas1, 2->Meas2, 3->RTC
 
+  if (Serial.available()){
+    String input_cmd = Serial.readStringUntil('/n');
+
+    // Procesar la cadena recibida en formato "id,value"
+    int delimiterIndex = input_cmd.indexOf(','); // Buscar la coma que separa id y value
+    if (delimiterIndex > 0) {
+      String id = input_cmd.substring(0, delimiterIndex); // Extraer el id
+      String value = input_cmd.substring(delimiterIndex + 1); // Extraer el value
+
+      // Convertir el id y el value a enteros (o realizar otras conversiones según sea necesario)
+      int idInt = id.toInt();
+      float valueFloat = value.toFloat();
+
+      Serial.print("ID: ");
+      Serial.println(idInt);
+      Serial.print("value: ");
+      Serial.println(valueFloat, 2);
+
+      if(idInt == 1){
+        value_volt = valueFloat;
+      }
+    }
+  }
+  
+  /* RTC */
+  DateTime now = rtc.now(); // Obtener fecha de RTC
+  datetimeStr = datetime2str(now); // Conversion de datetime a Str
+  snprintf(dataSend, datetimeStr.length()+1, "%s", datetimeStr.c_str()); // Conversion a array
+
+  /* I2C */
+  sendToSlave(dataSend); // Enviar data a slave
+  requestFromSlave(); // Respuesta de slave
+
+  /* DAC */
+  value_dac1 = map(value_volt*1000, 0, 3300, 0, 255);
+  dacWrite(PIN_DAC1, value_dac1);
 
   delay(1000);
 }
@@ -187,6 +222,6 @@ void requestFromSlave()
   dataRequest[index] = '\0'; // Terminar el string
 
   /* Verifico datos recibidos */
-  Serial.print("R-Slave: ");
+  //Serial.print("R-Slave: ");
   Serial.println(dataRequest);
 }
