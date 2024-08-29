@@ -190,10 +190,12 @@ class MainWindow(QMainWindow):
         self.ui.lcd_time_rtc.display(f"{0:02d}:{0:02d}:{0:02d}")
 
         # Callback de botones
-        self.ui.btn_ok_out1.clicked.connect(self.get_value_out1)
         self.ui.btn_init.clicked.connect(self.init)
         self.ui.btn_stop.clicked.connect(self.stop)
         self.ui.btn_ok_setsend1.clicked.connect(self.get_time_send1)
+
+        # Deteccion de buttongroup seleccionado
+        self.ui.buttonGroup.buttonClicked.connect(self.mostrar_seleccionado)
 
         # Asigno avance por segundos
         self.ui.set_time_send1.setCurrentSection(QTimeEdit.SecondSection)
@@ -208,6 +210,11 @@ class MainWindow(QMainWindow):
 
         # Inicializo por defecto envio cada 10 seg
         self.set_time1 = QTime(0, 0, 10, 0) 
+
+    def mostrar_seleccionado(self, boton_seleccionado):
+        # Obtener el texto del botón seleccionado
+        texto_seleccionado = boton_seleccionado.text()
+        print(f'Seleccionaste: {texto_seleccionado}')
 
     def timeout_1seg(self):
         """
@@ -230,6 +237,7 @@ class MainWindow(QMainWindow):
         if (seconds_total_timer % seconds_total_set) == 0:
             flag_value = True
 
+        self.obj_data_uart.reciv_serial()
         self.get_value_out1(reloj_str, flag_value)
         self.get_value_out2(reloj_str, flag_value)
 
@@ -242,8 +250,9 @@ class MainWindow(QMainWindow):
         """
         # MODO MANUAL PARA CARGAR VALORES
         value_out1 = self.ui.sbox_volt1.value()
-
-        self.graph1.update_graph(value_out1)
+        
+        self.obj_data_uart.send_serial(1, value_out1); # envio por UART a ESP32
+        self.graph1.update_graph(value_out1) # Solo en develop
 
         # Temporizador para enviar datos
         if flag:
