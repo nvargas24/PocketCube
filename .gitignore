@@ -1,9 +1,10 @@
 # Ignorar carpetas de caché de Python
 __pycache__/
 
-# Ignorar todos los archivos pdf
+# Ignorar todos los archivos
 *.pdf
-
+*pptx
+*.docx
 # Ignorar archivos generados por simulaciones de .asc
 *.log
 *.tmp
