@@ -168,7 +168,7 @@ void configInitialRTC()
 {
   /* Verifico deteccion de RTC */
   if (!rtc.begin()){
-    Serial.println(F("NO SE ENCUENTRA RTC"));
+    //Serial.println(F("NO SE ENCUENTRA RTC"));
     while (1);
   }
   

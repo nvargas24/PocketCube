@@ -54,7 +54,7 @@ class DataProcessor():
         except ValueError as e:
             # Manejo de errores: la cadena no es válida o el valor no puede convertirse a float
             print(f"Error: {e}")
-            return None
+            return None, None
 
     def separate_str(self, str_full):
         date, time, id, value = str_full.split()
