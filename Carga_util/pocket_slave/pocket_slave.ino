@@ -70,8 +70,9 @@ void requestEvent();
 void sendToAppUart(const char*);
 
 /* Meas */
-float readTemp();
-float readCurrent();
+float readAdc1();
+
+void formatSendCmd(int, const char*);
 
 /****************** Funciones Arduino ****************/
 /**
@@ -107,8 +108,8 @@ void loop()
   /* Serial */  /*Conversion de float a str*/
   // Necesario ya que arduino no reconoce float para usar en snprintf
   dtostrf(meas_data, 5, 2, dataStr);
-  snprintf(dataRequestApp, MAX_DATA, "1,%s", dataStr);
-  sendToAppUart(dataRequestApp);
+  formatSendCmd(MEAS1, dataStr);
+  sendToAppUart(dataSendApp);
   delay(1000);
 }
 
@@ -146,8 +147,7 @@ void requestEvent()
   /*Conversion de float a str*/
   // Necesario ya que arduino no reconoce float para usar en snprintf
   dtostrf(meas_data, 5, 2, dataStr);
-
-  snprintf(dataRequest, sizeof(dataRequest), "1,%s", dataStr);
+  snprintf(dataRequest, sizeof(dataRequest), "%d,%s", MEAS1, dataStr);
 
   /* Verificacion de datos a enviar
   Serial.print("S-Master: ");
@@ -186,4 +186,9 @@ float readAdc1()
   float voltaje = adc1Value*(5.0/1023);
 
   return voltaje;
+}
+
+void formatSendCmd(int id, const char* data)
+{
+  snprintf(dataSendApp, MAX_DATA, "%d,%s", id, data);
 }

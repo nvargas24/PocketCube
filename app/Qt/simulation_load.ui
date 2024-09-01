@@ -530,6 +530,11 @@
                </item>
                <item>
                 <widget class="QLabel" name="value_out1">
+                 <property name="font">
+                  <font>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -646,6 +651,11 @@
                </item>
                <item>
                 <widget class="QLabel" name="value_out2">
+                 <property name="font">
+                  <font>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>

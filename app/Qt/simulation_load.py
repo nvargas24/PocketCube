@@ -341,6 +341,7 @@ class Ui_MainWindow(object):
 
         self.value_out1 = QLabel(self.verticalLayoutWidget)
         self.value_out1.setObjectName(u"value_out1")
+        self.value_out1.setFont(font1)
         self.value_out1.setAlignment(Qt.AlignCenter)
 
         self.verticalLayout_7.addWidget(self.value_out1)
@@ -430,6 +431,7 @@ class Ui_MainWindow(object):
 
         self.value_out2 = QLabel(self.verticalLayoutWidget)
         self.value_out2.setObjectName(u"value_out2")
+        self.value_out2.setFont(font1)
         self.value_out2.setAlignment(Qt.AlignCenter)
 
         self.verticalLayout_8.addWidget(self.value_out2)
