@@ -56,6 +56,10 @@ class DataProcessor():
             print(f"Error: {e}")
             return None
 
+    def separate_str(self, str_full):
+        date, time, id, value = str_full.split()
+
+        return date, time, id, value
 
 class ManagerFile(): pass
 class ManagerDataUart(DataProcessor):

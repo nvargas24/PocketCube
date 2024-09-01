@@ -22,8 +22,15 @@ from modelo import *
 
 from Qt.simulation_load import *
 
-DAC1 = 1
-DAC2 = 2
+#--- ID
+MEAS1 = 1
+MEAS2 = 2
+RTC = 3
+DAC1 = 4
+DAC2 = 5
+
+NAME_MEAS1 = "Geiger"
+NAME_MEAS2 = "Source"
 
 class Graph_volt(FigureCanvas):
     def __init__(self):
@@ -168,7 +175,11 @@ class MainWindow(QMainWindow):
         # Ajustar el tamaño del QLabel al tamaño de la imagen
         self.ui.img_logo1.setScaledContents(True)
         self.ui.img_logo2.setScaledContents(True)
-        
+
+        # Habilitar el autoscroll
+        self.ui.table_serial.setAutoScroll(True)
+        self.ui.table_serial.setVerticalScrollMode(QTableWidget.ScrollPerItem)
+
         # Creo objetos 
         self.obj_data_uart = ManagerDataUart()
         self.obj_data_processor = DataProcessor()
@@ -245,15 +256,42 @@ class MainWindow(QMainWindow):
         self.get_value_out2(reloj_str, flag_value)
 
         # Lectura de puerto serial
+        id_m = 0
+        id_s = 0
+
         id_m, value_m = self.obj_data_uart.reciv_serial("Master")
         id_s, value_s = self.obj_data_uart.reciv_serial("Slave")
 
-        if id_m == 1:
-            value_m = float(value_m)
-            self.graph1.update_graph(value_m)
-        if id_m == 2:
-            value_m = float(value_m)
-            self.graph2.update_graph(value_m)
+        if id_s == MEAS1:
+            self.ui.value_out1.setText(value_s)            
+            value_s = float(value_s)
+            self.graph1.update_graph(value_s)
+        if id_s == MEAS2:
+            self.ui.value_out2.setText(value_s)            
+            value_s = float(value_s)
+            self.graph2.update_graph(value_s)
+        if id_m == RTC:
+            date, time, id, value = self.obj_data_processor.separate_str(value_m)
+            self.ui.lcd_time_rtc.display(f"{time}")
+            self.ui.lcd_date_rtc.setText(f"{date}")
+
+            # Determino nombre de id
+            if int(id) == MEAS1:
+                id_name = NAME_MEAS1
+            elif int(id) == MEAS2:
+                id_name = NAME_MEAS2
+
+            # Agregar fila a tabla
+            row_data = [id, id_name, value, f"{date} {time}"]
+            current_row = self.ui.table_serial.rowCount()
+            self.ui.table_serial.insertRow(current_row)
+
+            # Insertar los datos en la nueva fila
+            for column in range(len(row_data)):
+                item = QTableWidgetItem(row_data[column])
+                self.ui.table_serial.setItem(current_row, column, item)
+
+            self.ui.table_serial.scrollToBottom()
 
         # Incremento de timer QT -- LUEGO HACERLO CON ARDUINO
         self.time = self.time.addMSecs(1000)        

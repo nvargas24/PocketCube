@@ -44,6 +44,12 @@
 #define PIN_DAC1 25
 #define PIN_DAC2 26
 
+#define MEAS1 1
+#define MEAS2 2
+#define RTC 3
+#define DAC1 4
+#define DAC2 5
+
 /****************** Variables globales ***************/ 
 /* RTC */
 RTC_DS3231 rtc; // Creo objeto RTC_DS1307 rtc;
@@ -101,16 +107,17 @@ void loop()
   /* Serial */
   // Identificacion por comando en formato CSV
   // * Valor para DAC:ID,value -> 1,1.23 
-  // ** ID: 1->Meas1, 2->Meas2, 3->RTC
+  // ** ID: 1->Meas1, 2->Meas2, 3->RTC, 4->DAC1, 5->DAC2
   requestFromAppUart(&id, &value);
+  /* DAC */
   // Asigno dato segun id
-  if(id == 1){
-    value_volt = value;
+  if(id == DAC1){
+    value_volt = value; 
+    value_dac1 = map(value_volt*1000, 0, 3300, 0, 255);
+    dacWrite(PIN_DAC1, value_dac1);  
   }
 
-  /* DAC */
-  value_dac1 = map(value_volt*1000, 0, 3300, 0, 255);
-  dacWrite(PIN_DAC1, value_dac1);  
+  
 
   /* RTC */
   DateTime now = rtc.now(); // Obtener fecha de RTC
@@ -123,8 +130,14 @@ void loop()
 
   /* UART */
   // OBS: Solo enviar datos recibidos de Slave
-  sendToAppUart(dataRequest);
-  snprintf(dataSendApp, MAX_DATA, "3,%s", datetimeStr.c_str());
+  // Recorrer el array para encontrar la coma y reemplazarla por un espacio
+  for (int i = 0; i < strlen(dataRequest); i++) {
+      if (dataRequest[i] == ',') {
+          dataRequest[i] = ' ';
+          break; // Salir del bucle después de encontrar y reemplazar la coma
+      }
+  }
+  snprintf(dataSendApp, MAX_DATA, "%d,%s %s", RTC, datetimeStr.c_str(), dataRequest);
   sendToAppUart(dataSendApp);
 
   delay(1000);

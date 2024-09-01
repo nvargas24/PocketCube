@@ -41,6 +41,10 @@
 /*********************** Macros ******************8***/
 #define MAX_DATA 33
 
+#define MEAS1 1
+#define MEAS2 2
+#define RTC 3
+
 /****************** Variables globales ***************/ 
 /* I2C */
 const byte I2C_SLAVE_ADDR = 0x20;

@@ -17,7 +17,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(924, 719)
+        MainWindow.resize(924, 721)
         MainWindow.setStyleSheet(u"background-color: rgb(230, 230, 230);")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -339,6 +339,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_7.addLayout(self.horizontalLayout_19)
 
+        self.value_out1 = QLabel(self.verticalLayoutWidget)
+        self.value_out1.setObjectName(u"value_out1")
+        self.value_out1.setAlignment(Qt.AlignCenter)
+
+        self.verticalLayout_7.addWidget(self.value_out1)
+
         self.graph_out1 = QVBoxLayout()
         self.graph_out1.setObjectName(u"graph_out1")
 
@@ -366,8 +372,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_7.addLayout(self.horizontalLayout_17)
 
         self.verticalLayout_7.setStretch(0, 1)
-        self.verticalLayout_7.setStretch(2, 10)
-        self.verticalLayout_7.setStretch(3, 1)
+        self.verticalLayout_7.setStretch(1, 1)
+        self.verticalLayout_7.setStretch(2, 1)
+        self.verticalLayout_7.setStretch(3, 10)
+        self.verticalLayout_7.setStretch(4, 1)
 
         self.horizontalLayout_14.addLayout(self.verticalLayout_7)
 
@@ -420,6 +428,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addLayout(self.horizontalLayout_21)
 
+        self.value_out2 = QLabel(self.verticalLayoutWidget)
+        self.value_out2.setObjectName(u"value_out2")
+        self.value_out2.setAlignment(Qt.AlignCenter)
+
+        self.verticalLayout_8.addWidget(self.value_out2)
+
         self.graph_out2 = QVBoxLayout()
         self.graph_out2.setObjectName(u"graph_out2")
 
@@ -445,8 +459,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_8.addLayout(self.horizontalLayout_20)
 
         self.verticalLayout_8.setStretch(0, 1)
-        self.verticalLayout_8.setStretch(2, 10)
-        self.verticalLayout_8.setStretch(3, 1)
+        self.verticalLayout_8.setStretch(1, 1)
+        self.verticalLayout_8.setStretch(2, 1)
+        self.verticalLayout_8.setStretch(3, 10)
+        self.verticalLayout_8.setStretch(4, 1)
 
         self.horizontalLayout_14.addLayout(self.verticalLayout_8)
 
@@ -496,16 +512,16 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.lcd_time_rtc)
 
-        self.date_rtc = QLabel(self.verticalLayoutWidget_4)
-        self.date_rtc.setObjectName(u"date_rtc")
+        self.lcd_date_rtc = QLabel(self.verticalLayoutWidget_4)
+        self.lcd_date_rtc.setObjectName(u"lcd_date_rtc")
         font7 = QFont()
         font7.setFamily(u"Courier")
         font7.setBold(True)
         font7.setWeight(75)
-        self.date_rtc.setFont(font7)
-        self.date_rtc.setAlignment(Qt.AlignCenter)
+        self.lcd_date_rtc.setFont(font7)
+        self.lcd_date_rtc.setAlignment(Qt.AlignCenter)
 
-        self.verticalLayout_2.addWidget(self.date_rtc)
+        self.verticalLayout_2.addWidget(self.lcd_date_rtc)
 
         self.verticalLayout_2.setStretch(0, 10)
         self.verticalLayout_2.setStretch(1, 1)
@@ -535,31 +551,13 @@ class Ui_MainWindow(object):
         __qtablewidgetitem3 = QTableWidgetItem()
         __qtablewidgetitem3.setFont(font8);
         self.table_serial.setHorizontalHeaderItem(3, __qtablewidgetitem3)
-        if (self.table_serial.rowCount() < 50):
-            self.table_serial.setRowCount(50)
-        __qtablewidgetitem4 = QTableWidgetItem()
-        self.table_serial.setItem(0, 0, __qtablewidgetitem4)
-        __qtablewidgetitem5 = QTableWidgetItem()
-        self.table_serial.setItem(0, 1, __qtablewidgetitem5)
-        __qtablewidgetitem6 = QTableWidgetItem()
-        self.table_serial.setItem(0, 2, __qtablewidgetitem6)
-        __qtablewidgetitem7 = QTableWidgetItem()
-        self.table_serial.setItem(0, 3, __qtablewidgetitem7)
-        __qtablewidgetitem8 = QTableWidgetItem()
-        self.table_serial.setItem(1, 0, __qtablewidgetitem8)
-        __qtablewidgetitem9 = QTableWidgetItem()
-        self.table_serial.setItem(1, 1, __qtablewidgetitem9)
-        __qtablewidgetitem10 = QTableWidgetItem()
-        self.table_serial.setItem(1, 2, __qtablewidgetitem10)
-        __qtablewidgetitem11 = QTableWidgetItem()
-        self.table_serial.setItem(1, 3, __qtablewidgetitem11)
         self.table_serial.setObjectName(u"table_serial")
         self.table_serial.setFont(font6)
         self.table_serial.setFrameShape(QFrame.NoFrame)
         self.table_serial.setFrameShadow(QFrame.Raised)
         self.table_serial.setLineWidth(1)
         self.table_serial.setMidLineWidth(0)
-        self.table_serial.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.table_serial.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.table_serial.setAutoScrollMargin(4)
         self.table_serial.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_serial.setAlternatingRowColors(True)
@@ -568,7 +566,7 @@ class Ui_MainWindow(object):
         self.table_serial.setShowGrid(True)
         self.table_serial.setSortingEnabled(False)
         self.table_serial.setWordWrap(True)
-        self.table_serial.setRowCount(50)
+        self.table_serial.setRowCount(0)
         self.table_serial.setColumnCount(4)
         self.table_serial.horizontalHeader().setCascadingSectionResizes(False)
         self.table_serial.horizontalHeader().setDefaultSectionSize(75)
@@ -807,16 +805,18 @@ class Ui_MainWindow(object):
         self.label_12.setText(QCoreApplication.translate("MainWindow", u"Medici\u00f3n real:", None))
         self.btn_yes_in1.setText(QCoreApplication.translate("MainWindow", u"Si", None))
         self.btn_no_in1.setText(QCoreApplication.translate("MainWindow", u"No", None))
+        self.value_out1.setText("")
         self.label_11.setText(QCoreApplication.translate("MainWindow", u"Send:", None))
         self.label_send1.setText("")
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"Source", None))
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"Medici\u00f3n real:", None))
         self.btn_yes_in2.setText(QCoreApplication.translate("MainWindow", u"Si", None))
         self.btn_no_in2.setText(QCoreApplication.translate("MainWindow", u"No", None))
+        self.value_out2.setText("")
         self.label_13.setText(QCoreApplication.translate("MainWindow", u"Send:", None))
         self.label_send2.setText("")
         self.groupBox_slave.setTitle(QCoreApplication.translate("MainWindow", u"Master", None))
-        self.date_rtc.setText(QCoreApplication.translate("MainWindow", u"24-02-2024", None))
+        self.lcd_date_rtc.setText(QCoreApplication.translate("MainWindow", u"24-02-2024", None))
         ___qtablewidgetitem = self.table_serial.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"ID", None));
         ___qtablewidgetitem1 = self.table_serial.horizontalHeaderItem(1)
@@ -825,27 +825,6 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem2.setText(QCoreApplication.translate("MainWindow", u"Value[V]", None));
         ___qtablewidgetitem3 = self.table_serial.horizontalHeaderItem(3)
         ___qtablewidgetitem3.setText(QCoreApplication.translate("MainWindow", u"DateTime", None));
-
-        __sortingEnabled = self.table_serial.isSortingEnabled()
-        self.table_serial.setSortingEnabled(False)
-        ___qtablewidgetitem4 = self.table_serial.item(0, 0)
-        ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"01", None));
-        ___qtablewidgetitem5 = self.table_serial.item(0, 1)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"Gieger", None));
-        ___qtablewidgetitem6 = self.table_serial.item(0, 2)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("MainWindow", u"1.22", None));
-        ___qtablewidgetitem7 = self.table_serial.item(0, 3)
-        ___qtablewidgetitem7.setText(QCoreApplication.translate("MainWindow", u"14/05/2024 13:15:58", None));
-        ___qtablewidgetitem8 = self.table_serial.item(1, 0)
-        ___qtablewidgetitem8.setText(QCoreApplication.translate("MainWindow", u"02", None));
-        ___qtablewidgetitem9 = self.table_serial.item(1, 1)
-        ___qtablewidgetitem9.setText(QCoreApplication.translate("MainWindow", u"Source", None));
-        ___qtablewidgetitem10 = self.table_serial.item(1, 2)
-        ___qtablewidgetitem10.setText(QCoreApplication.translate("MainWindow", u"2.35", None));
-        ___qtablewidgetitem11 = self.table_serial.item(1, 3)
-        ___qtablewidgetitem11.setText(QCoreApplication.translate("MainWindow", u"14/05/2024 13:15:59", None));
-        self.table_serial.setSortingEnabled(__sortingEnabled)
-
         self.label_10.setText(QCoreApplication.translate("MainWindow", u"DAC Geiger", None))
         self.btn_manual_out1.setText(QCoreApplication.translate("MainWindow", u"Manual", None))
         self.btn_test_out1.setText(QCoreApplication.translate("MainWindow", u"Test", None))
