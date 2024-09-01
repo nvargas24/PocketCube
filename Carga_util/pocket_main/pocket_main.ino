@@ -40,7 +40,7 @@
 #include "RTClib.h"
 
 /*********************** Macros ******************8***/
-#define MAX_DATA_I2C 33
+#define MAX_DATA 33
 #define PIN_DAC1 25
 #define PIN_DAC2 26
 
@@ -51,18 +51,25 @@ String datetimeStr;  //
 
 /* I2C */
 const byte I2C_SLAVE_ADDR = 0x20; // Direccion I2C de Slave
-char dataRequest[MAX_DATA_I2C]; // Str respuesta de Slave
-char dataSend[MAX_DATA_I2C]; // Str a enviar de Master
+char dataRequest[MAX_DATA]; // Str respuesta de Slave
+char dataSend[MAX_DATA]; // Str a enviar de Master
+
+/* UART */
+char dataRequestApp[MAX_DATA]; // Str respuesta de Slave
+char dataSendApp[MAX_DATA]; // Str a enviar de Master
 
 /********* Declaracion de funciones internas *********/
 /* RTC */
-void printDate();
 void configInitialRTC();
 String datetime2str(DateTime date);
 
 /* I2C */
-void sendToSlave(String );
+void sendToSlave(const char*);
 void requestFromSlave();
+
+/* UART */
+void requestFromAppUart(int*, float*);
+void sendToAppUart(const char*);
 
 /* DAC */
 float value_volt = 0;
@@ -88,36 +95,23 @@ void setup()
 void loop() 
 {
   int value_dac1 = 0;
+  int id = 0;
+  float value = 0.0;
 
   /* Serial */
   // Identificacion por comando en formato CSV
   // * Valor para DAC:ID,value -> 1,1.23 
   // ** ID: 1->Meas1, 2->Meas2, 3->RTC
-
-  if (Serial.available()){
-    String input_cmd = Serial.readStringUntil('/n');
-
-    // Procesar la cadena recibida en formato "id,value"
-    int delimiterIndex = input_cmd.indexOf(','); // Buscar la coma que separa id y value
-    if (delimiterIndex > 0) {
-      String id = input_cmd.substring(0, delimiterIndex); // Extraer el id
-      String value = input_cmd.substring(delimiterIndex + 1); // Extraer el value
-
-      // Convertir el id y el value a enteros (o realizar otras conversiones según sea necesario)
-      int idInt = id.toInt();
-      float valueFloat = value.toFloat();
-
-      Serial.print("ID: ");
-      Serial.println(idInt);
-      Serial.print("value: ");
-      Serial.println(valueFloat, 2);
-
-      if(idInt == 1){
-        value_volt = valueFloat;
-      }
-    }
+  requestFromAppUart(&id, &value);
+  // Asigno dato segun id
+  if(id == 1){
+    value_volt = value;
   }
-  
+
+  /* DAC */
+  value_dac1 = map(value_volt*1000, 0, 3300, 0, 255);
+  dacWrite(PIN_DAC1, value_dac1);  
+
   /* RTC */
   DateTime now = rtc.now(); // Obtener fecha de RTC
   datetimeStr = datetime2str(now); // Conversion de datetime a Str
@@ -127,34 +121,17 @@ void loop()
   sendToSlave(dataSend); // Enviar data a slave
   requestFromSlave(); // Respuesta de slave
 
-  /* DAC */
-  value_dac1 = map(value_volt*1000, 0, 3300, 0, 255);
-  dacWrite(PIN_DAC1, value_dac1);
+  /* UART */
+  // OBS: Solo enviar datos recibidos de Slave
+  sendToAppUart(dataRequest);
+  snprintf(dataSendApp, MAX_DATA, "3,%s", datetimeStr.c_str());
+  sendToAppUart(dataSendApp);
 
   delay(1000);
 }
 
 /**************** Funciones internas  *****************/
-/**
- * @brief Escritura por puerto serial, solo test de RTC
- * @return nothing
- */
-void printDate(DateTime date)
-{
-  Serial.print(date.year(), DEC);
-  Serial.print('-');
-  Serial.print(date.month(), DEC);
-  Serial.print('-');
-  Serial.print(date.day(), DEC);
-  Serial.print(" ");
-  Serial.print(date.hour(), DEC);
-  Serial.print(':');
-  Serial.print(date.minute(), DEC);
-  Serial.print(':');
-  Serial.print(date.second(), DEC);
-  Serial.println();
-}
-
+/* RTC */
 /**
  * @brief Formatear la fecha y hora como "YYYY-MM-DD HH:MM:SS"
  * @return str de fecha y hora
@@ -189,6 +166,7 @@ void configInitialRTC()
   }
 }
 
+/* I2C */
 /**
  * @brief Enviar data a slave I2C
  * @return nothing
@@ -201,7 +179,15 @@ void sendToSlave(const char *data)
 
   /* Envio datos I2C */
   Wire.beginTransmission(I2C_SLAVE_ADDR);
-  Wire.write((const uint8_t *)data, strlen(data));
+  // Envía solo los datos válidos
+  for (size_t i = 0; i < strlen(data); i++) {
+    if (data[i] >= 32 && data[i] <= 126) { // Solo caracteres imprimibles// Cod ASCII
+      Wire.write((uint8_t)data[i]);
+    } 
+    else {
+      Wire.write(' '); // Reemplazar caracteres no imprimibles con un espacio
+    }
+  }
   Wire.endTransmission();
 }
 
@@ -217,11 +203,53 @@ void requestFromSlave()
   Wire.requestFrom(I2C_SLAVE_ADDR, sizeof(dataRequest)); // Solicitud a slave
 
   while (Wire.available() && index < sizeof(dataRequest) - 1) {
-    dataRequest[index++] = Wire.read();
+    char receivedChar = Wire.read();
+    // Filtra los caracteres válidos
+    if (receivedChar >= 32 && receivedChar <= 126) { // Solo caracteres imprimibles
+      dataRequest[index++] = receivedChar;
+    } else {
+      // Si encuentras un carácter no imprimible, puedes manejarlo aquí
+      dataRequest[index++] = ' '; // Reemplazar caracteres no imprimibles con un espacio
+    }
   }
   dataRequest[index] = '\0'; // Terminar el string
 
-  /* Verifico datos recibidos */
-  //Serial.print("R-Slave: ");
-  Serial.println(dataRequest);
+  /* Verifico datos recibidos
+  Serial.print("R-Slave: ");
+  Serial.print(dataRequest);*/
 }
+
+/* UART */
+/**
+ * @brief Enviar data app por UART
+ */
+void sendToAppUart(const char* data)
+{
+    //Enviar solo la parte válida del mensaje
+    for (int i = 0; i < strlen(data); i++) {
+      Serial.print(data[i]);
+    }
+    Serial.println();  // Envía un salto de línea al final
+}
+/**
+ * @brief Respuesta data de app por UART
+ * @return id y value
+ */
+void requestFromAppUart(int* id, float* value)
+{
+  if (Serial.available()){
+    String input_cmd = Serial.readStringUntil('/n');
+
+    // Procesar la cadena recibida en formato "id,value"
+    int delimiterIndex = input_cmd.indexOf(','); // Buscar la coma que separa id y value
+    if (delimiterIndex > 0) {
+      String idStr = input_cmd.substring(0, delimiterIndex); // Extraer el id
+      String valueStr = input_cmd.substring(delimiterIndex + 1); // Extraer el value
+
+      // Conversion de formatos y retornos
+      *id = idStr.toInt();
+      *value = valueStr.toFloat();
+    }
+  }
+}
+

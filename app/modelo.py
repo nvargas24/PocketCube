@@ -21,6 +21,8 @@ import serial
 import re
 import time
 
+FREQ_BAUD = 115200
+
 class DataProcessor():
     def filter_port(self, port_full):
         """
@@ -32,13 +34,36 @@ class DataProcessor():
 
         return port_num
 
+    def extract_value(self, data_str):
+        try:
+            # Divide la cadena en partes usando la coma como delimitador
+            parts = data_str.split(',')
+            
+            # Verifica que la cadena tenga al menos dos partes (id y value)
+            if len(parts) < 2:
+                raise ValueError("La cadena no contiene un valor válido.")
+            
+            # Extrae la parte correspondiente al valor y lo convierte a float
+            id_str = parts[0]
+            value_str = parts[1]
+            
+            id = int(id_str)
+            
+            return id, value_str
+            
+        except ValueError as e:
+            # Manejo de errores: la cadena no es válida o el valor no puede convertirse a float
+            print(f"Error: {e}")
+            return None
+
 
 class ManagerFile(): pass
-class ManagerDataUart():
+class ManagerDataUart(DataProcessor):
     def __init__(self):
-        self.port_master = None # Num de puerto seleccionado
-        self.port_slave = None # Num de puerto seleccionado
-        self.freq_baud = 115200
+        self.ser = {
+            "Master": None,
+            "Slave": None
+        }
 
     def list_port_com(self):
         list_ports = []
@@ -48,34 +73,48 @@ class ManagerDataUart():
             list_ports.append(port.description)
         return list_ports
 
-    def send_serial(self, id, value):
+    def init_serial(self, port_num, port_name):
         try:
-            # Configuracion de puerto serial
-            ser = serial.Serial(self.port_master, self.freq_baud)
+            # Configuro e identifico puerto serial
+            if port_name in self.ser:
+                self.ser[port_name] = serial.Serial(port_num, FREQ_BAUD)
+        except ValueError as e:
+            print(f"Error al conectar puerto {port_num}/n")
+            print(e)
+
+    def send_serial(self, port_name, id, value):
+        try:
             # Estructuro dato a enviar a formato CSV
             buf = f"{id},{value:.02f}"
-            #print(f"A ESP32: {buf}")
+            #print(f"Enviar a {port_name}: {buf}")
             # Envio datos por serial
-            ser.write(buf.encode())
-            ser.close()
+            self.ser[port_name].write(buf.encode())
+            #ser.close()
         except ValueError as e:
-            print(f"Error al conectar puerto {self.port_master}/n")
+            print(f"Error en {port_name}/n")
             print(e)
 
-
-    def reciv_serial(self):
+    def reciv_serial(self, port_name):
+        id = 0
+        value = 0.0
         try:
-            # Configuracion de puerto serial
-            ser = serial.Serial(self.port_master, self.freq_baud, timeout=1)
-            #print(ser.in_waiting)
-            time.sleep(0.1)
-            if ser.in_waiting > 0 :
-                linea = ser.readline().decode('utf-8').strip()
-                print(f"envio ESP32: {linea}")
-            ser.close()
+            if self.ser[port_name].in_waiting > 0 :
+                time.sleep(0.1)
+                linea = self.ser[port_name].readline().decode('utf-8').strip()
+                print(f"{port_name}: {linea}")
+                id, value=self.extract_value(linea)
+
         except serial.SerialException as e:
-            print(f"Error al conectar puerto {self.port_master}/n")
+            print(f"Error en {port_name}/n")
             print(e)
 
+        return id, value
+    
+    def close_ports(self, event):
+        if self.ser["Master"]:
+            self.ser["Master"].close()
+        if self.ser["Slave"]:
+            self.ser["Slave"].close()
+        event.accept()
 
 

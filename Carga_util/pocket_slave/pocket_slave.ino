@@ -39,25 +39,31 @@
 #include <Wire.h>
 
 /*********************** Macros ******************8***/
-#define MAX_DATA_I2C 33
+#define MAX_DATA 33
 
 /****************** Variables globales ***************/ 
 /* I2C */
 const byte I2C_SLAVE_ADDR = 0x20;
-char dataRequest[MAX_DATA_I2C];
-char dataReceive[MAX_DATA_I2C];
+char dataRequest[MAX_DATA];
+char dataReceive[MAX_DATA];
+
+/* UART */
+char dataRequestApp[MAX_DATA]; // Str respuesta de Slave
+char dataSendApp[MAX_DATA]; // Str a enviar de Master
 
 /* RTC */
 char datetime[20];
 
 /* Meas */
-float meas_temp = 0.0;
-float meas_current = 0.0;
+float meas_data = 0.0;
 
 /********* Declaracion de funciones internas *********/
 /* I2C */
 void receiveEvent(int bytes);
 void requestEvent();
+
+/* UART */
+void sendToAppUart(const char*);
 
 /* Meas */
 float readTemp();
@@ -85,19 +91,24 @@ void setup()
  */
 void loop() 
 {
+  char dataStr[10];
   /* Serial */
   // Identificacion por comando en formato CSV
   // * Valor para DAC:ID,value -> 1,1.23 
   // ** ID: 1->Meas1, 2->Meas2, 3->RTC
 
   /* Meas */
-  meas_temp = readTemp(); 
-  meas_current = readCurrent();
-  Serial.print("ADC A1: ");
-  Serial.println(meas_temp);
+  meas_data = readAdc1(); 
+
+  /* Serial */  /*Conversion de float a str*/
+  // Necesario ya que arduino no reconoce float para usar en snprintf
+  dtostrf(meas_data, 5, 2, dataStr);
+  snprintf(dataRequestApp, MAX_DATA, "1,%s", dataStr);
+  sendToAppUart(dataRequestApp);
   delay(1000);
 }
 
+/* I2C */
 /**
  * @brief Evento de recepcion de data
  * @return nothing
@@ -112,9 +123,9 @@ void receiveEvent(int bytes)
   }
   dataReceive[index] = '\0'; // Terminar el string
 
-  /* Verifico datos recibidos */
+  /* Verifico datos recibidos
   Serial.print("R-Master: ");
-  Serial.println(dataReceive);
+  Serial.println(dataReceive);*/
 
   /* Guardo data recibida en otra variable especifica */
   strcpy(datetime, dataReceive);
@@ -126,37 +137,49 @@ void receiveEvent(int bytes)
  */
 void requestEvent()
 {
-  char tempStr[10];
-  char currentStr[10];
+  char dataStr[10];
 
   /*Conversion de float a str*/
   // Necesario ya que arduino no reconoce float para usar en snprintf
-  dtostrf(meas_temp, 5, 2, tempStr);
-  dtostrf(meas_current, 5, 2, currentStr); 
+  dtostrf(meas_data, 5, 2, dataStr);
 
-  snprintf(dataRequest, sizeof(dataRequest), "1,%s", tempStr);
+  snprintf(dataRequest, sizeof(dataRequest), "1,%s", dataStr);
 
   /* Verificacion de datos a enviar
   Serial.print("S-Master: ");
   Serial.println(dataRequest);*/
 
-  Serial.println(dataRequest);
-
   /* Envio respuesta por I2C */
-  Wire.write(dataRequest);
+  // Envía solo los datos válidos
+  for (size_t i = 0; i < strlen(dataRequest); i++) {
+    if (dataRequest[i] >= 32 && dataRequest[i] <= 126) { // Solo caracteres imprimibles// Cod ASCII
+      Wire.write((uint8_t)dataRequest[i]);
+    } 
+    else {
+      Wire.write(' '); // Reemplazar caracteres no imprimibles con un espacio
+    }
+  }
 }
 
-/* Funciones ejemplos de lectura */
+/* UART */
+/**
+ * @brief Enviar data app por UART
+ */
+void sendToAppUart(const char* data)
+{
+    //Enviar solo la parte válida del mensaje
+    for (int i = 0; i < strlen(data); i++) {
+      Serial.print(data[i]);
+    }
+    Serial.println();  // Envía un salto de línea al final
+}
+
+/* Meas*/
 // conectar algun sensor para testear realtime
-float readTemp()
+float readAdc1()
 {
   int adc1Value = analogRead(A1);  // Leer el valor de ADC1 (A1)
   float voltaje = adc1Value*(5.0/1023);
 
   return voltaje;
-}
-
-float readCurrent()
-{
-  return 21.34;
 }

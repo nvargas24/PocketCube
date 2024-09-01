@@ -22,6 +22,9 @@ from modelo import *
 
 from Qt.simulation_load import *
 
+DAC1 = 1
+DAC2 = 2
+
 class Graph_volt(FigureCanvas):
     def __init__(self):
         self.xlim_init = 0
@@ -237,10 +240,22 @@ class MainWindow(QMainWindow):
         if (seconds_total_timer % seconds_total_set) == 0:
             flag_value = True
 
-        self.obj_data_uart.reciv_serial()
+        # Lectura de datos de UI
         self.get_value_out1(reloj_str, flag_value)
         self.get_value_out2(reloj_str, flag_value)
 
+        # Lectura de puerto serial
+        id_m, value_m = self.obj_data_uart.reciv_serial("Master")
+        id_s, value_s = self.obj_data_uart.reciv_serial("Slave")
+
+        if id_m == 1:
+            value_m = float(value_m)
+            self.graph1.update_graph(value_m)
+        if id_m == 2:
+            value_m = float(value_m)
+            self.graph2.update_graph(value_m)
+
+        # Incremento de timer QT -- LUEGO HACERLO CON ARDUINO
         self.time = self.time.addMSecs(1000)        
         self.time_total = self.time_total.addMSecs(1000)
 
@@ -251,8 +266,7 @@ class MainWindow(QMainWindow):
         # MODO MANUAL PARA CARGAR VALORES
         value_out1 = self.ui.sbox_volt1.value()
         
-        self.obj_data_uart.send_serial(1, value_out1); # envio por UART a ESP32
-        self.graph1.update_graph(value_out1) # Solo en develop
+        self.obj_data_uart.send_serial("Master", DAC1, value_out1); # envio por UART a ESP32
 
         # Temporizador para enviar datos
         if flag:
@@ -266,8 +280,6 @@ class MainWindow(QMainWindow):
         """
         # MODO MANUAL PARA CARGAR VALORES
         value_out2 = self.ui.sbox_volt2.value()
-
-        self.graph2.update_graph(value_out2)
 
         # Temporizador para enviar datos
         if flag:
@@ -300,11 +312,12 @@ class MainWindow(QMainWindow):
         # Asigno puertos
         port_m = self.ui.cbox_port_master.currentText() # Leo puerto de combobox
         port_s = self.ui.cbox_port_slave.currentText() # Leo puerto de combobox
-        self.obj_data_uart.port_master = self.obj_data_processor.filter_port(port_m) # Master
-        self.obj_data_uart.port_slave = self.obj_data_processor.filter_port(port_s) # Slave
+        port_master = self.obj_data_processor.filter_port(port_m) # Master
+        port_slave = self.obj_data_processor.filter_port(port_s) # Slave
 
-        # Envio datos por serial
-        self.obj_data_uart.send_serial(1, 1.34)
+        # Incializo puerto serial
+        self.obj_data_uart.init_serial(port_master, "Master")
+        self.obj_data_uart.init_serial(port_slave, "Slave")
 
     def stop(self):
         # Finalizo timer
