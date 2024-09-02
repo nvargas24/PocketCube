@@ -37,6 +37,8 @@
 
 /****** Encabezados *****/
 #include <Wire.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
 
 /*********************** Macros ******************8***/
 #define MAX_DATA 33
@@ -44,6 +46,7 @@
 #define MEAS1 1
 #define MEAS2 2
 #define RTC 3
+#define TIMER 6
 
 /****************** Variables globales ***************/ 
 /* I2C */
@@ -60,6 +63,10 @@ char datetime[20];
 
 /* Meas */
 float meas_data = 0.0;
+char dataStr[10];
+
+/* TIMER */
+volatile unsigned long seconds = 0;  // Variable para contar los segundos
 
 /********* Declaracion de funciones internas *********/
 /* I2C */
@@ -74,6 +81,8 @@ float readAdc1();
 
 void formatSendCmd(int, const char*);
 
+/* TIMER */
+void configTimer();
 /****************** Funciones Arduino ****************/
 /**
  * @brief Configuracion inicial
@@ -82,7 +91,7 @@ void formatSendCmd(int, const char*);
 void setup()
 {
   Serial.begin(115200); // Frecuencia en baudios para serial
-
+  configTimer();
   /* Eventos I2C */
   Wire.begin(I2C_SLAVE_ADDR);
   Wire.onReceive(receiveEvent);
@@ -96,20 +105,20 @@ void setup()
  */
 void loop() 
 {
-  char dataStr[10];
   /* Serial */
   // Identificacion por comando en formato CSV
   // * Valor para DAC:ID,value -> 1,1.23 
   // ** ID: 1->Meas1, 2->Meas2, 3->RTC
 
-  /* Meas */
+  /* Meas */  
   meas_data = readAdc1(); 
 
-  /* Serial */  /*Conversion de float a str*/
-  // Necesario ya que arduino no reconoce float para usar en snprintf
-  dtostrf(meas_data, 5, 2, dataStr);
-  formatSendCmd(MEAS1, dataStr);
-  sendToAppUart(dataSendApp);
+  /* TIMER */
+  if (seconds >= 1000){
+    formatSendCmd(TIMER, "----- TIMER ---");
+    sendToAppUart(dataSendApp);
+    seconds = 0;
+  }
   delay(1000);
 }
 
@@ -142,12 +151,14 @@ void receiveEvent(int bytes)
  */
 void requestEvent()
 {
-  char dataStr[10];
-
   /*Conversion de float a str*/
   // Necesario ya que arduino no reconoce float para usar en snprintf
   dtostrf(meas_data, 5, 2, dataStr);
-  snprintf(dataRequest, sizeof(dataRequest), "%d,%s", MEAS1, dataStr);
+  snprintf(dataRequest, MAX_DATA, "%d,%s", MEAS1, dataStr);
+
+  /* Serial */
+  formatSendCmd(MEAS1, dataStr);
+  sendToAppUart(dataSendApp);    
 
   /* Verificacion de datos a enviar
   Serial.print("S-Master: ");
@@ -191,4 +202,30 @@ float readAdc1()
 void formatSendCmd(int id, const char* data)
 {
   snprintf(dataSendApp, MAX_DATA, "%d,%s", id, data);
+}
+
+/* TIMER */
+void configTimer()
+{
+// Configura Timer0 para generar una interrupción cada segundo
+  cli();  // Deshabilita las interrupciones globales
+
+  // Configura Timer0 para CTC (Clear Timer on Compare Match) mode
+  TCCR0A = (1 << WGM01);  // Modo CTC (Clear Timer on Compare Match)
+  TCCR0B = (1 << CS02) | (1 << CS00);  // Prescaler 1024
+
+  // Configura el valor de comparación para 1 segundo
+  // (16 MHz / 1024) - 1 = 156 (aprox 1 segundo)
+  OCR0A = 156;  
+
+  // Habilita la interrupción de comparación de Timer0
+  TIMSK0 = (1 << OCIE0A);  
+
+  sei();  // Habilita las interrupciones globales
+
+}
+
+// Interrupción de Timer0
+ISR(TIMER0_COMPA_vect) {
+  seconds++;  // Incrementa el contador de segundos
 }
