@@ -17,7 +17,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(924, 721)
+        MainWindow.resize(924, 728)
         MainWindow.setStyleSheet(u"background-color: rgb(230, 230, 230);")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -339,12 +339,24 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_7.addLayout(self.horizontalLayout_19)
 
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.label_value1 = QLabel(self.verticalLayoutWidget)
+        self.label_value1.setObjectName(u"label_value1")
+        self.label_value1.setFont(font1)
+        self.label_value1.setAlignment(Qt.AlignCenter)
+
+        self.horizontalLayout_4.addWidget(self.label_value1)
+
         self.value_out1 = QLabel(self.verticalLayoutWidget)
         self.value_out1.setObjectName(u"value_out1")
         self.value_out1.setFont(font1)
         self.value_out1.setAlignment(Qt.AlignCenter)
 
-        self.verticalLayout_7.addWidget(self.value_out1)
+        self.horizontalLayout_4.addWidget(self.value_out1)
+
+
+        self.verticalLayout_7.addLayout(self.horizontalLayout_4)
 
         self.graph_out1 = QVBoxLayout()
         self.graph_out1.setObjectName(u"graph_out1")
@@ -374,7 +386,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_7.setStretch(0, 1)
         self.verticalLayout_7.setStretch(1, 1)
-        self.verticalLayout_7.setStretch(2, 1)
         self.verticalLayout_7.setStretch(3, 10)
         self.verticalLayout_7.setStretch(4, 1)
 
@@ -429,12 +440,24 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addLayout(self.horizontalLayout_21)
 
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.label_value2 = QLabel(self.verticalLayoutWidget)
+        self.label_value2.setObjectName(u"label_value2")
+        self.label_value2.setFont(font1)
+        self.label_value2.setAlignment(Qt.AlignCenter)
+
+        self.horizontalLayout_5.addWidget(self.label_value2)
+
         self.value_out2 = QLabel(self.verticalLayoutWidget)
         self.value_out2.setObjectName(u"value_out2")
         self.value_out2.setFont(font1)
         self.value_out2.setAlignment(Qt.AlignCenter)
 
-        self.verticalLayout_8.addWidget(self.value_out2)
+        self.horizontalLayout_5.addWidget(self.value_out2)
+
+
+        self.verticalLayout_8.addLayout(self.horizontalLayout_5)
 
         self.graph_out2 = QVBoxLayout()
         self.graph_out2.setObjectName(u"graph_out2")
@@ -462,7 +485,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.setStretch(0, 1)
         self.verticalLayout_8.setStretch(1, 1)
-        self.verticalLayout_8.setStretch(2, 1)
         self.verticalLayout_8.setStretch(3, 10)
         self.verticalLayout_8.setStretch(4, 1)
 
@@ -494,7 +516,7 @@ class Ui_MainWindow(object):
         self.groupBox_slave.setFont(font1)
         self.verticalLayoutWidget_4 = QWidget(self.groupBox_slave)
         self.verticalLayoutWidget_4.setObjectName(u"verticalLayoutWidget_4")
-        self.verticalLayoutWidget_4.setGeometry(QRect(20, 30, 371, 391))
+        self.verticalLayoutWidget_4.setGeometry(QRect(20, 30, 381, 391))
         self.verticalLayout_4 = QVBoxLayout(self.verticalLayoutWidget_4)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
@@ -538,6 +560,7 @@ class Ui_MainWindow(object):
         font8.setBold(True)
         font8.setWeight(75)
         __qtablewidgetitem = QTableWidgetItem()
+        __qtablewidgetitem.setTextAlignment(Qt.AlignCenter);
         __qtablewidgetitem.setFont(font8);
         self.table_serial.setHorizontalHeaderItem(0, __qtablewidgetitem)
         font9 = QFont()
@@ -545,12 +568,15 @@ class Ui_MainWindow(object):
         font9.setBold(True)
         font9.setWeight(75)
         __qtablewidgetitem1 = QTableWidgetItem()
+        __qtablewidgetitem1.setTextAlignment(Qt.AlignCenter);
         __qtablewidgetitem1.setFont(font9);
         self.table_serial.setHorizontalHeaderItem(1, __qtablewidgetitem1)
         __qtablewidgetitem2 = QTableWidgetItem()
+        __qtablewidgetitem2.setTextAlignment(Qt.AlignCenter);
         __qtablewidgetitem2.setFont(font8);
         self.table_serial.setHorizontalHeaderItem(2, __qtablewidgetitem2)
         __qtablewidgetitem3 = QTableWidgetItem()
+        __qtablewidgetitem3.setTextAlignment(Qt.AlignCenter);
         __qtablewidgetitem3.setFont(font8);
         self.table_serial.setHorizontalHeaderItem(3, __qtablewidgetitem3)
         self.table_serial.setObjectName(u"table_serial")
@@ -803,17 +829,19 @@ class Ui_MainWindow(object):
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"Set:", None))
         self.set_time_send1.setDisplayFormat(QCoreApplication.translate("MainWindow", u"HH:mm:ss", None))
         self.btn_ok_setsend1.setText(QCoreApplication.translate("MainWindow", u"OK", None))
-        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Geiger", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Meas 1", None))
         self.label_12.setText(QCoreApplication.translate("MainWindow", u"Medici\u00f3n real:", None))
         self.btn_yes_in1.setText(QCoreApplication.translate("MainWindow", u"Si", None))
         self.btn_no_in1.setText(QCoreApplication.translate("MainWindow", u"No", None))
+        self.label_value1.setText(QCoreApplication.translate("MainWindow", u"Value:", None))
         self.value_out1.setText("")
         self.label_11.setText(QCoreApplication.translate("MainWindow", u"Send:", None))
         self.label_send1.setText("")
-        self.label_5.setText(QCoreApplication.translate("MainWindow", u"Source", None))
+        self.label_5.setText(QCoreApplication.translate("MainWindow", u"Meas 2", None))
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"Medici\u00f3n real:", None))
         self.btn_yes_in2.setText(QCoreApplication.translate("MainWindow", u"Si", None))
         self.btn_no_in2.setText(QCoreApplication.translate("MainWindow", u"No", None))
+        self.label_value2.setText(QCoreApplication.translate("MainWindow", u"Value:", None))
         self.value_out2.setText("")
         self.label_13.setText(QCoreApplication.translate("MainWindow", u"Send:", None))
         self.label_send2.setText("")
@@ -827,11 +855,11 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem2.setText(QCoreApplication.translate("MainWindow", u"Value[V]", None));
         ___qtablewidgetitem3 = self.table_serial.horizontalHeaderItem(3)
         ___qtablewidgetitem3.setText(QCoreApplication.translate("MainWindow", u"DateTime", None));
-        self.label_10.setText(QCoreApplication.translate("MainWindow", u"DAC Geiger", None))
+        self.label_10.setText(QCoreApplication.translate("MainWindow", u"DAC 1", None))
         self.btn_manual_out1.setText(QCoreApplication.translate("MainWindow", u"Manual", None))
         self.btn_test_out1.setText(QCoreApplication.translate("MainWindow", u"Test", None))
         self.label_15.setText(QCoreApplication.translate("MainWindow", u"V", None))
-        self.label_8.setText(QCoreApplication.translate("MainWindow", u"DAC Source", None))
+        self.label_8.setText(QCoreApplication.translate("MainWindow", u"DAC 2", None))
         self.btn_manual_out2.setText(QCoreApplication.translate("MainWindow", u"Manual", None))
         self.btn_test_out2.setText(QCoreApplication.translate("MainWindow", u"Test", None))
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"V", None))

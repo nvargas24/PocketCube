@@ -29,8 +29,8 @@ RTC = 3
 DAC1 = 4
 DAC2 = 5
 
-NAME_MEAS1 = "Geiger"
-NAME_MEAS2 = "Source"
+NAME_MEAS1 = "Meas1"
+NAME_MEAS2 = "Meas2"
 
 class Graph_volt(FigureCanvas):
     def __init__(self):
@@ -179,6 +179,9 @@ class MainWindow(QMainWindow):
         # Habilitar el autoscroll
         self.ui.table_serial.setAutoScroll(True)
         self.ui.table_serial.setVerticalScrollMode(QTableWidget.ScrollPerItem)
+        
+        # Ajuste de ancho de columna segun contenido
+        self.ui.table_serial.resizeColumnsToContents()
 
         # Creo objetos 
         self.obj_data_uart = ManagerDataUart()
@@ -289,6 +292,7 @@ class MainWindow(QMainWindow):
             # Insertar los datos en la nueva fila
             for column in range(len(row_data)):
                 item = QTableWidgetItem(row_data[column])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.ui.table_serial.setItem(current_row, column, item)
 
             self.ui.table_serial.scrollToBottom()

@@ -62,7 +62,8 @@ char dataSendApp[MAX_DATA]; // Str a enviar de Master
 char datetime[20];
 
 /* Meas */
-float meas_data = 0.0;
+float meas1_data = 0.0;
+float meas2_data = 0.0;
 char dataStr[10];
 
 /* TIMER */
@@ -111,8 +112,8 @@ void loop()
   // ** ID: 1->Meas1, 2->Meas2, 3->RTC
 
   /* Meas */  
-  meas_data = readAdc1(); 
-
+  meas_data = readAdc1(A1);   
+  
   /* TIMER */
   if (seconds >= 1000){
     formatSendCmd(TIMER, "----- TIMER ---");
@@ -191,9 +192,9 @@ void sendToAppUart(const char* data)
 
 /* Meas*/
 // conectar algun sensor para testear realtime
-float readAdc1()
+float readAdc1(int adcPin)
 {
-  int adc1Value = analogRead(A1);  // Leer el valor de ADC1 (A1)
+  int adc1Value = analogRead(adcPin);  // Leer el valor de ADC1 (A1)
   float voltaje = adc1Value*(5.0/1023);
 
   return voltaje;
