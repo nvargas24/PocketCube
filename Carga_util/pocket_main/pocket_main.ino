@@ -144,7 +144,7 @@ void loop()
   snprintf(dataSendApp, MAX_DATA, "%d,%s %s", RTC, datetimeStr.c_str(), dataRequest);
   sendToAppUart(dataSendApp);
 
-  delay(1000);
+  delay(10);
 }
 
 /**************** Funciones internas  *****************/

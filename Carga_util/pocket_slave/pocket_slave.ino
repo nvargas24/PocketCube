@@ -112,7 +112,7 @@ void loop()
   // ** ID: 1->Meas1, 2->Meas2, 3->RTC
 
   /* Meas */  
-  meas_data = readAdc1(A1);   
+  meas1_data = readAdc1(A1);   
   
   /* TIMER */
   if (seconds >= 1000){
@@ -120,7 +120,7 @@ void loop()
     sendToAppUart(dataSendApp);
     seconds = 0;
   }
-  delay(1000);
+  delay(10);
 }
 
 /* I2C */
@@ -154,7 +154,7 @@ void requestEvent()
 {
   /*Conversion de float a str*/
   // Necesario ya que arduino no reconoce float para usar en snprintf
-  dtostrf(meas_data, 5, 2, dataStr);
+  dtostrf(meas1_data, 5, 2, dataStr);
   snprintf(dataRequest, MAX_DATA, "%d,%s", MEAS1, dataStr);
 
   /* Serial */
