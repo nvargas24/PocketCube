@@ -101,6 +101,7 @@ void setup()
 void loop() 
 {
   int value_dac1 = 0;
+  int value_dac2 = 0;
   int id = 0;
   float value = 0.0;
 
@@ -116,8 +117,11 @@ void loop()
     value_dac1 = map(value_volt*1000, 0, 3300, 0, 255);
     dacWrite(PIN_DAC1, value_dac1);  
   }
-
-  
+  else if(id == DAC2){
+    value_volt = value; 
+    value_dac2 = map(value_volt*1000, 0, 3300, 0, 255);
+    dacWrite(PIN_DAC2, value_dac2);  
+  }
 
   /* RTC */
   DateTime now = rtc.now(); // Obtener fecha de RTC
@@ -140,7 +144,7 @@ void loop()
   snprintf(dataSendApp, MAX_DATA, "%d,%s %s", RTC, datetimeStr.c_str(), dataRequest);
   sendToAppUart(dataSendApp);
 
-  delay(1000);
+  delay(10);
 }
 
 /**************** Funciones internas  *****************/
@@ -265,4 +269,3 @@ void requestFromAppUart(int* id, float* value)
     }
   }
 }
-
