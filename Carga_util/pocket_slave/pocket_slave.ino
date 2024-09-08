@@ -120,7 +120,7 @@ void loop()
     sendToAppUart(dataSendApp);
     seconds = 0;
   }
-  delay(10);
+  delay(100);
 }
 
 /* I2C */

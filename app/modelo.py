@@ -47,9 +47,9 @@ class DataProcessor():
             id_str = parts[0]
             value_str = parts[1]
             
-            id = int(id_str)
+            id_serial = int(id_str)
             
-            return id, value_str
+            return id_serial, value_str
             
         except ValueError as e:
             # Manejo de errores: la cadena no es válida o el valor no puede convertirse a float
@@ -86,33 +86,34 @@ class ManagerDataUart(DataProcessor):
             print(f"Error al conectar puerto {port_num}/n")
             print(e)
 
-    def send_serial(self, port_name, id, value):
+    def send_serial(self, port_name, id_serial, value):
         try:
             # Estructuro dato a enviar a formato CSV
-            buf = f"{id},{value:.02f}"
-            #print(f"Enviar a {port_name}: {buf}")
+            buf = f"{id_serial},{value:.02f}"
+            print(f"Enviar a {port_name}: {buf}")
             # Envio datos por serial
             self.ser[port_name].write(buf.encode())
+            time.sleep(0.01)
             #ser.close()
         except ValueError as e:
             print(f"Error en {port_name}/n")
             print(e)
 
     def reciv_serial(self, port_name):
-        id = 0
-        value = 0.0
+        id_serial = None
+        value = None
         try:
             if self.ser[port_name].in_waiting > 0 :
-                time.sleep(0.1)
+                #time.sleep(0.01)
                 linea = self.ser[port_name].readline().decode('utf-8').strip()
-                print(f"{port_name}: {linea}")
-                id, value=self.extract_value(linea)
+                #print(f"{port_name}: {linea}")
+                id_serial, value = self.extract_value(linea)
 
         except serial.SerialException as e:
             print(f"Error en {port_name}/n")
             print(e)
 
-        return id, value
+        return id_serial, value
     
     def close_ports(self, event):
         if self.ser["Master"]:

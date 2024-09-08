@@ -32,6 +32,8 @@ DAC2 = 5
 NAME_MEAS1 = "Meas1"
 NAME_MEAS2 = "Meas2"
 
+TIMEOUT = 100
+
 class Graph_volt(FigureCanvas):
     def __init__(self):
         self.xlim_init = 0
@@ -225,7 +227,8 @@ class MainWindow(QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.timeout_1mseg)
         self.cont= 0 # contador auxiliar para saber cuando llega al segundo
-
+        self.cont_aux = 0 # contador para enviar datos por UART
+        self.flag_send_uart = False
         # Inicializo por defecto envio cada 10 seg
         self.set_time1 = QTime(0, 0, 10, 0) 
 
@@ -257,18 +260,7 @@ class MainWindow(QMainWindow):
         return flag_value
 
     def dispatch_serial_master_event(self, data):
-        if data["serial_id"] == MEAS1:
-            self.ui.value_out1.setText(data["value"])            
-            value_s = float(data["value"])
-            self.graph1.update_graph(value_s)
-        elif data["serial_id"] == MEAS2:
-            self.ui.value_out2.setText(data["value"])            
-            value_s = float(data["value"])
-            self.graph2.update_graph(value_s)
-        else:
-            print("ID NO IDENTIFICADO")
 
-    def dispatch_serial_slave_event(self, data):
         if data["serial_id"] == RTC:
             # Identifico datos recibidos en la trama
             date, time, serial_id, value = self.obj_data_processor.separate_str(data["value"])
@@ -295,9 +287,22 @@ class MainWindow(QMainWindow):
 
             # Scrool automatico al cargarse un nuevo data que sobresalga de la tabla
             self.ui.table_serial.scrollToBottom()
-
         else:
             print("ID NO IDENTIFICADO")
+            print("Master: ", data)
+
+    def dispatch_serial_slave_event(self, data):
+        if data["serial_id"] == MEAS1:
+            self.ui.value_out1.setText(data["value"])            
+            value_s = float(data["value"])
+            self.graph1.update_graph(value_s)
+        elif data["serial_id"] == MEAS2:
+            self.ui.value_out2.setText(data["value"])            
+            value_s = float(data["value"])
+            self.graph2.update_graph(value_s)
+        else:
+            print("ID NO IDENTIFICADO")
+            print("Slave: ", data)
 
     def timeout_1mseg(self):
         """
@@ -308,16 +313,19 @@ class MainWindow(QMainWindow):
         value2 = self.get_value_out2()
 
         # Envio de datos
-        # Enviar a DAC por serial
-        self.obj_data_uart.send_serial("Master", DAC1, value1); # envio por UART a ESP32
-        self.obj_data_uart.send_serial("Master", DAC2, value2); # envio por UART a ESP32
+        if self.flag_send_uart:
+            # Enviar a DAC por serial
+            print("ENVIO CONFIG DAC")
+            self.obj_data_uart.send_serial("Master", DAC1, value1); # envio por UART a ESP32
+            self.obj_data_uart.send_serial("Master", DAC2, value2); # envio por UART a ESP32
+            self.flag_send_uart = False
 
         # Cargo datos relevantes en UI        
         reloj_str = self.update_reloj_slave()
         flag_value = self.verification_set_time()
 
-        self.load_value_ui(flag_value, DAC1, value1, reloj_str)
-        self.load_value_ui(flag_value, DAC2, value2, reloj_str)
+        self.load_value_ui(flag_value, MEAS1, value1, reloj_str)
+        self.load_value_ui(flag_value, MEAS2, value2, reloj_str)
 
         # Lectura de puerto serial
         data_master = {"serial_id": None, "value": None}
@@ -331,11 +339,18 @@ class MainWindow(QMainWindow):
         self.dispatch_serial_slave_event(data_slave)
 
         # Incremento de timer QT -- LUEGO HACERLO CON ARDUINO
-        self.cont+=100
+        
+        self.cont+=TIMEOUT
+        
         if self.cont==1000:
+            if (self.cont_aux%10) == 0:
+                self.flag_send_uart = True #Para enviar solo una vez config por uart
+            self.cont_aux +=1
             self.time = self.time.addMSecs(1000)        
             self.time_total = self.time_total.addMSecs(1000)
             self.cont = 0
+        
+
 
     def get_value_out1(self):
         """
@@ -359,10 +374,10 @@ class MainWindow(QMainWindow):
 
         # Temporizador para enviar datos
         if flag:
-            if serial_id==DAC1:
+            if serial_id==MEAS1:
                 self.ui.label_send1.setText(f"{reloj_str} {value:.02f}")
                 self.graph1.flag_send = True # Marca en grafico
-            elif serial_id==DAC2:
+            elif serial_id==MEAS2:
                 self.ui.label_send2.setText(f"{reloj_str} {value:.02f}")
                 self.graph2.flag_send = True # Marca en grafico
             
@@ -398,7 +413,7 @@ class MainWindow(QMainWindow):
 
     def init(self):
         # Inicio timer con actualizacion de datos cada 1mseg
-        self.timer.start(100)
+        self.timer.start(TIMEOUT)
 
         # Asigno puertos
         port_m = self.ui.cbox_port_master.currentText() # Leo puerto de combobox
