@@ -38,6 +38,7 @@
 /****** Encabezados *****/
 #include <Wire.h>
 #include "RTClib.h"
+#include <EEPROM.h>
 
 /*********************** Macros ******************8***/
 #define MAX_DATA 33
@@ -64,10 +65,17 @@ char dataSend[MAX_DATA]; // Str a enviar de Master
 char dataRequestApp[MAX_DATA]; // Str respuesta de Slave
 char dataSendApp[MAX_DATA]; // Str a enviar de Master
 
+/* EEPROM */
+const int EEPROM_SIZE = 512; // Tamaño de la EEPROM (esto depende de tu modelo de Arduino)
+const int THRESHOLD = 480;   // Umbral para enviar datos cuando se llena en un 90%
+int currentAddress = 0;      // Dirección actual en la EEPROM
+int dataCount = 0;           // Contador de datos guardados
+char dataSendEeprom[MAX_DATA]; // Str a enviar EEPROM
+
 /********* Declaracion de funciones internas *********/
 /* RTC */
 void configInitialRTC();
-String datetime2str(DateTime date);
+String datetimeNow();
 
 /* I2C */
 void sendToSlave(const char*);
@@ -76,9 +84,14 @@ void requestFromSlave();
 /* UART */
 void requestFromAppUart(int*, float*);
 void sendToAppUart(const char*);
+void commaToSpaceConverter(char *);
+void configFromApp(int , float );
 
 /* DAC */
 float value_volt = 0;
+
+/* EEPROM */
+void sendToEeprom();
 
 /****************** Funciones Arduino ****************/
 /**
@@ -100,32 +113,19 @@ void setup()
  */
 void loop() 
 {
-  int value_dac1 = 0;
-  int value_dac2 = 0;
   int id = 0;
   float value = 0.0;
-
   /* Serial */
   // Identificacion por comando en formato CSV
   // * Valor para DAC:ID,value -> 1,1.23 
   // ** ID: 1->Meas1, 2->Meas2, 3->RTC, 4->DAC1, 5->DAC2
   requestFromAppUart(&id, &value);
-  /* DAC */
-  // Asigno dato segun id
-  if(id == DAC1){
-    value_volt = value; 
-    value_dac1 = map(value_volt*1000, 0, 3300, 0, 255);
-    dacWrite(PIN_DAC1, value_dac1);  
-  }
-  else if(id == DAC2){
-    value_volt = value; 
-    value_dac2 = map(value_volt*1000, 0, 3300, 0, 255);
-    dacWrite(PIN_DAC2, value_dac2);  
+  if(id !=0){
+    configFromApp(id, value);  // Asigno dato segun id    
   }
 
   /* RTC */
-  DateTime now = rtc.now(); // Obtener fecha de RTC
-  datetimeStr = datetime2str(now); // Conversion de datetime a Str
+  datetimeStr = datetimeNow(); //Obtengfo datetime actual
   snprintf(dataSend, datetimeStr.length()+1, "%s", datetimeStr.c_str()); // Conversion a array
 
   /* I2C */
@@ -134,15 +134,11 @@ void loop()
 
   /* UART */
   // OBS: Solo enviar datos recibidos de Slave
-  // Recorrer el array para encontrar la coma y reemplazarla por un espacio
-  for (int i = 0; i < strlen(dataRequest); i++) {
-      if (dataRequest[i] == ',') {
-          dataRequest[i] = ' ';
-          break; // Salir del bucle después de encontrar y reemplazar la coma
-      }
-  }
+  commaToSpaceConverter(dataRequest);
   snprintf(dataSendApp, MAX_DATA, "%d,%s %s", RTC, datetimeStr.c_str(), dataRequest);
   sendToAppUart(dataSendApp);
+
+  /* EEPROM */
 
   delay(100);
 }
@@ -153,13 +149,14 @@ void loop()
  * @brief Formatear la fecha y hora como "YYYY-MM-DD HH:MM:SS"
  * @return str de fecha y hora
  */
-String datetime2str(DateTime date)
+String datetimeNow()
 {
   char datetimeStr[20];
+  DateTime now = rtc.now(); // Obtener fecha de RTC
 
   snprintf(datetimeStr, sizeof(datetimeStr), "%04d-%02d-%02d %02d:%02d:%02d", 
-           date.year(), date.month(), date.day(), 
-           date.hour(), date.minute(), date.second());
+           now.year(), now.month(), now.day(), 
+           now.hour(), now.minute(), now.second());
 
   return String(datetimeStr);
 }
@@ -256,7 +253,6 @@ void requestFromAppUart(int* id, float* value)
 {
   if (Serial.available()){
     String input_cmd = Serial.readStringUntil('/n');
-
     // Procesar la cadena recibida en formato "id,value"
     int delimiterIndex = input_cmd.indexOf(','); // Buscar la coma que separa id y value
     if (delimiterIndex > 0) {
@@ -267,5 +263,47 @@ void requestFromAppUart(int* id, float* value)
       *id = idStr.toInt();
       *value = valueStr.toFloat();
     }
+  }
+}
+
+void configFromApp(int id, float value)
+{ 
+  int value_map = 0;
+
+  if(id == DAC1){
+    value_map = map(value*1000, 0, 3300, 0, 255);
+    dacWrite(PIN_DAC1, value_map);  
+  }
+  else if(id == DAC2){
+    value_map = map(value*1000, 0, 3300, 0, 255);
+    dacWrite(PIN_DAC2, value_map);  
+  }
+  else{
+    Serial.print("id: ");
+    Serial.print(id);
+    Serial.println(" ; ID NO RECONOCIDO PARA CONFIG");
+  }
+}
+
+
+void commaToSpaceConverter(char *data)
+{
+  // Recorrer el array para encontrar la coma y reemplazarla por un espacio
+  for (int i = 0; i < strlen(data); i++) {
+      if (data[i] == ',') {
+          data[i] = ' ';
+          break; // Salir del bucle después de encontrar y reemplazar la coma
+      }
+  }
+}
+
+/* EEPROM */
+void sendToEeprom()
+{
+  // Almacenar en EEPROM
+  if (currentAddress < EEPROM_SIZE) {
+    EEPROM.put(currentAddress, dataSendEeprom);
+    currentAddress += sizeof(dataSendEeprom);
+    dataCount++;
   }
 }
