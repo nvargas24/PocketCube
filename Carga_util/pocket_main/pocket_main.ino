@@ -54,7 +54,7 @@
 /****************** Variables globales ***************/ 
 /* RTC */
 RTC_DS3231 rtc; // Creo objeto RTC_DS1307 rtc;
-String datetimeStr;  //
+char datetimeStr[MAX_DATA];  //
 
 /* I2C */
 const byte I2C_SLAVE_ADDR = 0x20; // Direccion I2C de Slave
@@ -64,7 +64,7 @@ char dataSend[MAX_DATA]; // Str a enviar de Master
 /* UART */
 char dataRequestApp[MAX_DATA]; // Str respuesta de Slave
 char dataSendApp[MAX_DATA]; // Str a enviar de Master
-
+char dataConcat[MAX_DATA]; // Buf auxiliar para concatenar texto
 /* EEPROM */
 const int EEPROM_SIZE = 512; // Tamaño de la EEPROM (esto depende de tu modelo de Arduino)
 const int THRESHOLD = 480;   // Umbral para enviar datos cuando se llena en un 90%
@@ -73,9 +73,11 @@ int dataCount = 0;           // Contador de datos guardados
 char dataSendEeprom[MAX_DATA]; // Str a enviar EEPROM
 
 /********* Declaracion de funciones internas *********/
+void formatDataSend(char* , int, char*);
+
 /* RTC */
 void configInitialRTC();
-String datetimeNow();
+void datetimeNow(char *);
 
 /* I2C */
 void sendToSlave(const char*);
@@ -125,17 +127,18 @@ void loop()
   }
 
   /* RTC */
-  datetimeStr = datetimeNow(); //Obtengfo datetime actual
-  snprintf(dataSend, datetimeStr.length()+1, "%s", datetimeStr.c_str()); // Conversion a array
-
+  datetimeNow(datetimeStr); //Obtengo datetime actual
+  
   /* I2C */
+  formatDataSend(dataSend, RTC, datetimeStr);
   sendToSlave(dataSend); // Enviar data a slave
   requestFromSlave(); // Respuesta de slave
 
   /* UART */
   // OBS: Solo enviar datos recibidos de Slave
   commaToSpaceConverter(dataRequest);
-  snprintf(dataSendApp, MAX_DATA, "%d,%s %s", RTC, datetimeStr.c_str(), dataRequest);
+  snprintf(dataConcat, MAX_DATA, "%s %s", datetimeStr, dataRequest);  // concateno datos
+  formatDataSend(dataSendApp, RTC, dataConcat);
   sendToAppUart(dataSendApp);
 
   /* EEPROM */
@@ -144,21 +147,24 @@ void loop()
 }
 
 /**************** Funciones internas  *****************/
+
+void formatDataSend(char* buf, int id, char* str)
+{
+  snprintf(buf, MAX_DATA, "%d,%s", id, str);
+}
+
 /* RTC */
 /**
  * @brief Formatear la fecha y hora como "YYYY-MM-DD HH:MM:SS"
  * @return str de fecha y hora
  */
-String datetimeNow()
+void datetimeNow(char *datetimeStr)
 {
-  char datetimeStr[20];
   DateTime now = rtc.now(); // Obtener fecha de RTC
 
-  snprintf(datetimeStr, sizeof(datetimeStr), "%04d-%02d-%02d %02d:%02d:%02d", 
+  snprintf(datetimeStr, MAX_DATA, "%04d-%02d-%02d %02d:%02d:%02d", 
            now.year(), now.month(), now.day(), 
            now.hour(), now.minute(), now.second());
-
-  return String(datetimeStr);
 }
 
 /**
@@ -175,8 +181,8 @@ void configInitialRTC()
   
   /* Fijo datetime en caso de desconexion de la alimentacion */
   if (rtc.lostPower()){
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));// Fijar a fecha y hora de compilacion
-    // rtc.adjust(DateTime(2024, 8, 3, 18, 0, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
+    //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));// Fijar a fecha y hora de compilacion
+    rtc.adjust(DateTime(2025, 9, 8, 22, 23, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
   }
 }
 

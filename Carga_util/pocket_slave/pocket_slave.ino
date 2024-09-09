@@ -80,7 +80,7 @@ void sendToAppUart(const char*);
 /* Meas */
 float readAdc1();
 
-void formatSendCmd(int, const char*);
+void formatSendCmd(char*, int, const char*);
 
 /* TIMER */
 void configTimer();
@@ -116,7 +116,7 @@ void loop()
   
   /* TIMER */
   if (seconds >= 1000){
-    formatSendCmd(TIMER, "----- TIMER ---");
+    formatSendCmd(dataSendApp, TIMER, "----- TIMER ---");
     sendToAppUart(dataSendApp);
     seconds = 0;
   }
@@ -143,7 +143,7 @@ void receiveEvent(int bytes)
   Serial.println(dataReceive);*/
 
   /* Guardo data recibida en otra variable especifica */
-  strcpy(datetime, dataReceive);
+  //strcpy(datetime, dataReceive);
 }
 
 /**
@@ -152,15 +152,12 @@ void receiveEvent(int bytes)
  */
 void requestEvent()
 {
-  /*Conversion de float a str*/
-  // Necesario ya que arduino no reconoce float para usar en snprintf
-  dtostrf(meas1_data, 5, 2, dataStr);
-  snprintf(dataRequest, MAX_DATA, "%d,%s", MEAS1, dataStr);
-
+  dtostrf(meas1_data, 5, 2, dataStr);// Necesario ya que arduino no reconoce float para usar en snprintf
+  formatSendCmd(dataRequest, MEAS1, dataStr); 
+  
   /* Serial */
-  formatSendCmd(MEAS1, dataStr);
-  sendToAppUart(dataSendApp);    
-
+  formatSendCmd(dataSendApp, MEAS1, dataStr);
+  sendToAppUart(dataSendApp);  
   /* Verificacion de datos a enviar
   Serial.print("S-Master: ");
   Serial.println(dataRequest);*/
@@ -175,6 +172,8 @@ void requestEvent()
       Wire.write(' '); // Reemplazar caracteres no imprimibles con un espacio
     }
   }
+
+
 }
 
 /* UART */
@@ -200,9 +199,9 @@ float readAdc1(int adcPin)
   return voltaje;
 }
 
-void formatSendCmd(int id, const char* data)
+void formatSendCmd(char* buf, int id, const char* data)
 {
-  snprintf(dataSendApp, MAX_DATA, "%d,%s", id, data);
+  snprintf(buf, MAX_DATA, "%d,%s", id, data);
 }
 
 /* TIMER */
