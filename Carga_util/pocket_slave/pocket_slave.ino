@@ -112,8 +112,8 @@ void loop()
   // ** ID: 1->Meas1, 2->Meas2, 3->RTC
 
   /* Meas */  
-  meas1_data = readAdc1(A1);   
-  
+  meas1_data = readAdc1(A2);   
+  meas2_data = readAdc1(A3);    
   /* TIMER */
   if (seconds >= 1000){
     formatSendCmd(dataSendApp, TIMER, "----- TIMER ---");

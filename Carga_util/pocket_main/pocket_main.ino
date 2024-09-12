@@ -87,7 +87,7 @@ void requestFromSlave();
 void requestFromAppUart(int*, float*);
 void sendToAppUart(const char*);
 void commaToSpaceConverter(char *);
-void configFromApp(int , float );
+//void configFromApp(int , float );
 
 /* DAC */
 float value_volt = 0;
@@ -122,9 +122,9 @@ void loop()
   // * Valor para DAC:ID,value -> 1,1.23 
   // ** ID: 1->Meas1, 2->Meas2, 3->RTC, 4->DAC1, 5->DAC2
   requestFromAppUart(&id, &value);
-  if(id !=0){
-    configFromApp(id, value);  // Asigno dato segun id    
-  }
+  //if(id !=0){
+  //  configFromApp(id, value);  // Asigno dato segun id    
+  //}
 
   /* RTC */
   datetimeNow(datetimeStr); //Obtengo datetime actual
@@ -181,8 +181,8 @@ void configInitialRTC()
   
   /* Fijo datetime en caso de desconexion de la alimentacion */
   if (rtc.lostPower()){
-    //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));// Fijar a fecha y hora de compilacion
-    rtc.adjust(DateTime(2025, 9, 8, 22, 23, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));// Fijar a fecha y hora de compilacion
+    //rtc.adjust(DateTime(2025, 9, 8, 22, 23, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
   }
 }
 
@@ -271,7 +271,7 @@ void requestFromAppUart(int* id, float* value)
     }
   }
 }
-
+/*
 void configFromApp(int id, float value)
 { 
   int value_map = 0;
@@ -290,7 +290,7 @@ void configFromApp(int id, float value)
     Serial.println(" ; ID NO RECONOCIDO PARA CONFIG");
   }
 }
-
+*/
 
 void commaToSpaceConverter(char *data)
 {
