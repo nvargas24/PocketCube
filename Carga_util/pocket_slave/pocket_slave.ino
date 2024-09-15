@@ -62,9 +62,10 @@ char dataSendApp[MAX_DATA]; // Str a enviar de Master
 char datetime[20];
 
 /* Meas */
-float meas1_data = 0.0;
-float meas2_data = 0.0;
-char dataStr[10];
+float meas1 = 0.0;
+float meas2 = 0.0;
+char measStr1[MAX_DATA];
+char measStr2[MAX_DATA];
 
 /* TIMER */
 volatile unsigned long seconds = 0;  // Variable para contar los segundos
@@ -73,6 +74,7 @@ volatile unsigned long seconds = 0;  // Variable para contar los segundos
 /* I2C */
 void receiveEvent(int bytes);
 void requestEvent();
+void sendLimitedData(char *);
 
 /* UART */
 void sendToAppUart(const char*);
@@ -112,8 +114,8 @@ void loop()
   // ** ID: 1->Meas1, 2->Meas2, 3->RTC
 
   /* Meas */  
-  meas1_data = readAdc1(A2);   
-  meas2_data = readAdc1(A3);    
+  meas1 = readAdc1(A2);   
+  meas2 = readAdc1(A3);    
   /* TIMER */
   if (seconds >= 1000){
     formatSendCmd(dataSendApp, TIMER, "----- TIMER ---");
@@ -152,28 +154,42 @@ void receiveEvent(int bytes)
  */
 void requestEvent()
 {
-  dtostrf(meas1_data, 5, 2, dataStr);// Necesario ya que arduino no reconoce float para usar en snprintf
-  formatSendCmd(dataRequest, MEAS1, dataStr); 
-  
-  /* Serial */
-  formatSendCmd(dataSendApp, MEAS1, dataStr);
-  sendToAppUart(dataSendApp);  
+  if(!strcmp(dataReceive, "MEAS1")){
+    /* I2C */
+    dtostrf(meas1, 5, 2, measStr1);// Necesario ya que arduino no reconoce float para usar en snprintf
+    formatSendCmd(dataRequest, MEAS1, measStr1); 
+    sendLimitedData(dataRequest); // Envía solo los datos válidos I2C 
+
+    /* Serial */
+    formatSendCmd(dataSendApp, MEAS1, measStr1);
+    sendToAppUart(dataSendApp);      
+  }
+  else if(!strcmp(dataReceive, "MEAS2")){
+    /* I2C */
+    dtostrf(meas2, 5, 2, measStr2);  
+    formatSendCmd(dataRequest, MEAS2, measStr2); 
+    sendLimitedData(dataRequest); // Envía solo los datos válidos I2C 
+    /* Serial */
+    formatSendCmd(dataSendApp, MEAS2, measStr2);
+    sendToAppUart(dataSendApp);  
+  }
+
   /* Verificacion de datos a enviar
   Serial.print("S-Master: ");
   Serial.println(dataRequest);*/
 
-  /* Envio respuesta por I2C */
-  // Envía solo los datos válidos
-  for (size_t i = 0; i < strlen(dataRequest); i++) {
-    if (dataRequest[i] >= 32 && dataRequest[i] <= 126) { // Solo caracteres imprimibles// Cod ASCII
-      Wire.write((uint8_t)dataRequest[i]);
+}
+
+void sendLimitedData(char *msj)
+{
+  for (size_t i = 0; i < strlen(msj); i++) {
+    if (msj[i] >= 32 && msj[i] <= 126) { // Solo caracteres imprimibles// Cod ASCII
+      Wire.write((uint8_t)msj[i]);
     } 
     else {
       Wire.write(' '); // Reemplazar caracteres no imprimibles con un espacio
     }
   }
-
-
 }
 
 /* UART */

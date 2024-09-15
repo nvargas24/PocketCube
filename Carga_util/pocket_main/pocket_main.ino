@@ -130,8 +130,18 @@ void loop()
   datetimeNow(datetimeStr); //Obtengo datetime actual
   
   /* I2C */
-  formatDataSend(dataSend, RTC, datetimeStr);
-  sendToSlave(dataSend); // Enviar data a slave
+  //formatDataSend(dataSend, RTC, datetimeStr);
+  sendToSlave("MEAS1"); // Enviar data a slave
+  requestFromSlave(); // Respuesta de slave
+
+  /* UART */
+  // OBS: Solo enviar datos recibidos de Slave
+  commaToSpaceConverter(dataRequest);
+  snprintf(dataConcat, MAX_DATA, "%s %s", datetimeStr, dataRequest);  // concateno datos
+  formatDataSend(dataSendApp, RTC, dataConcat);
+  sendToAppUart(dataSendApp);
+
+  sendToSlave("MEAS2"); // Enviar data a slave
   requestFromSlave(); // Respuesta de slave
 
   /* UART */
