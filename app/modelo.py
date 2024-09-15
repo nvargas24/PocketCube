@@ -90,7 +90,7 @@ class ManagerDataUart(DataProcessor):
         try:
             # Estructuro dato a enviar a formato CSV
             buf = f"{id_serial},{value:.02f}"
-            print(f"Enviar a {port_name}: {buf}")
+            #print(f"Enviar a {port_name}: {buf}")
             # Envio datos por serial
             self.ser[port_name].write(buf.encode())
             time.sleep(0.01)

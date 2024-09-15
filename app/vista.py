@@ -32,7 +32,7 @@ DAC2 = 5
 NAME_MEAS1 = "Meas1"
 NAME_MEAS2 = "Meas2"
 
-TIMEOUT = 100
+TIMEOUT = 10
 
 class Graph_volt(FigureCanvas):
     def __init__(self):
@@ -168,11 +168,11 @@ class MainWindow(QMainWindow):
         #self.setWindowIcon(QIcon(".\Imagenes\logotipo_simple_utn_haedo.png"))
 
         # Cargo icono a app
-        self.setWindowIcon(QIcon('./Imagenes/logo_utn.png'))
+        self.setWindowIcon(QIcon(r'./Imagenes/logo_utn.png'))
 
         # Establecer la imagen en el QLabel
-        self.ui.img_logo1.setPixmap(QPixmap(".\Imagenes\logotipo_diysatellite.png"))
-        self.ui.img_logo2.setPixmap(QPixmap(".\Imagenes\logotipo_simple_utn_haedo.png"))
+        self.ui.img_logo1.setPixmap(QPixmap(r".\Imagenes\logotipo_diysatellite.png"))
+        self.ui.img_logo2.setPixmap(QPixmap(r".\Imagenes\logotipo_simple_utn_haedo.png"))
 
         # Ajustar el tamaño del QLabel al tamaño de la imagen
         self.ui.img_logo1.setScaledContents(True)
@@ -204,7 +204,6 @@ class MainWindow(QMainWindow):
         self.ui.graph_out2.addWidget(self.graph2)
 
         # Formato de reloj a LCD
-        self.ui.lcd_timer.display(f"{0:02d}:{0:02d}:{0:02d}")
         self.ui.lcd_timer_total.display(f"{0:02d}:{0:02d}:{0:02d}")        
         self.ui.lcd_time_rtc.display(f"{0:02d}:{0:02d}:{0:02d}")
 
@@ -213,14 +212,10 @@ class MainWindow(QMainWindow):
         self.ui.btn_stop.clicked.connect(self.stop)
         self.ui.btn_ok_setsend1.clicked.connect(self.get_time_send1)
 
-        # Deteccion de buttongroup seleccionado
-        self.ui.buttonGroup.buttonClicked.connect(self.mostrar_seleccionado)
-
         # Asigno avance por segundos
         self.ui.set_time_send1.setCurrentSection(QTimeEdit.SecondSection)
 
         # Inicializar el tiempo a 00:00:00
-        self.time = QTime(0, 0, 0)
         self.time_total = QTime(0, 0, 0)
 
         # Timer para actualizar grafico #REEMPLAZAR POR DATA DE TIMER ARDUINO
@@ -232,25 +227,16 @@ class MainWindow(QMainWindow):
         # Inicializo por defecto envio cada 10 seg
         self.set_time1 = QTime(0, 0, 10, 0) 
 
-    def mostrar_seleccionado(self, boton_seleccionado):
-        # Obtener el texto del botón seleccionado
-        texto_seleccionado = boton_seleccionado.text()
-        print(f'Seleccionaste: {texto_seleccionado}')
-
     def update_reloj_slave(self):
         # Convertir a str QTime
-        reloj_str = self.time.toString("hh:mm:ss")
         reloj_str_total = self.time_total.toString("hh:mm:ss")
         # Mostrar tiempo en display
-        self.ui.lcd_timer.display(reloj_str)        
         self.ui.lcd_timer_total.display(reloj_str_total)
 
-        return reloj_str
+        return reloj_str_total
 
     def verification_set_time(self):
         flag_value = False # Indica que se cumple intervalo de accion
-        # Obtengo segundos para setear envios y del time
-        seconds_total_timer = self.to_seconds(self.time)
         seconds_total_set = self.to_seconds(self.set_time1)
         
         # Temporizador para enviar datos
@@ -300,32 +286,32 @@ class MainWindow(QMainWindow):
             self.ui.value_out2.setText(data["value"])            
             value_s = float(data["value"])
             self.graph2.update_graph(value_s)
-        else:
-            print("ID NO IDENTIFICADO")
-            print("Slave: ", data)
+        #else:
+        #    print("ID NO IDENTIFICADO")
+        #    print("Slave: ", data)
 
     def timeout_1mseg(self):
         """
         Acciones a realizar cada vez que pasa un segundo
         """
+        """
         # Lectura de datos de UI
         value1 = self.get_value_out1()
         value2 = self.get_value_out2()
-
+        """
         # Envio de datos
+        """
         if self.flag_send_uart:
             # Enviar a DAC por serial
             print("ENVIO CONFIG DAC")
             self.obj_data_uart.send_serial("Master", DAC1, value1); # envio por UART a ESP32
             self.obj_data_uart.send_serial("Master", DAC2, value2); # envio por UART a ESP32
             self.flag_send_uart = False
-
+        """
         # Cargo datos relevantes en UI        
         reloj_str = self.update_reloj_slave()
-        flag_value = self.verification_set_time()
+        #flag_value = self.verification_set_time()
 
-        self.load_value_ui(flag_value, MEAS1, value1, reloj_str)
-        self.load_value_ui(flag_value, MEAS2, value2, reloj_str)
 
         # Lectura de puerto serial
         data_master = {"serial_id": None, "value": None}
@@ -333,6 +319,11 @@ class MainWindow(QMainWindow):
 
         data_master["serial_id"], data_master["value"]= self.obj_data_uart.reciv_serial("Master")
         data_slave["serial_id"], data_slave["value"] = self.obj_data_uart.reciv_serial("Slave")
+
+        #self.load_value_ui(True, data_slave["serial_id"], data_slave["value"], reloj_str)
+        #self.load_value_ui(flag_value, MEAS2, data_slave["value"], reloj_str)
+
+        print(data_slave)
 
         # Acciones a realizar recibir los datos de master y slave
         self.dispatch_serial_master_event(data_master)
@@ -346,7 +337,6 @@ class MainWindow(QMainWindow):
             if (self.cont_aux%10) == 0:
                 self.flag_send_uart = True #Para enviar solo una vez config por uart
             self.cont_aux +=1
-            self.time = self.time.addMSecs(1000)        
             self.time_total = self.time_total.addMSecs(1000)
             self.cont = 0
         
@@ -387,8 +377,6 @@ class MainWindow(QMainWindow):
         """
         Envio de data si se cumple temporizador
         """
-        # Reseteo time
-        self.time = QTime(0, 0, 0, 0)
         # Obtener tiempo para enviar data
         self.set_time1 = self.ui.set_time_send1.time()
 
