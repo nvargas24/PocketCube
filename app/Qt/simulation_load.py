@@ -243,13 +243,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.label_value1 = QLabel(self.verticalLayoutWidget)
-        self.label_value1.setObjectName(u"label_value1")
-        self.label_value1.setFont(font1)
-        self.label_value1.setAlignment(Qt.AlignCenter)
-
-        self.horizontalLayout_4.addWidget(self.label_value1)
-
         self.value_out1 = QLabel(self.verticalLayoutWidget)
         self.value_out1.setObjectName(u"value_out1")
         self.value_out1.setFont(font1)
@@ -310,13 +303,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_5 = QHBoxLayout()
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.label_value2 = QLabel(self.verticalLayoutWidget)
-        self.label_value2.setObjectName(u"label_value2")
-        self.label_value2.setFont(font1)
-        self.label_value2.setAlignment(Qt.AlignCenter)
-
-        self.horizontalLayout_5.addWidget(self.label_value2)
-
         self.value_out2 = QLabel(self.verticalLayoutWidget)
         self.value_out2.setObjectName(u"value_out2")
         self.value_out2.setFont(font1)
@@ -611,12 +597,10 @@ class Ui_MainWindow(object):
         self.img_logo2.setText("")
         self.groupBox_master.setTitle(QCoreApplication.translate("MainWindow", u"Slave", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"Meas 1", None))
-        self.label_value1.setText(QCoreApplication.translate("MainWindow", u"Value:", None))
         self.value_out1.setText("")
         self.label_11.setText(QCoreApplication.translate("MainWindow", u"Send:", None))
         self.label_send1.setText("")
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"Meas 2", None))
-        self.label_value2.setText(QCoreApplication.translate("MainWindow", u"Value:", None))
         self.value_out2.setText("")
         self.label_13.setText(QCoreApplication.translate("MainWindow", u"Send:", None))
         self.label_send2.setText("")

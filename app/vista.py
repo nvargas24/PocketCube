@@ -279,11 +279,11 @@ class MainWindow(QMainWindow):
 
     def dispatch_serial_slave_event(self, data):
         if data["serial_id"] == MEAS1:
-            self.ui.value_out1.setText(data["value"])            
+            self.ui.value_out1.setText(f'Value:{data["value"]}V  Time:{data["time"]}s' )
             value_s = float(data["value"])
             self.graph1.update_graph(value_s)
         elif data["serial_id"] == MEAS2:
-            self.ui.value_out2.setText(data["value"])            
+            self.ui.value_out2.setText(f'Value:{data["value"]}V  Time:{data["time"]}s')            
             value_s = float(data["value"])
             self.graph2.update_graph(value_s)
         #else:
@@ -294,36 +294,20 @@ class MainWindow(QMainWindow):
         """
         Acciones a realizar cada vez que pasa un segundo
         """
-        """
-        # Lectura de datos de UI
-        value1 = self.get_value_out1()
-        value2 = self.get_value_out2()
-        """
-        # Envio de datos
-        """
-        if self.flag_send_uart:
-            # Enviar a DAC por serial
-            print("ENVIO CONFIG DAC")
-            self.obj_data_uart.send_serial("Master", DAC1, value1); # envio por UART a ESP32
-            self.obj_data_uart.send_serial("Master", DAC2, value2); # envio por UART a ESP32
-            self.flag_send_uart = False
-        """
         # Cargo datos relevantes en UI        
         reloj_str = self.update_reloj_slave()
-        #flag_value = self.verification_set_time()
-
 
         # Lectura de puerto serial
-        data_master = {"serial_id": None, "value": None}
-        data_slave = {"serial_id": None, "value": None}
-
+        data_master = {"serial_id": None, "value": None, "time": None}
+        data_slave = {"serial_id": None, "value": None, "time": None}
         data_master["serial_id"], data_master["value"]= self.obj_data_uart.reciv_serial("Master")
+        data_master["time"] = self.to_seconds(self.time_total)
         data_slave["serial_id"], data_slave["value"] = self.obj_data_uart.reciv_serial("Slave")
-
+        data_slave["time"] = self.to_seconds(self.time_total)
         #self.load_value_ui(True, data_slave["serial_id"], data_slave["value"], reloj_str)
         #self.load_value_ui(flag_value, MEAS2, data_slave["value"], reloj_str)
 
-        print(data_slave)
+        #print(data_slave)
 
         # Acciones a realizar recibir los datos de master y slave
         self.dispatch_serial_master_event(data_master)
