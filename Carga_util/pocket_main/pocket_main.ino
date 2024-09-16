@@ -44,12 +44,16 @@
 #define MAX_DATA 33
 #define PIN_DAC1 25
 #define PIN_DAC2 26
+#define MAX_EEPROM 1024
+#define THRESHOLD (MAX_EEPROM*0.99) //Umbral para enviar datos cuando se llena en un 90%
 
 #define MEAS1 1
 #define MEAS2 2
 #define RTC 3
 #define DAC1 4
 #define DAC2 5
+#define EEPROM_SIZE_FREE 6
+#define EEPRON_DATA 7
 
 /****************** Variables globales ***************/ 
 /* RTC */
@@ -65,12 +69,11 @@ char dataSend[MAX_DATA]; // Str a enviar de Master
 char dataRequestApp[MAX_DATA]; // Str respuesta de Slave
 char dataSendApp[MAX_DATA]; // Str a enviar de Master
 char dataConcat[MAX_DATA]; // Buf auxiliar para concatenar texto
+
 /* EEPROM */
-const int EEPROM_SIZE = 512; // Tamaño de la EEPROM (esto depende de tu modelo de Arduino)
-const int THRESHOLD = 480;   // Umbral para enviar datos cuando se llena en un 90%
-int currentAddress = 0;      // Dirección actual en la EEPROM
-int dataCount = 0;           // Contador de datos guardados
-char dataSendEeprom[MAX_DATA]; // Str a enviar EEPROM
+int address = 0;      // Dirección actual en la EEPROM
+char dataEEPROM[MAX_DATA]; // Str a enviar EEPROM
+char dataReadEEPROM[MAX_EEPROM];
 
 /********* Declaracion de funciones internas *********/
 void formatDataSend(char* , int, char*);
@@ -89,11 +92,11 @@ void sendToAppUart(const char*);
 void commaToSpaceConverter(char *);
 //void configFromApp(int , float );
 
-/* DAC */
-float value_volt = 0;
-
 /* EEPROM */
-void sendToEeprom();
+void writeEEPROM(char*, size_t);
+int stageUsedEEPROM();
+void clearEEPROM();
+void readEEPROM(char*);
 
 /****************** Funciones Arduino ****************/
 /**
@@ -129,29 +132,59 @@ void loop()
   /* RTC */
   datetimeNow(datetimeStr); //Obtengo datetime actual
   
-  /* I2C */
+  /* I2C MEAS1 */
   //formatDataSend(dataSend, RTC, datetimeStr);
   sendToSlave("MEAS1"); // Enviar data a slave
   requestFromSlave(); // Respuesta de slave
 
-  /* UART */
-  // OBS: Solo enviar datos recibidos de Slave
+  /* UART MEAS1 */
   commaToSpaceConverter(dataRequest);
   snprintf(dataConcat, MAX_DATA, "%s %s", datetimeStr, dataRequest);  // concateno datos
   formatDataSend(dataSendApp, RTC, dataConcat);
   sendToAppUart(dataSendApp);
 
+  /* I2C MEAS2 */
   sendToSlave("MEAS2"); // Enviar data a slave
   requestFromSlave(); // Respuesta de slave
 
-  /* UART */
-  // OBS: Solo enviar datos recibidos de Slave
+  /* UART MEAS2 */
   commaToSpaceConverter(dataRequest);
   snprintf(dataConcat, MAX_DATA, "%s %s", datetimeStr, dataRequest);  // concateno datos
   formatDataSend(dataSendApp, RTC, dataConcat);
   sendToAppUart(dataSendApp);
 
   /* EEPROM */
+  int totalEEPROM = EEPROM.length();
+  int usedEEPROM = stageUsedEEPROM();
+  int freeEEPROM = totalEEPROM - usedEEPROM;
+
+  //snprintf(dataEEPROM, MAX_DATA, "%d", totalEEPROM);
+  //formatDataSend(dataSendApp, 7, dataEEPROM);
+  //sendToAppUart(dataSendApp);
+  
+  //snprintf(dataEEPROM, MAX_DATA, "%d", usedEEPROM);
+  //formatDataSend(dataSendApp, 8, dataEEPROM);
+  //sendToAppUart(dataSendApp);
+  
+  snprintf(dataEEPROM, MAX_DATA, "%d", freeEEPROM);
+  formatDataSend(dataSendApp, EEPROM_SIZE_FREE, dataEEPROM);
+  sendToAppUart(dataSendApp);
+
+  //formatDataSend(dataSendApp, EEPRON_DATA, dataConcat);
+  //sendToAppUart(dataSendApp);
+  writeEEPROM(dataConcat, strlen(dataConcat));  // solo guaro datetime, id y value de 
+  readEEPROM(dataReadEEPROM);
+  Serial.print("------ Data leida de EEPROM:");
+  Serial.println(dataReadEEPROM);
+
+  if(usedEEPROM >= THRESHOLD){
+    Serial.println("EEPROM casi llena");
+    readEEPROM(dataReadEEPROM);
+    Serial.print("+++++++ Data leida de EEPROM:");
+    Serial.println(dataReadEEPROM);
+    clearEEPROM();
+    memset(dataReadEEPROM, 0, MAX_EEPROM);  // Rellena el array con ceros
+  }
 
   delay(100);
 }
@@ -192,7 +225,7 @@ void configInitialRTC()
   /* Fijo datetime en caso de desconexion de la alimentacion */
   if (rtc.lostPower()){
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));// Fijar a fecha y hora de compilacion
-    //rtc.adjust(DateTime(2025, 9, 8, 22, 23, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
+    rtc.adjust(DateTime(2024, 9, 15, 21, 12, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
   }
 }
 
@@ -302,6 +335,10 @@ void configFromApp(int id, float value)
 }
 */
 
+/**
+ * @brief Conversion de comas a espacios para adjuntar a trama de datos
+ * @return None
+ */
 void commaToSpaceConverter(char *data)
 {
   // Recorrer el array para encontrar la coma y reemplazarla por un espacio
@@ -314,12 +351,67 @@ void commaToSpaceConverter(char *data)
 }
 
 /* EEPROM */
-void sendToEeprom()
+/**
+ * @brief Cargar datos en memoria EEPROM
+ * @return None
+ */
+void writeEEPROM(char* data, size_t length)
 {
-  // Almacenar en EEPROM
-  if (currentAddress < EEPROM_SIZE) {
-    EEPROM.put(currentAddress, dataSendEeprom);
-    currentAddress += sizeof(dataSendEeprom);
-    dataCount++;
+  char dataWrite[length+2]; // considero 2 fines, ";": fin de msj "/0" fin de array
+
+  snprintf(dataWrite, length+2, "%s;", data);
+  Serial.print("------DATA A EEPROM: ");
+  Serial.println(dataWrite);
+  // Escribe los datos en la EEPROM
+  for (int i = 0; i < strlen(dataWrite); i++) {
+    EEPROM.write(address++, dataWrite[i]);
   }
+  // Escribe el delimitador ';' al final
+  if (address < MAX_EEPROM) {
+    EEPROM.write(address, ';');
+  }
+  Serial.println("SAVE DATA EEPROM");
+}
+
+void readEEPROM(char* data)
+{ 
+  int address = 0;
+  int index = 0;
+
+  // Lee los datos desde la EEPROM hasta llenar el array o llegar al final de la EEPROM
+  while (address < MAX_EEPROM && index < MAX_EEPROM - 1) {
+    char c = EEPROM.read(address++);
+    data[index++] = c;
+  }
+
+  // Añade un carácter nulo al final del array para que sea una cadena de texto válida
+  data[index] = '\0';
+}
+
+/**
+ * @brief Vaciar memoria EEPROM
+ * @return None
+ */
+void clearEEPROM() 
+{
+  Serial.println("Vaciando EEPROM...");
+  for (int i = 0; i < MAX_EEPROM; i++) {
+    EEPROM.write(i, 0xFF);  // Escribir valor por defecto (0xFF) en toda la EEPROM
+  }
+  Serial.println("EEPROM vaciada.");
+}
+
+/**
+ * @brief Calculo de espacio de memoria EEPROM interna utilizada
+ * @return used: espacio de memoria utilizado
+ */
+int stageUsedEEPROM()
+{
+  int used = 0;
+  for (int i = 0; i < EEPROM.length(); i++) {
+    if (EEPROM.read(i) != 0xFF) {  // La EEPROM vacía tiene el valor 0xFF
+      used++;
+    }
+  }
+  return used; 
 }
