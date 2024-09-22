@@ -41,11 +41,18 @@
 #include <EEPROM.h>
 
 /*********************** Macros ******************8***/
-#define MAX_DATA 33
+#define MAX_DATA_I2C 33
+#define MAX_DATA_UART 40
+#define MAX_DATA_RTC 20
 #define PIN_DAC1 25
 #define PIN_DAC2 26
 #define MAX_EEPROM 1024
 #define THRESHOLD (MAX_EEPROM*0.99) //Umbral para enviar datos cuando se llena en un 90%
+#define MAX_SIZE_MEAS 7
+
+#define TOTAL_EEPROM 0
+#define USED_EEPROM 1
+#define FREE_EEPROM 2
 
 #define MEAS1 1
 #define MEAS2 2
@@ -58,20 +65,17 @@
 /****************** Variables globales ***************/ 
 /* RTC */
 RTC_DS3231 rtc; // Creo objeto RTC_DS1307 rtc;
-char datetimeStr[MAX_DATA];  //
+char datetimeStr[MAX_DATA_RTC];  //
 
 /* I2C */
 const byte I2C_SLAVE_ADDR = 0x20; // Direccion I2C de Slave
-char dataRequest[MAX_DATA]; // Str respuesta de Slave
-char dataSend[MAX_DATA]; // Str a enviar de Master
+char dataRequest[MAX_DATA_I2C]; // Str respuesta de Slave
+char dataSend[MAX_DATA_I2C]; // Str a enviar de Master
 
 /* UART */
-char dataRequestApp[MAX_DATA]; // Str respuesta de Slave
-char dataSendApp[MAX_DATA]; // Str a enviar de Master
 
 /* EEPROM */
 int address = 0;      // Dirección actual en la EEPROM
-char dataEEPROM[MAX_DATA]; // Str a enviar EEPROM
 char dataReadEEPROM[MAX_EEPROM];
 
 /********* Declaracion de funciones internas *********/
@@ -96,6 +100,7 @@ void writeEEPROM(char*, size_t);
 int stageUsedEEPROM();
 void clearEEPROM();
 void readEEPROM(char*);
+int analyzeEEPROMStorage(int);
 
 /****************** Funciones Arduino ****************/
 /**
@@ -119,7 +124,14 @@ void loop()
 {
   int id = 0;
   float value = 0.0;
-  char dataConcat[MAX_DATA]; // Buf auxiliar para concatenar texto
+  char dataConcat[MAX_DATA_UART]; // Buf auxiliar para concatenar texto
+  char meas1[MAX_SIZE_MEAS];
+  char meas2[MAX_SIZE_MEAS];
+  int sizeEEPROM = 0;
+  char strAux[MAX_DATA_UART];
+  char dataSendApp[MAX_DATA_UART]; // Str a enviar de Master a APP
+
+  
   /* Serial */
   // Identificacion por comando en formato CSV
   // * Valor para DAC:ID,value -> 1,1.23 
@@ -133,55 +145,43 @@ void loop()
   datetimeNow(datetimeStr); //Obtengo datetime actual
   
   /* I2C MEAS1 */
-  //formatDataSend(dataSend, RTC, datetimeStr);
   sendToSlave("MEAS1"); // Enviar data a slave
   requestFromSlave(); // Respuesta de slave
-
-  /* UART MEAS1 */
-  commaToSpaceConverter(dataRequest);
-  snprintf(dataConcat, MAX_DATA, "%s %s", datetimeStr, dataRequest);  // concateno datos
-  formatDataSend(dataSendApp, RTC, dataConcat);
-  sendToAppUart(dataSendApp);
+  strcpy(meas1, dataRequest);
+  commaToSpaceConverter(meas1);
 
   /* I2C MEAS2 */
   sendToSlave("MEAS2"); // Enviar data a slave
   requestFromSlave(); // Respuesta de slave
+  strcpy(meas2, dataRequest);
+  commaToSpaceConverter(meas2);
 
-  /* UART MEAS2 */
-  commaToSpaceConverter(dataRequest);
-  snprintf(dataConcat, MAX_DATA, "%s %s", datetimeStr, dataRequest);  // concateno datos
+  /* ENVIO MEDICIONES A APP */
+  snprintf(dataConcat, MAX_DATA_UART, "%s +%s +%s", datetimeStr, meas1, meas2);  // concateno datos
   formatDataSend(dataSendApp, RTC, dataConcat);
   sendToAppUart(dataSendApp);
 
   /* EEPROM */
-  int totalEEPROM = EEPROM.length();
-  int usedEEPROM = stageUsedEEPROM();
-  int freeEEPROM = totalEEPROM - usedEEPROM;
-
-  //snprintf(dataEEPROM, MAX_DATA, "%d", totalEEPROM);
-  //formatDataSend(dataSendApp, 7, dataEEPROM);
-  //sendToAppUart(dataSendApp);
-  
-  //snprintf(dataEEPROM, MAX_DATA, "%d", usedEEPROM);
-  //formatDataSend(dataSendApp, 8, dataEEPROM);
-  //sendToAppUart(dataSendApp);
-  
-  snprintf(dataEEPROM, MAX_DATA, "%d", freeEEPROM);
-  formatDataSend(dataSendApp, EEPROM_SIZE_FREE, dataEEPROM);
+  sizeEEPROM = analyzeEEPROMStorage(FREE_EEPROM);
+  snprintf(strAux, MAX_DATA_UART, "%d", sizeEEPROM); // Conversion de int a str
+  formatDataSend(dataSendApp, EEPROM_SIZE_FREE, strAux);
   sendToAppUart(dataSendApp);
 
   //formatDataSend(dataSendApp, EEPRON_DATA, dataConcat);
   //sendToAppUart(dataSendApp);
-  writeEEPROM(dataConcat, strlen(dataConcat));  // solo guaro datetime, id y value de 
+  writeEEPROM(dataConcat, strlen(dataConcat));  // solo guardo datetime, id y value de 
   readEEPROM(dataReadEEPROM);
   Serial.print("------ Data leida de EEPROM:");
   Serial.println(dataReadEEPROM);
 
-  if(usedEEPROM >= THRESHOLD){
+  
+  if(sizeEEPROM <= 10){
     Serial.println("EEPROM casi llena");
-    readEEPROM(dataReadEEPROM);
-    Serial.print("+++++++ Data leida de EEPROM:");
-    Serial.println(dataReadEEPROM);
+
+    //readEEPROM(dataReadEEPROM);
+    //Serial.print("+++++++ Data leida de EEPROM:");
+    //Serial.println(dataReadEEPROM);
+
     clearEEPROM();
     memset(dataReadEEPROM, 0, MAX_EEPROM);  // Rellena el array con ceros
   }
@@ -193,7 +193,7 @@ void loop()
 
 void formatDataSend(char* buf, int id, char* str)
 {
-  snprintf(buf, MAX_DATA, "%d,%s", id, str);
+  snprintf(buf, MAX_DATA_UART, "%d,%s", id, str);
 }
 
 /* RTC */
@@ -205,7 +205,7 @@ void datetimeNow(char *datetimeStr)
 {
   DateTime now = rtc.now(); // Obtener fecha de RTC
 
-  snprintf(datetimeStr, MAX_DATA, "%04d-%02d-%02d %02d:%02d:%02d", 
+  snprintf(datetimeStr, MAX_DATA_RTC, "%04d-%02d-%02d %02d:%02d:%02d", 
            now.year(), now.month(), now.day(), 
            now.hour(), now.minute(), now.second());
 }
@@ -267,7 +267,7 @@ int requestFromSlave()
   /* Preparo Master para recibir respuesta de Slave  */
   Wire.requestFrom(I2C_SLAVE_ADDR, sizeof(dataRequest)); // Solicitud a slave
 
-  while (Wire.available() && (index < MAX_DATA)) {
+  while (Wire.available() && (index < MAX_DATA_I2C)) {
     receivedChar = Wire.read();
     // Filtra los caracteres válidos
     if (receivedChar >= 32 && receivedChar <= 126) { // Solo caracteres imprimibles
@@ -291,7 +291,7 @@ int requestFromSlave()
 
 /* UART */
 /**
- * @brief Enviar data app por UART
+ * @brief Enviar data app por UART, limita solo caracteres
  */
 void sendToAppUart(const char* data)
 {
@@ -421,4 +421,23 @@ int stageUsedEEPROM()
     }
   }
   return used; 
+}
+
+int analyzeEEPROMStorage(int type)
+{
+  int totalEEPROM = EEPROM.length();
+  int usedEEPROM = stageUsedEEPROM();
+  int freeEEPROM = totalEEPROM - usedEEPROM;
+
+
+  if(type == TOTAL_EEPROM){
+    return totalEEPROM;
+  }
+  else if(type == USED_EEPROM){
+    return usedEEPROM;
+  }
+  else if(type == FREE_EEPROM){
+    return freeEEPROM;
+  }
+
 }
