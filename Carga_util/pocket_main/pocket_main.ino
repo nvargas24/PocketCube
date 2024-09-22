@@ -60,7 +60,8 @@
 #define DAC1 4
 #define DAC2 5
 #define EEPROM_SIZE_FREE 6
-#define EEPRON_DATA 7
+#define EEPROM_DATA 7
+#define EEPROM_CLEAR 8
 
 /****************** Variables globales ***************/ 
 /* RTC */
@@ -131,7 +132,8 @@ void loop()
   char dataSendApp[MAX_DATA_UART]; // Str a enviar de Master a APP
   size_t sizeDataConcat = 0;
   char dataReadEEPROM[MAX_EEPROM];
-  
+  char aux_eeprom[MAX_EEPROM];
+
   /* Serial */
   // Identificacion por comando en formato CSV
   // * Valor para DAC:ID,value -> 1,1.23 
@@ -168,23 +170,20 @@ void loop()
   formatDataSend(dataSendApp, EEPROM_SIZE_FREE, strAux);
   sendToAppUart(dataSendApp);
 
-  //formatDataSend(dataSendApp, EEPRON_DATA, dataConcat);
-  //sendToAppUart(dataSendApp);
-  writeEEPROM(dataConcat, sizeDataConcat);  // solo guardo datetime, id y value de mediciones
-  readEEPROM(dataReadEEPROM);
-  Serial.print("------ Data leida de EEPROM:");
-  Serial.println(dataReadEEPROM);
 
-  
-  if(sizeEEPROM <= 10){
-    Serial.println("EEPROM casi llena");
-
-    //readEEPROM(dataReadEEPROM);
-    //Serial.print("+++++++ Data leida de EEPROM:");
-    //Serial.println(dataReadEEPROM);
+  if(sizeEEPROM >= sizeDataConcat){
+    writeEEPROM(dataConcat, sizeDataConcat);  // solo guardo datetime, id y value de mediciones
+  }
+  else{
+    readEEPROM(dataReadEEPROM);
+    //snprintf(aux_eeprom, MAX_EEPROM, "%d,%s", EEPROM_DATA, dataReadEEPROM);
+    sendToAppUart(dataReadEEPROM);
 
     clearEEPROM();
     memset(dataReadEEPROM, 0, MAX_EEPROM);  // Rellena el array con ceros
+    address = 0; // ubico en primera celda de EEPROM, evitando data cortada
+    formatDataSend(dataSendApp, EEPROM_CLEAR, "VACIO"); // Notificacion de vacio de EEPROM
+    sendToAppUart(dataSendApp); 
   }
 
   delay(100);
