@@ -76,7 +76,6 @@ char dataSend[MAX_DATA_I2C]; // Str a enviar de Master
 
 /* EEPROM */
 int address = 0;      // Dirección actual en la EEPROM
-char dataReadEEPROM[MAX_EEPROM];
 
 /********* Declaracion de funciones internas *********/
 void formatDataSend(char* , int, char*);
@@ -130,7 +129,8 @@ void loop()
   int sizeEEPROM = 0;
   char strAux[MAX_DATA_UART];
   char dataSendApp[MAX_DATA_UART]; // Str a enviar de Master a APP
-
+  size_t sizeDataConcat = 0;
+  char dataReadEEPROM[MAX_EEPROM];
   
   /* Serial */
   // Identificacion por comando en formato CSV
@@ -158,6 +158,7 @@ void loop()
 
   /* ENVIO MEDICIONES A APP */
   snprintf(dataConcat, MAX_DATA_UART, "%s +%s +%s", datetimeStr, meas1, meas2);  // concateno datos
+  sizeDataConcat = strlen(dataConcat);
   formatDataSend(dataSendApp, RTC, dataConcat);
   sendToAppUart(dataSendApp);
 
@@ -169,7 +170,7 @@ void loop()
 
   //formatDataSend(dataSendApp, EEPRON_DATA, dataConcat);
   //sendToAppUart(dataSendApp);
-  writeEEPROM(dataConcat, strlen(dataConcat));  // solo guardo datetime, id y value de 
+  writeEEPROM(dataConcat, sizeDataConcat);  // solo guardo datetime, id y value de mediciones
   readEEPROM(dataReadEEPROM);
   Serial.print("------ Data leida de EEPROM:");
   Serial.println(dataReadEEPROM);
