@@ -156,7 +156,7 @@ void requestEvent()
 {
   if(!strcmp(dataReceive, "MEAS1")){
     /* I2C */
-    dtostrf(meas1, 5, 2, measStr1);// Necesario ya que arduino no reconoce float para usar en snprintf
+    dtostrf(meas1, 4, 2, measStr1);// Necesario ya que arduino no reconoce float para usar en snprintf
     formatSendCmd(dataRequest, MEAS1, measStr1); 
     sendLimitedData(dataRequest); // Envía solo los datos válidos I2C 
 
@@ -166,7 +166,7 @@ void requestEvent()
   }
   else if(!strcmp(dataReceive, "MEAS2")){
     /* I2C */
-    dtostrf(meas2, 5, 2, measStr2);  
+    dtostrf(meas2, 4, 2, measStr2);  
     formatSendCmd(dataRequest, MEAS2, measStr2); 
     sendLimitedData(dataRequest); // Envía solo los datos válidos I2C 
     /* Serial */

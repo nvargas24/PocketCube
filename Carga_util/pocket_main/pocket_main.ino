@@ -68,7 +68,6 @@ char dataSend[MAX_DATA]; // Str a enviar de Master
 /* UART */
 char dataRequestApp[MAX_DATA]; // Str respuesta de Slave
 char dataSendApp[MAX_DATA]; // Str a enviar de Master
-char dataConcat[MAX_DATA]; // Buf auxiliar para concatenar texto
 
 /* EEPROM */
 int address = 0;      // Dirección actual en la EEPROM
@@ -84,7 +83,7 @@ void datetimeNow(char *);
 
 /* I2C */
 void sendToSlave(const char*);
-void requestFromSlave();
+int requestFromSlave();
 
 /* UART */
 void requestFromAppUart(int*, float*);
@@ -120,6 +119,7 @@ void loop()
 {
   int id = 0;
   float value = 0.0;
+  char dataConcat[MAX_DATA]; // Buf auxiliar para concatenar texto
   /* Serial */
   // Identificacion por comando en formato CSV
   // * Valor para DAC:ID,value -> 1,1.23 
@@ -258,28 +258,35 @@ void sendToSlave(const char *data)
  * @brief Respuesta de Slave I2C
  * @return String con mensaje de Slave
  */
-void requestFromSlave()
+int requestFromSlave()
 {
   uint8_t index = 0;  
-  
+  char receivedChar;
+  int size_rta = 0;
+
   /* Preparo Master para recibir respuesta de Slave  */
   Wire.requestFrom(I2C_SLAVE_ADDR, sizeof(dataRequest)); // Solicitud a slave
 
-  while (Wire.available() && index < sizeof(dataRequest) - 1) {
-    char receivedChar = Wire.read();
+  while (Wire.available() && (index < MAX_DATA)) {
+    receivedChar = Wire.read();
     // Filtra los caracteres válidos
     if (receivedChar >= 32 && receivedChar <= 126) { // Solo caracteres imprimibles
-      dataRequest[index++] = receivedChar;
-    } else {
-      // Si encuentras un carácter no imprimible, puedes manejarlo aquí
-      dataRequest[index++] = ' '; // Reemplazar caracteres no imprimibles con un espacio
+      dataRequest[index] = receivedChar;
+      index++;
+    } 
+    else {
+      // Si encuentras un carácter no imprimible
+      break;
     }
   }
   dataRequest[index] = '\0'; // Terminar el string
 
+  size_rta = strlen(dataRequest);
+
   /* Verifico datos recibidos
   Serial.print("R-Slave: ");
   Serial.print(dataRequest);*/
+  return size_rta;
 }
 
 /* UART */
