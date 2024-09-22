@@ -40,7 +40,8 @@
 #include "RTClib.h"
 #include <EEPROM.h>
 
-/*********************** Macros ******************8***/
+/*********************** Macros *********************/
+#define I2C_SLAVE_ADDR 0x20
 #define MAX_DATA_I2C 33
 #define MAX_DATA_UART 40
 #define MAX_DATA_RTC 20
@@ -69,7 +70,6 @@ RTC_DS3231 rtc; // Creo objeto RTC_DS1307 rtc;
 char datetimeStr[MAX_DATA_RTC];  //
 
 /* I2C */
-const byte I2C_SLAVE_ADDR = 0x20; // Direccion I2C de Slave
 char dataRequest[MAX_DATA_I2C]; // Str respuesta de Slave
 char dataSend[MAX_DATA_I2C]; // Str a enviar de Master
 
@@ -80,6 +80,7 @@ int address = 0;      // Dirección actual en la EEPROM
 
 /********* Declaracion de funciones internas *********/
 void formatDataSend(char* , int, char*);
+void formatDataSendLong(int, char*);
 
 /* RTC */
 void configInitialRTC();
@@ -177,6 +178,7 @@ void loop()
   else{
     readEEPROM(dataReadEEPROM);
     //snprintf(aux_eeprom, MAX_EEPROM, "%d,%s", EEPROM_DATA, dataReadEEPROM);
+    formatDataSendLong(EEPROM_DATA, dataReadEEPROM);
     sendToAppUart(dataReadEEPROM);
 
     clearEEPROM();
@@ -190,7 +192,27 @@ void loop()
 }
 
 /**************** Funciones internas  *****************/
+void formatDataSendLong(int id, char* str)
+{
+  char text[3];
+  int textoLen;
+  int arrayLen;
 
+  snprintf(text, 3, "%d,", id);
+
+  textoLen = strlen(text);
+  arrayLen = strlen(str);
+  
+  for (int i = arrayLen; i >= 0; i--) {
+    str[i + textoLen] = str[i]; // Desplaza el contenido
+  }
+
+  // Copia el nuevo texto al inicio del array
+  for (int i = 0; i < textoLen; i++) {
+    str[i] = text[i];
+  }
+
+}
 void formatDataSend(char* buf, int id, char* str)
 {
   snprintf(buf, MAX_DATA_UART, "%d,%s", id, str);
@@ -297,7 +319,9 @@ void sendToAppUart(const char* data)
 {
     //Enviar solo la parte válida del mensaje
     for (int i = 0; i < strlen(data); i++) {
-      Serial.print(data[i]);
+      if (data[i] >= 32 && data[i] <= 126) { // Solo caracteres imprimibles// Cod ASCII
+        Serial.print(data[i]);
+      }
     }
     Serial.println();  // Envía un salto de línea al final
 }
