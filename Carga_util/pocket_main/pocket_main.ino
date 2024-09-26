@@ -58,11 +58,9 @@
 #define MEAS1 1
 #define MEAS2 2
 #define RTC 3
-#define DAC1 4
-#define DAC2 5
-#define EEPROM_SIZE_FREE 6
-#define EEPROM_DATA 7
-#define EEPROM_CLEAR 8
+#define EEPROM_FREE 4
+#define EEPROM_DATA 5
+#define STATE 6
 
 /****************** Variables globales ***************/ 
 /* RTC */
@@ -144,6 +142,9 @@ void loop()
   //  configFromApp(id, value);  // Asigno dato segun id    
   //}
 
+  formatDataSend(dataSendApp, STATE, "Read MEASURES");
+  sendToAppUart(dataSendApp);   
+  
   /* RTC */
   datetimeNow(datetimeStr); //Obtengo datetime actual
   
@@ -160,7 +161,7 @@ void loop()
   commaToSpaceConverter(meas2);
 
   /* ENVIO MEDICIONES A APP */
-  snprintf(dataConcat, MAX_DATA_UART, "%s +%s +%s", datetimeStr, meas1, meas2);  // concateno datos
+  snprintf(dataConcat, MAX_DATA_UART, "%s %s %s", datetimeStr, meas1, meas2);  // concateno datos
   sizeDataConcat = strlen(dataConcat);
   formatDataSend(dataSendApp, RTC, dataConcat);
   sendToAppUart(dataSendApp);
@@ -168,23 +169,30 @@ void loop()
   /* EEPROM */
   sizeEEPROM = analyzeEEPROMStorage(FREE_EEPROM);
   snprintf(strAux, MAX_DATA_UART, "%d", sizeEEPROM); // Conversion de int a str
-  formatDataSend(dataSendApp, EEPROM_SIZE_FREE, strAux);
+  formatDataSend(dataSendApp, EEPROM_FREE, strAux);
   sendToAppUart(dataSendApp);
 
 
   if(sizeEEPROM >= sizeDataConcat){
+    formatDataSend(dataSendApp, STATE, "Write EEPROM");
+    sendToAppUart(dataSendApp);    
     writeEEPROM(dataConcat, sizeDataConcat);  // solo guardo datetime, id y value de mediciones
   }
   else{
+    formatDataSend(dataSendApp, STATE, "Read EEPROM"); // Notificacion de vacio de EEPROM
+    sendToAppUart(dataSendApp);     
     readEEPROM(dataReadEEPROM);
+
     //snprintf(aux_eeprom, MAX_EEPROM, "%d,%s", EEPROM_DATA, dataReadEEPROM);
     formatDataSendLong(EEPROM_DATA, dataReadEEPROM);
     sendToAppUart(dataReadEEPROM);
 
+    formatDataSend(dataSendApp, STATE, "Clear EEPROM"); // Notificacion de vacio de EEPROM
+    sendToAppUart(dataSendApp); 
     clearEEPROM();
     memset(dataReadEEPROM, 0, MAX_EEPROM);  // Rellena el array con ceros
     address = 0; // ubico en primera celda de EEPROM, evitando data cortada
-    formatDataSend(dataSendApp, EEPROM_CLEAR, "VACIO"); // Notificacion de vacio de EEPROM
+    formatDataSend(dataSendApp, STATE, "EEPROM OK"); // Notificacion de vacio de EEPROM
     sendToAppUart(dataSendApp); 
   }
 
@@ -391,8 +399,7 @@ void writeEEPROM(char* data, size_t length)
   char dataWrite[length+2]; // considero 2 fines, ";": fin de msj "/0" fin de array
 
   snprintf(dataWrite, length+2, "%s;", data);
-  Serial.print("------DATA A EEPROM: ");
-  Serial.println(dataWrite);
+  
   // Escribe los datos en la EEPROM
   for (int i = 0; i < strlen(dataWrite); i++) {
     EEPROM.write(address++, dataWrite[i]);
@@ -401,7 +408,6 @@ void writeEEPROM(char* data, size_t length)
   if (address < MAX_EEPROM) {
     EEPROM.write(address, ';');
   }
-  Serial.println("SAVE DATA EEPROM");
 }
 
 void readEEPROM(char* data)
@@ -425,11 +431,11 @@ void readEEPROM(char* data)
  */
 void clearEEPROM() 
 {
-  Serial.println("Vaciando EEPROM...");
+  //Serial.println("Vaciando EEPROM...");
   for (int i = 0; i < MAX_EEPROM; i++) {
     EEPROM.write(i, 0xFF);  // Escribir valor por defecto (0xFF) en toda la EEPROM
   }
-  Serial.println("EEPROM vaciada.");
+  //Serial.println("EEPROM vaciada.");
 }
 
 /**

@@ -246,36 +246,42 @@ class MainWindow(QMainWindow):
         return flag_value
 
     def dispatch_serial_master_event(self, data):
-
+        
         if data["serial_id"] == RTC:
             # Identifico datos recibidos en la trama
-            date, time, serial_id, value = self.obj_data_processor.separate_str(data["value"])
+            date, time, serial_id1, value1, serial_id2, value2 = self.obj_data_processor.separate_str(data["value"])
             # Determino nombre de id
-            if int(serial_id) == MEAS1:
-                id_name = NAME_MEAS1
-            elif int(serial_id) == MEAS2:
-                id_name = NAME_MEAS2            
+            if int(serial_id1) == MEAS1:
+                id_name1 = NAME_MEAS1
+            if int(serial_id2) == MEAS2:
+                id_name2 = NAME_MEAS2            
 
             # Muestro datos de RTC en display
             self.ui.lcd_time_rtc.display(f"{time}")
             self.ui.lcd_date_rtc.setText(f"{date}")
 
             # Agregar fila a tabla
-            row_data = [serial_id, id_name, value, f"{date} {time}"]
-            current_row = self.ui.table_serial.rowCount()
-            self.ui.table_serial.insertRow(current_row)
-
-            # Insertar los datos en la nueva fila
-            for column in range(len(row_data)):
-                item = QTableWidgetItem(row_data[column])
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.ui.table_serial.setItem(current_row, column, item)
+            row_data = [serial_id1, id_name1, value1, f"{date} {time}"]
+            self.load_row_table(row_data)
+            row_data = [serial_id2, id_name2, value2, f"{date} {time}"]
+            self.load_row_table(row_data)
 
             # Scrool automatico al cargarse un nuevo data que sobresalga de la tabla
             self.ui.table_serial.scrollToBottom()
+            
         else:
-            print("ID NO IDENTIFICADO")
-            print("Master: ", data)
+            print("Master: ID NO IDENTIFICADO")
+            print("Data Master: ", data)
+
+    def load_row_table(self, row_data):
+        current_row = self.ui.table_serial.rowCount()
+        self.ui.table_serial.insertRow(current_row)
+
+        # Insertar los datos en la nueva fila
+        for column in range(len(row_data)):
+            item = QTableWidgetItem(row_data[column])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.ui.table_serial.setItem(current_row, column, item)
 
     def dispatch_serial_slave_event(self, data):
         if data["serial_id"] == MEAS1:
@@ -304,10 +310,8 @@ class MainWindow(QMainWindow):
         data_master["time"] = self.to_seconds(self.time_total)
         data_slave["serial_id"], data_slave["value"] = self.obj_data_uart.reciv_serial("Slave")
         data_slave["time"] = self.to_seconds(self.time_total)
-        #self.load_value_ui(True, data_slave["serial_id"], data_slave["value"], reloj_str)
-        #self.load_value_ui(flag_value, MEAS2, data_slave["value"], reloj_str)
+        
 
-        #print(data_slave)
 
         # Acciones a realizar recibir los datos de master y slave
         self.dispatch_serial_master_event(data_master)

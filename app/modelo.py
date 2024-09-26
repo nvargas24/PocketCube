@@ -57,9 +57,9 @@ class DataProcessor():
             return None, None
 
     def separate_str(self, str_full):
-        date, time, id, value = str_full.split()
+        date, time, serial_id1, value1, serial_id2, value2 = str_full.split()
 
-        return date, time, id, value
+        return date, time, serial_id1, value1, serial_id2, value2
 
 class ManagerFile(): pass
 class ManagerDataUart(DataProcessor):
