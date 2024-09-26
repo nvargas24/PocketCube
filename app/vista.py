@@ -349,19 +349,6 @@ class MainWindow(QMainWindow):
         value_out2 = self.ui.sbox_volt2.value()
 
         return value_out2
-
-    def load_value_ui(self, flag, serial_id, value, reloj_str):
-
-        # Temporizador para enviar datos
-        if flag:
-            if serial_id==MEAS1:
-                self.ui.label_send1.setText(f"{reloj_str} {value:.02f}")
-                self.graph1.flag_send = True # Marca en grafico
-            elif serial_id==MEAS2:
-                self.ui.label_send2.setText(f"{reloj_str} {value:.02f}")
-                self.graph2.flag_send = True # Marca en grafico
-            
-            flag = False
         
     def get_time_send1(self):
         """

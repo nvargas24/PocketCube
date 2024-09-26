@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>924</width>
-    <height>728</height>
+    <height>714</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -283,14 +283,14 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>30</y>
+            <y>20</y>
             <width>441</width>
             <height>401</height>
            </rect>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout" stretch="4,1,19">
+          <layout class="QVBoxLayout" name="verticalLayout" stretch="4,1,10,10">
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_18" stretch="7">
+            <layout class="QHBoxLayout" name="horizontalLayout_18" stretch="0">
              <item>
               <widget class="QLCDNumber" name="lcd_timer_total">
                <property name="layoutDirection">
@@ -329,9 +329,12 @@
             </widget>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="1,1,1">
+            <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,10">
+             <property name="spacing">
+              <number>1</number>
+             </property>
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_7" stretch="1,0,10,1">
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
                <item>
                 <widget class="QLabel" name="label_4">
                  <property name="font">
@@ -350,66 +353,34 @@
                 </widget>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_4">
-                 <item>
-                  <widget class="QLabel" name="value_out1">
-                   <property name="font">
-                    <font>
-                     <pointsize>12</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QVBoxLayout" name="graph_out1"/>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="1,2">
-                 <item>
-                  <widget class="QLabel" name="label_11">
-                   <property name="font">
-                    <font>
-                     <pointsize>10</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>Send:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_send1">
-                   <property name="font">
-                    <font>
-                     <pointsize>10</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                <widget class="QLabel" name="value_out1">
+                 <property name="font">
+                  <font>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
              <item>
-              <widget class="Line" name="line_2">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-              </widget>
+              <layout class="QVBoxLayout" name="graph_out1"/>
              </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_7" stretch="1,10">
+             <property name="spacing">
+              <number>1</number>
+             </property>
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_8" stretch="1,0,10,1">
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
                <item>
                 <widget class="QLabel" name="label_5">
                  <property name="font">
@@ -428,56 +399,24 @@
                 </widget>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_5">
-                 <item>
-                  <widget class="QLabel" name="value_out2">
-                   <property name="font">
-                    <font>
-                     <pointsize>12</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QVBoxLayout" name="graph_out2"/>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_20" stretch="1,2">
-                 <item>
-                  <widget class="QLabel" name="label_13">
-                   <property name="font">
-                    <font>
-                     <pointsize>10</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>Send:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_send2">
-                   <property name="font">
-                    <font>
-                     <pointsize>10</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                <widget class="QLabel" name="value_out2">
+                 <property name="font">
+                  <font>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
                </item>
               </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="graph_out2"/>
              </item>
             </layout>
            </item>
@@ -506,12 +445,12 @@
           <property name="geometry">
            <rect>
             <x>20</x>
-            <y>30</y>
+            <y>20</y>
             <width>381</width>
-            <height>391</height>
+            <height>401</height>
            </rect>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="6,0,20,1">
+          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="6,0,20,1,0">
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,1">
              <property name="spacing">
@@ -798,6 +737,13 @@
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QProgressBar" name="progressBar">
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </widget>
@@ -886,10 +832,4 @@
  </widget>
  <resources/>
  <connections/>
- <buttongroups>
-  <buttongroup name="buttonGroup_3"/>
-  <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_4"/>
- </buttongroups>
 </ui>
