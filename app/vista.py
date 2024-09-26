@@ -26,7 +26,7 @@ from Qt.simulation_load import *
 MEAS1 = 1
 MEAS2 = 2
 RTC = 3
-EEPROM_FREE = 4
+EEPROM_USED = 4
 EEPROM_DATA = 5
 STATE = 6
 
@@ -50,7 +50,7 @@ class Graph_volt(FigureCanvas):
         self.grid_lines_h = []
 
         self.fig, self.ax = plt.subplots(1, dpi=82, figsize=(12,12), sharey=True, facecolor="none")
-        self.fig.subplots_adjust(left=.18, bottom=.2, right=.95, top=.95) #Ajuste de escala de grafica
+        self.fig.subplots_adjust(left=.09, bottom=.2, right=.95, top=.95) #Ajuste de escala de grafica
         super().__init__(self.fig)
 
         self.set_graph_style()
@@ -61,27 +61,6 @@ class Graph_volt(FigureCanvas):
 
         # Crear la línea inicial
         self.line, = self.ax.plot([], [], picker=5)
-
-        #self.test_graph()
-        #self.draw()
-
-    def test_graph(self):
-        # Generar datos de ejemplo
-        voltaje = np.linspace(0, 4, 10)  # Voltaje en voltios (V)
-        corriente = np.linspace(0, 1, 10)  # Corriente en amperios (A)
-        potencia = voltaje * corriente  # Potencia en vatios (W)
-
-        # Encontrar el punto de máxima potencia
-        indice_max_potencia = np.argmax(potencia)
-        voltaje_mpp = voltaje[indice_max_potencia]
-        corriente_mpp = corriente[indice_max_potencia]
-        potencia_mpp = potencia[indice_max_potencia]
-
-        # Graficar potencia vs voltaje
-        self.ax.plot(voltaje, potencia, label='Potencia vs Voltaje', color='blue', linewidth=2.5)
-
-        # Marcar el punto MPP
-        self.ax.scatter(voltaje_mpp, potencia_mpp, color='red', zorder=2, label='MPP')
 
     def update_graph(self, new_y_value):
         """
@@ -165,7 +144,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.setWindowTitle("Simulador - Grupo SyCE UTN-FRH")
 
-        self.setFixedSize(930, 720)
+        self.setFixedSize(930, 750)
         #self.setWindowIcon(QIcon(".\Imagenes\logotipo_simple_utn_haedo.png"))
 
         # Cargo icono a app
@@ -228,6 +207,10 @@ class MainWindow(QMainWindow):
         # Inicializo por defecto envio cada 10 seg
         self.set_time1 = QTime(0, 0, 10, 0) 
 
+        # Atributos de datos master y slave
+        self.data_master = {"serial_id": None, "value": None, "time": None}
+        self.data_slave = {"serial_id": None, "value": None, "time": None}
+
     def update_reloj_slave(self):
         # Convertir a str QTime
         reloj_str_total = self.time_total.toString("hh:mm:ss")
@@ -271,6 +254,8 @@ class MainWindow(QMainWindow):
             self.ui.table_serial.scrollToBottom()
         elif data["serial_id"] == STATE:
             self.ui.text_state.setText(data["value"])
+        elif data["serial_id"] == EEPROM_USED:
+            self.ui.prog_bar_eeprom_used.setValue(int(data["value"]))
         else:
             print("Master: ID NO IDENTIFICADO")
             print("Data Master: ", data)
@@ -306,18 +291,14 @@ class MainWindow(QMainWindow):
         reloj_str = self.update_reloj_slave()
 
         # Lectura de puerto serial
-        data_master = {"serial_id": None, "value": None, "time": None}
-        data_slave = {"serial_id": None, "value": None, "time": None}
-        data_master["serial_id"], data_master["value"]= self.obj_data_uart.reciv_serial("Master")
-        data_master["time"] = self.to_seconds(self.time_total)
-        data_slave["serial_id"], data_slave["value"] = self.obj_data_uart.reciv_serial("Slave")
-        data_slave["time"] = self.to_seconds(self.time_total)
+        self.data_master["serial_id"], self.data_master["value"]= self.obj_data_uart.reciv_serial("Master")
+        self.data_master["time"] = self.to_seconds(self.time_total)
+        self.data_slave["serial_id"], self.data_slave["value"] = self.obj_data_uart.reciv_serial("Slave")
+        self.data_slave["time"] = self.to_seconds(self.time_total)
         
-
-
         # Acciones a realizar recibir los datos de master y slave
-        self.dispatch_serial_master_event(data_master)
-        self.dispatch_serial_slave_event(data_slave)
+        self.dispatch_serial_master_event(self.data_master)
+        self.dispatch_serial_slave_event(self.data_slave)
 
         # Incremento de timer QT -- LUEGO HACERLO CON ARDUINO
         

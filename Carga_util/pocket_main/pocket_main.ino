@@ -58,7 +58,7 @@
 #define MEAS1 1
 #define MEAS2 2
 #define RTC 3
-#define EEPROM_FREE 4
+#define EEPROM_USED 4
 #define EEPROM_DATA 5
 #define STATE 6
 
@@ -126,7 +126,10 @@ void loop()
   char dataConcat[MAX_DATA_UART]; // Buf auxiliar para concatenar texto
   char meas1[MAX_SIZE_MEAS];
   char meas2[MAX_SIZE_MEAS];
-  int sizeEEPROM = 0;
+  int sizeEEPROM_total = 0;
+  int sizeEEPROM_used = 0;
+  int sizeEEPROM_used_per = 0;
+  int sizeEEPROM_free = 0;
   char strAux[MAX_DATA_UART];
   char dataSendApp[MAX_DATA_UART]; // Str a enviar de Master a APP
   size_t sizeDataConcat = 0;
@@ -167,13 +170,17 @@ void loop()
   sendToAppUart(dataSendApp);
 
   /* EEPROM */
-  sizeEEPROM = analyzeEEPROMStorage(FREE_EEPROM);
-  snprintf(strAux, MAX_DATA_UART, "%d", sizeEEPROM); // Conversion de int a str
-  formatDataSend(dataSendApp, EEPROM_FREE, strAux);
+  sizeEEPROM_total = analyzeEEPROMStorage(TOTAL_EEPROM);
+  sizeEEPROM_used = analyzeEEPROMStorage(USED_EEPROM);
+  sizeEEPROM_free = analyzeEEPROMStorage(FREE_EEPROM);
+  sizeEEPROM_used_per = (sizeEEPROM_used*100.0)/sizeEEPROM_total;
+
+  snprintf(strAux, MAX_DATA_UART, "%d", sizeEEPROM_used_per); // Conversion de int a str
+  formatDataSend(dataSendApp, EEPROM_USED, strAux);
   sendToAppUart(dataSendApp);
 
 
-  if(sizeEEPROM >= sizeDataConcat){
+  if(sizeEEPROM_free >= sizeDataConcat){
     formatDataSend(dataSendApp, STATE, "Write EEPROM");
     sendToAppUart(dataSendApp);    
     writeEEPROM(dataConcat, sizeDataConcat);  // solo guardo datetime, id y value de mediciones

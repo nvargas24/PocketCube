@@ -17,13 +17,13 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(924, 714)
+        MainWindow.resize(924, 749)
         MainWindow.setStyleSheet(u"background-color: rgb(230, 230, 230);")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayoutWidget_6 = QWidget(self.centralwidget)
         self.verticalLayoutWidget_6.setObjectName(u"verticalLayoutWidget_6")
-        self.verticalLayoutWidget_6.setGeometry(QRect(20, 10, 891, 681))
+        self.verticalLayoutWidget_6.setGeometry(QRect(20, 10, 891, 711))
         self.verticalLayout_6 = QVBoxLayout(self.verticalLayoutWidget_6)
         self.verticalLayout_6.setSpacing(10)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
@@ -196,7 +196,7 @@ class Ui_MainWindow(object):
         self.groupBox_master.setFont(font1)
         self.verticalLayoutWidget = QWidget(self.groupBox_master)
         self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
-        self.verticalLayoutWidget.setGeometry(QRect(10, 20, 441, 401))
+        self.verticalLayoutWidget.setGeometry(QRect(10, 20, 441, 441))
         self.verticalLayout = QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -295,8 +295,8 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.setStretch(0, 4)
         self.verticalLayout.setStretch(1, 1)
-        self.verticalLayout.setStretch(2, 10)
-        self.verticalLayout.setStretch(3, 10)
+        self.verticalLayout.setStretch(2, 12)
+        self.verticalLayout.setStretch(3, 12)
 
         self.horizontalLayout.addWidget(self.groupBox_master)
 
@@ -312,7 +312,7 @@ class Ui_MainWindow(object):
         self.groupBox_slave.setFont(font1)
         self.verticalLayoutWidget_4 = QWidget(self.groupBox_slave)
         self.verticalLayoutWidget_4.setObjectName(u"verticalLayoutWidget_4")
-        self.verticalLayoutWidget_4.setGeometry(QRect(20, 20, 381, 401))
+        self.verticalLayoutWidget_4.setGeometry(QRect(20, 20, 381, 441))
         self.verticalLayout_4 = QVBoxLayout(self.verticalLayoutWidget_4)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
@@ -468,14 +468,14 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_4.addWidget(self.line_6)
 
-        self.progressBar = QProgressBar(self.verticalLayoutWidget_4)
-        self.progressBar.setObjectName(u"progressBar")
-        self.progressBar.setValue(0)
+        self.prog_bar_eeprom_used = QProgressBar(self.verticalLayoutWidget_4)
+        self.prog_bar_eeprom_used.setObjectName(u"prog_bar_eeprom_used")
+        self.prog_bar_eeprom_used.setValue(0)
 
-        self.verticalLayout_4.addWidget(self.progressBar)
+        self.verticalLayout_4.addWidget(self.prog_bar_eeprom_used)
 
         self.verticalLayout_4.setStretch(0, 6)
-        self.verticalLayout_4.setStretch(2, 20)
+        self.verticalLayout_4.setStretch(2, 22)
         self.verticalLayout_4.setStretch(3, 1)
 
         self.horizontalLayout.addWidget(self.groupBox_slave)

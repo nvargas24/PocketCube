@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>924</width>
-    <height>714</height>
+    <height>749</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
       <x>20</x>
       <y>10</y>
       <width>891</width>
-      <height>681</height>
+      <height>711</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_6" stretch="1,4,1,16,2">
@@ -285,10 +285,10 @@
             <x>10</x>
             <y>20</y>
             <width>441</width>
-            <height>401</height>
+            <height>441</height>
            </rect>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout" stretch="4,1,10,10">
+          <layout class="QVBoxLayout" name="verticalLayout" stretch="4,1,12,12">
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_18" stretch="0">
              <item>
@@ -447,10 +447,10 @@
             <x>20</x>
             <y>20</y>
             <width>381</width>
-            <height>401</height>
+            <height>441</height>
            </rect>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="6,0,20,1,0">
+          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="6,0,22,1,0">
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_2" stretch="10,1">
              <property name="spacing">
@@ -738,7 +738,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QProgressBar" name="progressBar">
+            <widget class="QProgressBar" name="prog_bar_eeprom_used">
              <property name="value">
               <number>0</number>
              </property>
