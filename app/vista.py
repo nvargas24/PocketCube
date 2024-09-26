@@ -26,8 +26,9 @@ from Qt.simulation_load import *
 MEAS1 = 1
 MEAS2 = 2
 RTC = 3
-DAC1 = 4
-DAC2 = 5
+EEPROM_FREE = 4
+EEPROM_DATA = 5
+STATE = 6
 
 NAME_MEAS1 = "Meas1"
 NAME_MEAS2 = "Meas2"
@@ -268,7 +269,8 @@ class MainWindow(QMainWindow):
 
             # Scrool automatico al cargarse un nuevo data que sobresalga de la tabla
             self.ui.table_serial.scrollToBottom()
-            
+        elif data["serial_id"] == STATE:
+            self.ui.text_state.setText(data["value"])
         else:
             print("Master: ID NO IDENTIFICADO")
             print("Data Master: ", data)
