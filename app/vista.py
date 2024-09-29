@@ -168,6 +168,7 @@ class MainWindow(QMainWindow):
         # Creo objetos 
         self.obj_data_uart = ManagerDataUart()
         self.obj_data_processor = DataProcessor()
+        self.obj_file = ManagerFile()
 
         # Carga de puertos disponibles en combobox
         list_ports = self.obj_data_uart.list_port_com()
@@ -239,7 +240,7 @@ class MainWindow(QMainWindow):
                 id_name1 = NAME_MEAS1
             if int(serial_id2) == MEAS2:
                 id_name2 = NAME_MEAS2            
-
+            
             # Muestro datos de RTC en display
             self.ui.lcd_time_rtc.display(f"{time}")
             self.ui.lcd_date_rtc.setText(f"{date}")
@@ -256,6 +257,12 @@ class MainWindow(QMainWindow):
             self.ui.text_state.setText(data["value"])
         elif data["serial_id"] == EEPROM_USED:
             self.ui.prog_bar_eeprom_used.setValue(int(data["value"]))
+        elif data["serial_id"] == EEPROM_DATA:
+            data = self.obj_data_processor.format_tocsv(data["value"])
+            print("Master: Concateno data de EEPROM a CSV")
+            print(data)
+            self.obj_file.create_csv(data)
+            # FALTA AGREGAR PARA CARGAR ARCHIVO CSV
         else:
             print("Master: ID NO IDENTIFICADO")
             print("Data Master: ", data)
@@ -279,9 +286,9 @@ class MainWindow(QMainWindow):
             self.ui.value_out2.setText(f'Value:{data["value"]}V  Time:{data["time"]}s')            
             value_s = float(data["value"])
             self.graph2.update_graph(value_s)
-        #else:
-        #    print("ID NO IDENTIFICADO")
-        #    print("Slave: ", data)
+        else:
+            print("ID NO IDENTIFICADO")
+            print("Data Slave: ", data)
 
     def timeout_1mseg(self):
         """

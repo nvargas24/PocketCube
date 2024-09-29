@@ -179,7 +179,7 @@ void loop()
   formatDataSend(dataSendApp, EEPROM_USED, strAux);
   sendToAppUart(dataSendApp);
 
-
+  
   if(sizeEEPROM_free >= sizeDataConcat){
     formatDataSend(dataSendApp, STATE, "Write EEPROM");
     sendToAppUart(dataSendApp);    
@@ -202,7 +202,7 @@ void loop()
     formatDataSend(dataSendApp, STATE, "EEPROM OK"); // Notificacion de vacio de EEPROM
     sendToAppUart(dataSendApp); 
   }
-
+  
   delay(100);
 }
 
@@ -412,9 +412,9 @@ void writeEEPROM(char* data, size_t length)
     EEPROM.write(address++, dataWrite[i]);
   }
   // Escribe el delimitador ';' al final
-  if (address < MAX_EEPROM) {
-    EEPROM.write(address, ';');
-  }
+  //if (address < MAX_EEPROM) {
+  //  EEPROM.write(address, ';');
+  //}
 }
 
 void readEEPROM(char* data)
