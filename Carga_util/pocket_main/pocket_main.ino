@@ -262,7 +262,7 @@ void configInitialRTC()
   /* Fijo datetime en caso de desconexion de la alimentacion */
   if (rtc.lostPower()){
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));// Fijar a fecha y hora de compilacion
-    rtc.adjust(DateTime(2024, 9, 15, 21, 12, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
+    //rtc.adjust(DateTime(2024, 9, 15, 21, 12, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
   }
 }
 

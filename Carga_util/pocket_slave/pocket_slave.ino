@@ -46,7 +46,9 @@
 #define MEAS1 1
 #define MEAS2 2
 #define RTC 3
-#define TIMER 6
+#define EEPROM_USED 4
+#define EEPROM_DATA 5
+#define STATE 6
 
 /****************** Variables globales ***************/ 
 /* I2C */
@@ -67,9 +69,6 @@ float meas2 = 0.0;
 char measStr1[MAX_DATA];
 char measStr2[MAX_DATA];
 
-/* TIMER */
-volatile unsigned long seconds = 0;  // Variable para contar los segundos
-
 /********* Declaracion de funciones internas *********/
 /* I2C */
 void receiveEvent(int bytes);
@@ -84,8 +83,6 @@ float readAdc1();
 
 void formatSendCmd(char*, int, const char*);
 
-/* TIMER */
-void configTimer();
 /****************** Funciones Arduino ****************/
 /**
  * @brief Configuracion inicial
@@ -94,7 +91,6 @@ void configTimer();
 void setup()
 {
   Serial.begin(115200); // Frecuencia en baudios para serial
-  configTimer();
   /* Eventos I2C */
   Wire.begin(I2C_SLAVE_ADDR);
   Wire.onReceive(receiveEvent);
@@ -116,12 +112,6 @@ void loop()
   /* Meas */  
   meas1 = readAdc1(A2);   
   meas2 = readAdc1(A3);    
-  /* TIMER */
-  if (seconds >= 1000){
-    formatSendCmd(dataSendApp, TIMER, "----- TIMER ---");
-    sendToAppUart(dataSendApp);
-    seconds = 0;
-  }
   delay(100);
 }
 
@@ -220,28 +210,3 @@ void formatSendCmd(char* buf, int id, const char* data)
   snprintf(buf, MAX_DATA, "%d,%s", id, data);
 }
 
-/* TIMER */
-void configTimer()
-{
-// Configura Timer0 para generar una interrupción cada segundo
-  cli();  // Deshabilita las interrupciones globales
-
-  // Configura Timer0 para CTC (Clear Timer on Compare Match) mode
-  TCCR0A = (1 << WGM01);  // Modo CTC (Clear Timer on Compare Match)
-  TCCR0B = (1 << CS02) | (1 << CS00);  // Prescaler 1024
-
-  // Configura el valor de comparación para 1 segundo
-  // (16 MHz / 1024) - 1 = 156 (aprox 1 segundo)
-  OCR0A = 156;  
-
-  // Habilita la interrupción de comparación de Timer0
-  TIMSK0 = (1 << OCIE0A);  
-
-  sei();  // Habilita las interrupciones globales
-
-}
-
-// Interrupción de Timer0
-ISR(TIMER0_COMPA_vect) {
-  seconds++;  // Incrementa el contador de segundos
-}

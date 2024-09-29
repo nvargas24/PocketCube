@@ -297,8 +297,10 @@ class MainWindow(QMainWindow):
         self.data_slave["time"] = self.to_seconds(self.time_total)
         
         # Acciones a realizar recibir los datos de master y slave
-        self.dispatch_serial_master_event(self.data_master)
-        self.dispatch_serial_slave_event(self.data_slave)
+        if self.data_master["serial_id"] != None:
+            self.dispatch_serial_master_event(self.data_master)
+        if self.data_slave["serial_id"] != None:
+            self.dispatch_serial_slave_event(self.data_slave)
 
         # Incremento de timer QT -- LUEGO HACERLO CON ARDUINO
         
