@@ -60,9 +60,9 @@ class DataProcessor():
             return None, None
 
     def separate_str(self, str_full):
-        date, time, serial_id1, value1, serial_id2, value2 = str_full.split()
+        date, time, value1, value2 = str_full.split()
 
-        return date, time, serial_id1, value1, serial_id2, value2
+        return date, time, value1, value2
     
     def format_tocsv(self, str):
         str_format = str.replace(";","\n")
@@ -75,29 +75,13 @@ class DataProcessor():
 
 class ManagerFile():
     def create_csv(self, data):
-        """
-        archivo_csv = 'data_pocket.csv'
-        # Verifica si el archivo ya existe
-        archivo_existe = os.path.isfile(archivo_csv)
-
-        with open(archivo_csv, mode='a', newline='') as file:
-            csv_writer = csv.writer(file)
-            # Si el archivo no existía, escribe los encabezados
-            if not archivo_existe:
-                encabezados = ['Fecha', 'Hora', 'ID_1', 'Valor_1', 'ID_2', 'Valor_2']  # Ajusta según tu formato de datos
-                csv_writer.writerow(encabezados)
-            try:
-                csv_writer.writerow(datos)
-            except KeyboardInterrupt:
-                print("Finalizando la recepción de datos.")
-        """
                 # Cargar los datos en un DataFrame
         df = pd.read_csv(StringIO(data), header=None)
 
         # Mostrar las primeras filas del DataFrame
         print(df)
         # Renombrar las columnas
-        df.columns = ['Fecha', 'Hora', 'ID_1', 'Valor_1', 'ID_2', 'Valor_2']
+        df.columns = ['Fecha', 'Hora', 'Meas1', 'Meas2']
         # Ruta donde se guardará el archivo CSV
         csv_file_path = 'data_output.csv'
 

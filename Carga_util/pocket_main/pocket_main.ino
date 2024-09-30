@@ -79,6 +79,7 @@ int address = 0;      // Dirección actual en la EEPROM
 /********* Declaracion de funciones internas *********/
 void formatDataSend(char* , int, char*);
 void formatDataSendLong(int, char*);
+void filterValue(char *);
 
 /* RTC */
 void configInitialRTC();
@@ -155,13 +156,15 @@ void loop()
   sendToSlave("MEAS1"); // Enviar data a slave
   requestFromSlave(); // Respuesta de slave
   strcpy(meas1, dataRequest);
-  commaToSpaceConverter(meas1);
+  //commaToSpaceConverter(meas1);
+  filterValue(meas1);
 
   /* I2C MEAS2 */
   sendToSlave("MEAS2"); // Enviar data a slave
   requestFromSlave(); // Respuesta de slave
   strcpy(meas2, dataRequest);
-  commaToSpaceConverter(meas2);
+  //commaToSpaceConverter(meas2);
+  filterValue(meas2);
 
   /* ENVIO MEDICIONES A APP */
   snprintf(dataConcat, MAX_DATA_UART, "%s %s %s", datetimeStr, meas1, meas2);  // concateno datos
@@ -179,7 +182,6 @@ void loop()
   formatDataSend(dataSendApp, EEPROM_USED, strAux);
   sendToAppUart(dataSendApp);
 
-  
   if(sizeEEPROM_free >= sizeDataConcat){
     formatDataSend(dataSendApp, STATE, "Write EEPROM");
     sendToAppUart(dataSendApp);    
@@ -196,7 +198,7 @@ void loop()
 
     formatDataSend(dataSendApp, STATE, "Clear EEPROM"); // Notificacion de vacio de EEPROM
     sendToAppUart(dataSendApp); 
-    clearEEPROM();
+    //clearEEPROM();
     memset(dataReadEEPROM, 0, MAX_EEPROM);  // Rellena el array con ceros
     address = 0; // ubico en primera celda de EEPROM, evitando data cortada
     formatDataSend(dataSendApp, STATE, "EEPROM OK"); // Notificacion de vacio de EEPROM
@@ -207,6 +209,19 @@ void loop()
 }
 
 /**************** Funciones internas  *****************/
+void filterValue(char *str)
+{
+  // Encuentra la posición de la coma
+  char *commaPtr = strchr(str, ','); // Busca la coma en el array
+
+  // Si se encuentra la coma, desplaza el resto del array hacia la izquierda
+  if (commaPtr != nullptr) {
+      // Desplaza el contenido del array a la izquierda
+      int offset = commaPtr - str; // Calcula el desplazamiento
+      strcpy(str, commaPtr+1); // Copia el resto del array sobre el inicio
+  }
+}
+
 void formatDataSendLong(int id, char* str)
 {
   char text[3];
@@ -411,6 +426,7 @@ void writeEEPROM(char* data, size_t length)
   for (int i = 0; i < strlen(dataWrite); i++) {
     EEPROM.write(address++, dataWrite[i]);
   }
+
   // Escribe el delimitador ';' al final
   //if (address < MAX_EEPROM) {
   //  EEPROM.write(address, ';');
@@ -440,7 +456,7 @@ void clearEEPROM()
 {
   //Serial.println("Vaciando EEPROM...");
   for (int i = 0; i < MAX_EEPROM; i++) {
-    EEPROM.write(i, 0xFF);  // Escribir valor por defecto (0xFF) en toda la EEPROM
+    EEPROM.update(i, 0xFF);  // Escribir valor por defecto (0xFF) en toda la EEPROM
   }
   //Serial.println("EEPROM vaciada.");
 }

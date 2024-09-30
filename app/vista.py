@@ -234,21 +234,16 @@ class MainWindow(QMainWindow):
         
         if data["serial_id"] == RTC:
             # Identifico datos recibidos en la trama
-            date, time, serial_id1, value1, serial_id2, value2 = self.obj_data_processor.separate_str(data["value"])
-            # Determino nombre de id
-            if int(serial_id1) == MEAS1:
-                id_name1 = NAME_MEAS1
-            if int(serial_id2) == MEAS2:
-                id_name2 = NAME_MEAS2            
-            
+            date, time, value1, value2 = self.obj_data_processor.separate_str(data["value"])
+
             # Muestro datos de RTC en display
             self.ui.lcd_time_rtc.display(f"{time}")
             self.ui.lcd_date_rtc.setText(f"{date}")
 
             # Agregar fila a tabla
-            row_data = [serial_id1, id_name1, value1, f"{date} {time}"]
+            row_data = [str(MEAS1), NAME_MEAS1, value1, f"{date} {time}"]
             self.load_row_table(row_data)
-            row_data = [serial_id2, id_name2, value2, f"{date} {time}"]
+            row_data = [str(MEAS2), NAME_MEAS2, value2, f"{date} {time}"]
             self.load_row_table(row_data)
 
             # Scrool automatico al cargarse un nuevo data que sobresalga de la tabla
