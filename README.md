@@ -5,17 +5,6 @@ Proyecto satelital del grupo de investigación SyCE (Simulación y calculo de ca
 
 Este documento proporciona una descripción concisa del pinout de los pines I2C en el ESP32 y el Arduino Uno.
 
-## ESP32
-
-El ESP32 utiliza los siguientes pines para la comunicación I2C por defecto:
-
-- **SDA (Data):** GPIO 21
-- **SCL (Clock):** GPIO 22
-
-![Pinout ESP32 I2C](Imagenes/ESP32_pinout.jpg)
-
-Es posible cambiar estos pines en el código, pero estos son los pines predeterminados para la mayoría de las placas ESP32.
-
 ## Arduino Uno
 
 El Arduino Uno utiliza los siguientes pines para la comunicación I2C:
@@ -26,6 +15,10 @@ El Arduino Uno utiliza los siguientes pines para la comunicación I2C:
 ![Pinout Arduino Uno I2C](Imagenes/arduino_uno_pinout.avif)
 
 Estos pines están conectados internamente al módulo TWI (Two Wire Interface) del microcontrolador.
+
+## ATtiny85
+![Attiny85_pinout](Imagenes/ATtiny85_pinout.jpg)
+
 
 ## Referencias
 
