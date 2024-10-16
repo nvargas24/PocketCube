@@ -20,7 +20,7 @@ La aplicación se encarga de monitorear las lecturas provenientes de los **2 pin
   - **Read MEAS**: Lectura de datos matcheados con RTC
   - **Error**: Estado particular cuando no se reonoce ID
 
-- **Tabla de registro de datos**: Pariticularmente sólo presenta los datos recibidos en un formato extendido (ver ##Pocket Main ###Procesamiento de datos) identificando por ID, mostrando tanto sus descripción como el datetime del instante que se recibio.
+- **Tabla de registro de datos**: Pariticularmente sólo presenta los datos recibidos en un formato extendido (ver sección [Procesamiento de datos](#procesamiento-de-datos)) identificando por ID, mostrando tanto sus descripción como el datetime del instante que se recibio.
 
 - **Barra de espacio de memoria**: Indica el espacio de la memoria EEPROM
 - **Displays LCD**: Se cuenta con 2 display para mostrar tiempos
