@@ -30,8 +30,8 @@ en base a las primeras muestras.
 
 ## Diagrama Funcional
 
-![Diagrama en bloques de TIMER](Imagenes/diagrama_en_bloques_timer-jpg)
-![Diagrama en bloques de MAIN](Imagenes/diagrama_en_bloques_main-jpg)
+![Diagrama en bloques de TIMER](../Imagenes/diagrama_en_bloques_timer.jpg)
+![Diagrama en bloques de MAIN](../Imagenes/diagrama_en_bloques_main.jpg)
 
 
 ## Ejemplo de Funcionamiento
