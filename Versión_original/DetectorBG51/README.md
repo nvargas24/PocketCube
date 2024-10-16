@@ -1,19 +1,16 @@
-# DectectorBG51
+# DetectorBG51
 
-El **DetectorBG51** es un ejemplo de uso en **Laboratorios Bacon** para la 
-detección de pulsos cada 5 segundos. Implementa un contador utilizando 
-interrupciones (ISR) y muestra el promedio de los pulsos detectados en 
-una pantalla LCD.
-
-Este sistema es útil para realizar mediciones en tiempo real, mostrando los 
-datos tanto en la terminal como en una pantalla LCD.
+El **DetectorBG51** es un sensor que se utiliza en **Laboratorios Bacon** para la 
+detección radiación por medio de la detección de pulsos cada 5 segundos. 
+Para esto se implementa un contador utilizando interrupciones (ISR) y muestra 
+el promedio de los pulsos detectados y maxima cantidad en una pantalla LCD.
 
 ## Descripción General
 
 El sistema realiza la detección de pulsos y almacena los valores en un array, 
-realizando un promedio sobre los últimos valores. El tiempo de muestreo es 
+realizando un promedio sobre los primeros valores. El tiempo de muestreo es 
 de 1 segundo, y cada 5 segundos se calcula el promedio de pulsos por segundo (cps) 
-en base a las últimas muestras.
+en base a las primeras muestras.
 
 ### Variables Principales
 - `mostrar`: Habilita la visualización de los datos tanto por la terminal como en la LCD.
@@ -37,18 +34,18 @@ en base a las últimas muestras.
 
 ## Ejemplo de Funcionamiento
 
-| Timer [s] | decCPS1[0] | decCPS1[1] | decCPS1[2] | decCPS1[3] | decCPS1[4] | cps1 |
-|-----------|------------|------------|------------|------------|------------|------|
-| 0         | 0          | 0          | 0          | 0          | 0          | 0    |
-| 1         | 7          | 0          | 0          | 0          | 0          | 1.4  |
-| 2         | 7          | 3          | 0          | 0          | 0          | 2    |
-| 3         | 7          | 3          | 2          | 0          | 0          | 2.4  |
-| 4         | 7          | 3          | 2          | 9          | 0          | 4.2  |
-| 5         | 7          | 3          | 2          | 9          | 5          | 5.2  |
-| 6         | 1          | 3          | 2          | 9          | 5          | 4    |
-| 7         | 1          | 7          | 2          | 9          | 5          | 4.8  |
-| 8         | 1          | 7          | 1          | 9          | 5          | 4.6  |
-| 9         | 1          | 7          | 1          | 2          | 5          | 3.2  |
-| 10        | 1          | 7          | 1          | 2          | 9          | 4    |
+| Timer [s] | x | decCPS1[0] | decCPS1[1] | decCPS1[2] | decCPS1[3] | decCPS1[4] | cps1 | state         |
+|-----------|---|------------|------------|------------|------------|------------|------|---------------|
+| 0         | 0 | 0          | 0          | 0          | 0          | 0          | 0    |Init           |
+| 1         | 0 | 7          | 0          | 0          | 0          | 0          | 1.4  |Meas           |
+| 2         | 1 | 7          | 3          | 0          | 0          | 0          | 2    |Meas           |
+| 3         | 2 | 7          | 3          | 2          | 0          | 0          | 2.4  |Meas           |
+| 4         | 3 | 7          | 3          | 2          | 9          | 0          | 4.2  |Meas           |
+| 5         | 4 | 7          | 3          | 2          | 9          | 5          | 5.2  |Meas/Reset x   |
+| 6         | 0 | 1          | ***3**     | ***2**     | ***9**     | ***5**     | 4   |Meas           |
+| 7         | 1 | 1          | 7          | ***2**     | ***9**     | ***5**     | 4.8 |Meas           |
+| 8         | 2 | 1          | 7          | 1          | ***9**     | ***5**     | 4.6 |Meas           |
+| 9         | 3 | 1          | 7          | 1          | 2          | ***5**     | 3.2 |Meas           |
+| 10        | 4 | 1          | 7          | 1          | 2          | 9          | 4    |Meas           |
 
 El valor de `cps1` representa el promedio de los pulsos por segundo basado en las últimas 5 muestras almacenadas en el array `deCPS1[]`.
