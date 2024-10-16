@@ -14,3 +14,7 @@ __pycache__/
 *.raw
 *.net
 *.plt
+# Ignorar archivos generados por simulaciones de .asc
+*.zip
+*.kicad_pro
+*.kicad_prl
