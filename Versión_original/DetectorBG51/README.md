@@ -33,7 +33,9 @@ en base a las últimas muestras.
 
 ## Diagrama Funcional
 
-* [Incluir imagen de diagrama en bloques aquí]*
+![Diagrama en bloques de TIMER](Imagenes/diagrama_en_bloques_timer-jpg)
+![Diagrama en bloques de MAIN](Imagenes/diagrama_en_bloques_main-jpg)
+
 
 ## Ejemplo de Funcionamiento
 
