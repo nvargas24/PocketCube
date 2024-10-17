@@ -30,8 +30,8 @@ en base a las primeras muestras.
 
 ## Diagrama Funcional
 
-![Diagrama en bloques de TIMER](Imagenes/diagrama_en_bloques_timer-jpg)
-![Diagrama en bloques de MAIN](Imagenes/diagrama_en_bloques_main-jpg)
+![Diagrama en bloques de TIMER](../../Imagenes/diagrama_en_bloques_timer.jpg)
+![Diagrama en bloques de MAIN](../../Imagenes/diagrama_en_bloques_main.jpg)
 
 
 ## Ejemplo de Funcionamiento
@@ -50,4 +50,10 @@ en base a las primeras muestras.
 | 9         | 3 | 1          | 7          | 1          | 2          | ***5**     | 3.2 |Meas           |
 | 10        | 4 | 1          | 7          | 1          | 2          | 9          | 4    |Meas           |
 
-El valor de `cps1` representa el promedio de los pulsos por segundo basado en las últimas 5 muestras almacenadas en el array `deCPS1[]`.
+1. El valor de `cps1` representa el promedio de los pulsos por segundo basado en las primeras 5 muestras almacenadas en el array `deCPS1[]`.
+
+2. Luego del **state: 'Reset x'** se empiezan a sobreecribir los datos del array.
+3. `cpsMax` se interpreta que registra el máximo valor del promedio.
+4. Para evitar un **overflow** se limita `cps1`<9999.
+
+***ADV.: Falta reseteo e inicilización de array para evitar datos erroneos.***
