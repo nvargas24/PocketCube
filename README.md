@@ -70,26 +70,67 @@ En este modo, el pin **PB4** del ATtiny85 está configurado para conversión ana
 
 # Esquemáticos de Conexión
 
-## Pinout de I2C para Arduino Uno y ATtiny85
+![Conexión_arduino_attiny85](Imagenes\Debug_Attiny85.jpg)
 
-Esta sección proporciona una descripción del pinout I2C en el **Arduino Uno** y el **ATtiny85**.
-
-### Arduino Uno
+## Arduino Uno
 
 El **Arduino Uno** utiliza los siguientes pines para la comunicación I2C:
 
 - **SDA (Data):** Pin A4
 - **SCL (Clock):** Pin A5
 
-![Pinout Arduino Uno I2C](Imagenes/arduino_uno_pinout.avif)
+![Pinout Arduino Uno](Imagenes/arduino_uno_pinout.avif)
 
 Estos pines están conectados internamente al módulo TWI (Two Wire Interface) del microcontrolador.
 
-### ATtiny85
+## ATtiny85
 
-El **ATtiny85** utiliza los siguientes pines para la comunicación I2C:
+El **ATtiny85** utiliza los siguientes pines:
 
 ![Attiny85 Pinout](Imagenes/attiny85_pinout.jpeg)
+
+## Depuración y Carga de Programas en el ATtiny85
+
+Para cargar un programa en el **ATtiny85** utilizando un **Arduino UNO** como programador, sigue estos pasos. Es necesario conectar los pines de depuración (Debugger) de acuerdo a la interfaz SPI.
+
+### Conexión de Pines SPI (Debugger)
+
+Conecta los pines del **Arduino UNO** a los del **ATtiny85** de la siguiente manera:
+
+- **SS (Slave Select):** Pin 1 (Móodulo ATtiny85)
+- **MOSI (Master Out Slave In):** Pin 2 (Módulo ATtiny85)
+- **MISO (Master In Slave Out):** Pin 3 (Módulo ATtiny85)
+- **SCK (Serial Clock):** Pin 4 (Módulo ATtiny85)
+
+### Carga del Programa "ArduinoISP"
+
+Una vez realizada la conexión de los pines, sigue estos pasos:
+
+1. En el IDE de Arduino, ve a **Ejemplos -> ArduinoISP -> ArduinoISP.ino**.
+2. Carga este programa en tu **Arduino UNO**.
+
+### Instalación de la Librería para el ATtiny85
+
+Antes de cargar cualquier programa en el **ATtiny85**, asegúrate de que el IDE de Arduino tenga instalada la librería necesaria para reconocer el microcontrolador.
+
+1. Ve a **Preferencias** en el IDE de Arduino.
+2. En el campo **Gestor de URLs Adicionales de Tarjetas**, añade la siguiente URL:
+https://mcudude.github.io/MiniCore/package_MCUdude_MiniCore_index.json
+3. Dirígete al **Gestor de Placas** e instala la librería **ATtinyCore** (*ver).
+
+### Configuración en el IDE de Arduino
+
+Una vez que la librería esté instalada, configura el IDE de Arduino de la siguiente manera:
+
+- **Placa:** ATtiny25/45/85
+- **Chip:** ATtiny85
+- **Frecuencia:** 8 MHz (internal)
+- **Port:** Selecciona el puerto correspondiente al Arduino UNO
+- **Programador:** AVR Dragon ISP Mode (ATtinyCore)
+
+### Carga de Programas en el ATtiny85
+
+Con la configuración correcta y el **Arduino UNO** programado como ISP, ya puedes cargar un programa en el **ATtiny85** de la misma manera que lo harías en un Arduino UNO. Solo asegúrate de seleccionar el **programador** correcto antes de realizar la carga.
 
 ---
 
