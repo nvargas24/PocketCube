@@ -70,7 +70,7 @@ En este modo, el pin **PB4** del ATtiny85 está configurado para conversión ana
 
 # Esquemáticos de Conexión
 
-![Conexión_arduino_attiny85](Imagenes\Debug_Attiny85.jpg)
+![Conexión_arduino_attiny85](Imagenes/Debug_Attiny85.jpg)
 
 ## Arduino Uno
 
