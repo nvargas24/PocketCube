@@ -206,53 +206,44 @@ class MainWindow(QMainWindow):
         self.load_row_table(row_data, "cp")
         row_data = ["0~3", "24-10-24 13:23:16", "12,5","0.00255"]
         self.load_row_table(row_data, "dosis")
-            
-
-    def update_reloj_slave(self):
-        # Convertir a str QTime
-        reloj_str_total = self.time_total.toString("hh:mm:ss")
         
-        return reloj_str_total
-
-    def verification_set_time(self):
-        flag_value = False # Indica que se cumple intervalo de accion
-        seconds_total_set = self.to_seconds(self.set_time1)
-        
-        # Temporizador para enviar datos
-        if (seconds_total_timer % seconds_total_set) == 0:
-            flag_value = True
-
-        return flag_value
+        self.cont_meas1=0 # contador de segundos al recibir datos de Prototipo
 
     def dispatch_serial_master_event(self, data):
-        
-        if data["serial_id"] == RTC:
-            # Identifico datos recibidos en la trama
-            date, time, value1, value2 = self.obj_data_processor.separate_str(data["value"])
+        """
+        Identifico datos recibidos en la trama
+        """
+        # cargo datos en tabla serial
+        #row_data = [f"{data['serial_id']}", f"{data['value']}"]
+        #self.load_row_table(row_data, "serial")
+
+        # cargo datos en la tabla cp
+        if data['serial_id'] == MEAS1:
+            self.cont_meas1+=1
+            datetime, meas1 = self.obj_data_processor.extract_meas(data['value'])
+
+            row_data = [f"{self.cont_meas1}", f"{datetime}", f"{meas1}"]
+            self.load_row_table(row_data, "cp")
+            self.ui.table_cp.scrollToBottom()
+
+        # cargar datos de RTC en display
+        if data['serial_id'] == RTC:
+            datetime = data['value']
+            date, time = datetime.split()
 
             # Muestro datos de RTC en display
             self.ui.lcd_time_rtc.display(f"{time}")
-            self.ui.lcd_date_rtc.setText(f"{date}")
+            self.ui.lcd_date_rtc.setText(f"{date}")  
 
-            # Agregar fila a tabla
-            
-            row_data = ["1", "24-10-24 13:23:12", "23"]
-            self.load_row_table(row_data, "cp")
-            row_data = ["0~3", "24-10-24 13:23:16", "12,5","0.00255"]
-            self.load_row_table(row_data, "dosis")
-            
-
-            # Scrool automatico al cargarse un nuevo data que sobresalga de la tabla
-            #self.ui.table_serial.scrollToBottom()
         elif data["serial_id"] == STATE:
-            self.ui.text_state.setText(data["value"])
+            self.ui.label_state.setText(data["value"])
         elif data["serial_id"] == EEPROM_USED:
             self.ui.prog_bar_eeprom_used.setValue(int(data["value"]))
-        elif data["serial_id"] == EEPROM_DATA:
-            data = self.obj_data_processor.format_tocsv(data["value"])
-            print("Master: Concateno data de EEPROM a CSV")
-            print(data)
-            self.obj_file.create_csv(data)
+        #elif data["serial_id"] == EEPROM_DATA:
+        #    data = self.obj_data_processor.format_tocsv(data["value"])
+        #    print("Master: Concateno data de EEPROM a CSV")
+        #    print(data)
+        #    self.obj_file.create_csv(data)
             # FALTA AGREGAR PARA CARGAR ARCHIVO CSV
         else:
             print("Master: ID NO IDENTIFICADO")
@@ -273,55 +264,19 @@ class MainWindow(QMainWindow):
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             table.setItem(current_row, column, item)
 
-    def dispatch_serial_slave_event(self, data):
-        if data["serial_id"] == MEAS1:
-            self.ui.value_out1.setText(f'Value:{data["value"]}V  Time:{data["time"]}s' )
-            value_s = float(data["value"])
-            self.graph1.update_graph(value_s)
-        elif data["serial_id"] == MEAS2:
-            self.ui.value_out2.setText(f'Value:{data["value"]}V  Time:{data["time"]}s')            
-            value_s = float(data["value"])
-            self.graph2.update_graph(value_s)
-        else:
-            print("ID NO IDENTIFICADO")
-            print("Data Slave: ", data)
-
     def timeout_1mseg(self):
         """
         Acciones a realizar cada vez que pasa un segundo
-        """
-        # Cargo datos relevantes en UI        
-        reloj_str = self.update_reloj_slave()
-
+        """      
         # Lectura de puerto serial
         self.data_master["serial_id"], self.data_master["value"]= self.obj_data_uart.reciv_serial("Master")
-        self.data_master["time"] = self.to_seconds(self.time_total)
         
-        # Acciones a realizar recibir los datos de master y slave
+        # Acciones a realizar recibir los datos de master
         if self.data_master["serial_id"] != None:
             self.dispatch_serial_master_event(self.data_master)
 
-    def to_seconds(self, time):
-        """
-        Convierte a segundos
-        """
-        seconds_total = time.hour() * 3600 \
-                        + time.minute() * 60 \
-                        + time.second()
-        return seconds_total
-
-    def to_milliseconds(self, time):
-        """
-        Convierte a milisegundos totales
-        """
-        milliseconds_total = (time.hour() * 3600 * 1000) \
-                            + (time.minute() * 60 * 1000) \
-                            + (time.second() * 1000) \
-                            + time.msec()
-        return milliseconds_total
-
     def init(self):
-        # Inicio timer con actualizacion de datos cada 1mseg
+        # Inicio timer con actualizacion de datos cada 1seg
         self.timer.start(TIMEOUT)
 
         # Asigno puertos

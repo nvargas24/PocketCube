@@ -63,6 +63,11 @@ class DataProcessor():
         date, time, value1, value2 = str_full.split()
 
         return date, time, value1, value2
+
+    def extract_meas(self, str_full):
+        datetime, value = str_full.split()
+
+        return datetime, value
     
     def format_tocsv(self, str):
         str_format = str.replace(";","\n")
@@ -72,6 +77,25 @@ class DataProcessor():
 
     def id_text_descrip(self):
         pass
+
+    def to_seconds(self, time):
+        """
+        Convierte a segundos
+        """
+        seconds_total = time.hour() * 3600 \
+                        + time.minute() * 60 \
+                        + time.second()
+        return seconds_total
+
+    def to_milliseconds(self, time):
+        """
+        Convierte a milisegundos totales
+        """
+        milliseconds_total = (time.hour() * 3600 * 1000) \
+                            + (time.minute() * 60 * 1000) \
+                            + (time.second() * 1000) \
+                            + time.msec()
+        return milliseconds_total
 
 class ManagerFile():
     def create_csv(self, data):
@@ -109,6 +133,7 @@ class ManagerDataUart(DataProcessor):
             # Configuro e identifico puerto serial
             if port_name in self.ser:
                 self.ser[port_name] = serial.Serial(port_num, FREQ_BAUD)
+                print("Conexion exitosa")
         except ValueError as e:
             print(f"Error al conectar puerto {port_num}/n")
             print(e)
