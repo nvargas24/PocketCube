@@ -30,8 +30,11 @@ La aplicación se encarga de monitorear las lecturas provenientes de los **2 pin
 ## Pocket Main
 ### Comunicación I2C con la Carga Útil
 Se utiliza el protocolo **I2C** para la comunicación entre el **Arduino UNO** (Pocket Main) y la **Carga Útil** (ATtiny85).
-  - **Pin PB0** -> **Pin A4** -> **SDA**
-  - **Pin PB2** -> **Pin A5** -> **SCL/SCK**
+
+| Pin ATtiny85 | Pin Arduino | Función  |
+|--------------|-------------|----------|
+| PB0          | A4          | SDA      |
+| PB2          | A5          | SCL/SCK  |
 
 ### Procesamiento de datos
 El **Arduino UNO** es responsable de recibir, procesar y enviar los datos provenientes de la Carga Útil a la aplicación.
@@ -116,19 +119,22 @@ Antes de cargar cualquier programa en el **ATtiny85**, asegúrate de que el IDE 
 1. Ve a **Preferencias** en el IDE de Arduino.
 2. En el campo **Gestor de URLs Adicionales de Tarjetas**, añade la siguiente URL:
 https://mcudude.github.io/MiniCore/package_MCUdude_MiniCore_index.json
-3. Dirígete al **Gestor de Placas** e instala la librería **ATtinyCore** (*ver).
+3. Descargar libreria TinyWireS: 
+https://playground.arduino.cc/uploads/Code/TinyWireS/index.zip
+4. Descomprimir el .zip y agregar a la carpeta ***libraries*** de Arduino
+5. Finalmente resetear IDE Arduino para guardar configuraciones
 
 ### Configuración en el IDE de Arduino
 
 Una vez que la librería esté instalada, configura el IDE de Arduino de la siguiente manera:
 
 - **Placa:** ATtiny25/45/85
-- **Chip:** ATtiny85
-- **Frecuencia:** 8 MHz (internal)
-- **Port:** Selecciona el puerto correspondiente al Arduino UNO
-- **Programador:** AVR Dragon ISP Mode (ATtinyCore)
+- **Clock:** Internal 1MHz
+- **Proccessor:** ATtiny85
+- **Port:** [Selecciona el puerto correspondiente al Arduino UNO]
+- **Programador:** Arduino as ISP
 
-### Carga de Programas en el ATtiny85
+### Carga de programas en el ATtiny85
 
 Con la configuración correcta y el **Arduino UNO** programado como ISP, ya puedes cargar un programa en el **ATtiny85** de la misma manera que lo harías en un Arduino UNO. Solo asegúrate de seleccionar el **programador** correcto antes de realizar la carga.
 
