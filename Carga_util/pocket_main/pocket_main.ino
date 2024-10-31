@@ -82,6 +82,8 @@ char dataSend[MAX_DATA_I2C]; // Str a enviar de Master
 /* UART */
 int serial_id = 0;
 int value = 0;
+char lastRTC[MAX_DATA_I2C] = ""; // Buffer para almacenar el último mensaje enviado
+char lastState[MAX_DATA_I2C] = ""; // Buffer para almacenar el último mensaje enviado
 
 /* TIMER */
 bool i2cActive = false;
@@ -142,33 +144,34 @@ void loop()
   char dataConcat[MAX_DATA_UART]; // Buf auxiliar para concatenar texto
   char meas1[MAX_SIZE_MEAS];
   char meas2[MAX_SIZE_MEAS];
-  int sizeEEPROM_total = 0;
-  int sizeEEPROM_used = 0;
-  int sizeEEPROM_used_per = 0;
-  int sizeEEPROM_free = 0;
-  char strAux[MAX_DATA_UART];
-  char dataSendApp[MAX_DATA_UART]; // Str a enviar de Master a APP
+  //int sizeEEPROM_total = 0;
+  //int sizeEEPROM_used = 0;
+  //int sizeEEPROM_used_per = 0;
+  //int sizeEEPROM_free = 0;
+  //char strAux[MAX_DATA_UART];
   size_t sizeDataConcat = 0;
-  char dataReadEEPROM[MAX_EEPROM];
-  char aux_eeprom[MAX_EEPROM];
+  //char dataReadEEPROM[MAX_EEPROM];
+  //char aux_eeprom[MAX_EEPROM];
 
   i2cActive = false;
   /* Serial */
   requestFromAppUart(&serial_id, &value);
   delay(100);
-  Serial.print(serial_id);
-  Serial.print(",");
-  Serial.println(value);
+  //Serial.print(serial_id);
+  //Serial.print(",");
+  //Serial.println(value);
   if(serial_id !=0){
     configFromApp(serial_id, value);  // Asigno dato segun id    
   }
 
-
-  formatDataSend(dataSendApp, STATE, "Read MEASURES");
-  sendToAppUart(dataSendApp);   
+  sendToAppUart(STATE, "Read MEASURES");   
   
   /* RTC */
   //datetimeNow(datetimeStr); //Obtengo datetime actual
+  /* ENVIO DATETIME */
+  //formatDataSend(RTCSendApp, RTC, );
+  sendToAppUart(RTC, "2024-10-27 15:30:45");
+    
   if(i2cActive){
     /* I2C MEAS1 */
     /* Envio datos I2C */
@@ -194,10 +197,7 @@ void loop()
     formatDataSend(dataSendApp, RTC, dataConcat);
     sendToAppUart(dataSendApp);*/
 
-  /* ENVIO DATETIME */
-  formatDataSend(dataSendApp, RTC, "2024-10-27 15:30:45");
-  sendToAppUart(dataSendApp);
-  
+
   /* EEPROM
     sizeEEPROM_total = analyzeEEPROMStorage(TOTAL_EEPROM);
     sizeEEPROM_used = analyzeEEPROMStorage(USED_EEPROM);
@@ -231,8 +231,6 @@ void loop()
       sendToAppUart(dataSendApp); 
     }
   */
-  Serial.print("i2cActive: ");
-  Serial.println(i2cActive);
 }
 
 /**************** Funciones internas  *****************/
@@ -384,15 +382,33 @@ int requestFromSlave()
 /**
  * @brief Enviar data app por UART, limita solo caracteres
  */
-void sendToAppUart(const char* data)
+void sendToAppUart(int serial_id, const char* data)
 {
-    //Enviar solo la parte válida del mensaje
-    for (int i = 0; i < strlen(data); i++) {
-      if (data[i] >= 32 && data[i] <= 126) { // Solo caracteres imprimibles// Cod ASCII
-        Serial.print(data[i]);
-      }
+    bool flag_rtc = false;
+    bool flag_state = false;
+    char dataSendApp[MAX_DATA_UART]; // Str a enviar de Master a APP
+
+    formatDataSend(dataSendApp, serial_id, data);
+    
+    if((serial_id == RTC) && (strcmp(data, lastRTC)!=0)){
+      flag_rtc = true;
     }
-    Serial.println();  // Envía un salto de línea al final
+    else if((serial_id == STATE) && (strcmp(data, lastState)!=0)){
+      flag_state = true;
+    }
+
+    if(flag_rtc==false && flag_state==false){
+      //Enviar solo la parte válida del mensaje
+      for (int i = 0; i < strlen(data); i++) {
+        if (data[i] >= 32 && data[i] <= 126) { // Solo caracteres imprimibles// Cod ASCII
+          Serial.print(data[i]);
+        }
+      }
+      Serial.println();  // Envía un salto de línea al final      
+    }
+    // Copia el nuevo mensaje en el buffer `ultimoMensaje`
+    //strncpy(lastMsj, data, MAX_DATA_I2C - 1);
+    //lastMsj[MAX_DATA_I2C - 1] = '\0';  // Asegura el carácter nulo al final  
 }
 /**
  * @brief Respuesta data de app por UART
