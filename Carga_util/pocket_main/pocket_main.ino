@@ -61,9 +61,14 @@
 #define EEPROM_USED 4
 #define EEPROM_DATA 5
 #define STATE 6
+#define TIMER 7
 
 #define STR_MEAS1 '1'
 #define STR_MEAS2 '2'
+
+#define STOP_TIMER 0
+#define INIT_TIMER 1
+
 
 /****************** Variables globales ***************/ 
 /* RTC */
@@ -75,6 +80,12 @@ char dataRequest[MAX_DATA_I2C]; // Str respuesta de Slave
 char dataSend[MAX_DATA_I2C]; // Str a enviar de Master
 
 /* UART */
+int serial_id = 0;
+int value = 0;
+
+/* TIMER */
+bool i2cActive = false;
+bool timerActive = true;
 
 /* EEPROM */
 int address = 0;      // Dirección actual en la EEPROM
@@ -117,6 +128,7 @@ void setup()
   Wire.begin(); // Inicializo comunicacion I2C
   //Wire.setClock(100000); // Configurar la frecuencia I2C a 100 kHz
   //configInitialRTC(); // Inicializo configuiracion de RTC
+  configTimer();
   delay(1000); 
 }
 
@@ -127,8 +139,6 @@ void setup()
  */
 void loop() 
 {
-  int id = 0;
-  float value = 0.0;
   char dataConcat[MAX_DATA_UART]; // Buf auxiliar para concatenar texto
   char meas1[MAX_SIZE_MEAS];
   char meas2[MAX_SIZE_MEAS];
@@ -142,37 +152,41 @@ void loop()
   char dataReadEEPROM[MAX_EEPROM];
   char aux_eeprom[MAX_EEPROM];
 
+  i2cActive = false;
   /* Serial */
-    // Identificacion por comando en formato CSV
-    // * Valor para DAC:ID,value -> 1,1.23 
-    // ** ID: 1->Meas1, 2->Meas2, 3->RTC, 4->DAC1, 5->DAC2
-    //requestFromAppUart(&id, &value);
-    //if(id !=0){
-    //  configFromApp(id, value);  // Asigno dato segun id    
-    //}
+  requestFromAppUart(&serial_id, &value);
+  delay(100);
+  Serial.print(serial_id);
+  Serial.print(",");
+  Serial.println(value);
+  if(serial_id !=0){
+    configFromApp(serial_id, value);  // Asigno dato segun id    
+  }
+
 
   formatDataSend(dataSendApp, STATE, "Read MEASURES");
   sendToAppUart(dataSendApp);   
   
   /* RTC */
   //datetimeNow(datetimeStr); //Obtengo datetime actual
-  
-  /* I2C MEAS1 */
-  /* Envio datos I2C */
-  sendToSlaveC(STR_MEAS1); // Solicitud de data en pin PB3
-  delay(100); // Pequeña espera para asegurar que el esclavo reciba el dato
-  requestFromSlave(); // Respuesta de slave
-  //strcpy(meas1, dataRequest);
-  //commaToSpaceConverter(meas1);
-  //filterValue(meas1);
+  if(i2cActive){
+    /* I2C MEAS1 */
+    /* Envio datos I2C */
+    sendToSlaveC(STR_MEAS1); // Solicitud de data en pin PB3
+    delay(100); // Pequeña espera para asegurar que el esclavo reciba el dato
+    requestFromSlave(); // Respuesta de slave
+    //strcpy(meas1, dataRequest);
+    //commaToSpaceConverter(meas1);
+    //filterValue(meas1);
 
-  /* I2C MEAS2 */
-  sendToSlaveC(STR_MEAS2); // Enviar data a slave
-  delay(100); // Pequeña espera para asegurar que el esclavo reciba el dato
-  requestFromSlave(); // Respuesta de slave
-  //strcpy(meas2, dataRequest);
-  //commaToSpaceConverter(meas2);
-  //filterValue(meas2);
+    /* I2C MEAS2 */
+    sendToSlaveC(STR_MEAS2); // Enviar data a slave
+    delay(100); // Pequeña espera para asegurar que el esclavo reciba el dato
+    requestFromSlave(); // Respuesta de slave
+    //strcpy(meas2, dataRequest);
+    //commaToSpaceConverter(meas2);
+    //filterValue(meas2);
+  }
 
   /* ENVIO MEDICIONES A APP 
     snprintf(dataConcat, MAX_DATA_UART, "%s %s %s", datetimeStr, meas1, meas2);  // concateno datos
@@ -217,7 +231,8 @@ void loop()
       sendToAppUart(dataSendApp); 
     }
   */
-  delay(1000);
+  Serial.print("i2cActive: ");
+  Serial.println(i2cActive);
 }
 
 /**************** Funciones internas  *****************/
@@ -383,7 +398,7 @@ void sendToAppUart(const char* data)
  * @brief Respuesta data de app por UART
  * @return id y value
  */
-void requestFromAppUart(int* id, float* value)
+void requestFromAppUart(int* id, int* value)
 {
   if (Serial.available()){
     String input_cmd = Serial.readStringUntil('/n');
@@ -395,30 +410,29 @@ void requestFromAppUart(int* id, float* value)
 
       // Conversion de formatos y retornos
       *id = idStr.toInt();
-      *value = valueStr.toFloat();
+      *value = valueStr.toInt();
     }
   }
 }
-/*
-void configFromApp(int id, float value)
+/**
+ * @brief Configuracion a realizar en Arduino
+ */
+void configFromApp(int serial_id, int cmd)
 { 
-  int value_map = 0;
-
-  if(id == DAC1){
-    value_map = map(value*1000, 0, 3300, 0, 255);
-    dacWrite(PIN_DAC1, value_map);  
-  }
-  else if(id == DAC2){
-    value_map = map(value*1000, 0, 3300, 0, 255);
-    dacWrite(PIN_DAC2, value_map);  
+  if(serial_id==TIMER){
+    if(cmd==INIT_TIMER){
+      timerActive = true;
+    }
+    else if(cmd==STOP_TIMER){
+      timerActive = false;
+    }
   }
   else{
     Serial.print("id: ");
-    Serial.print(id);
+    Serial.print(serial_id);
     Serial.println(" ; ID NO RECONOCIDO PARA CONFIG");
   }
 }
-*/
 
 /**
  * @brief Conversion de comas a espacios para adjuntar a trama de datos
@@ -517,4 +531,33 @@ int analyzeEEPROMStorage(int type)
     return freeEEPROM;
   }
 
+}
+
+/**
+ * @brief Configuración del temporizador 1
+ */
+void configTimer()
+{
+  noInterrupts();           // Desactivar interrupciones
+  TCCR1A = 0;               // Limpiar registros
+  TCCR1B = 0;
+  TCNT1 = 0;                // Inicializar el contador del temporizador
+  OCR1A = 15624;            // Valor de comparación para 1 segundo a 16 MHz con prescaler de 1024
+  TCCR1B |= (1 << WGM12);   // Modo CTC
+  TCCR1B |= (1 << CS12) | (1 << CS10); // Prescaler de 1024
+  TIMSK1 |= (1 << OCIE1A);  // Habilitar interrupción por comparación
+  interrupts();             // Activar interrupciones
+}
+
+/**
+ * @brief Interrupción del temporizador 1
+ */
+ISR(TIMER1_COMPA_vect) 
+{
+  if(timerActive){
+    i2cActive = true;
+  }
+  else{
+    i2cActive = false;
+  }
 }
