@@ -216,7 +216,7 @@ class MainWindow(QMainWindow):
         # cargo datos en tabla serial
         #row_data = [f"{data['serial_id']}", f"{data['value']}"]
         #self.load_row_table(row_data, "serial")
-
+                                                                                                                                                                                                                                                                                                                       
         # cargo datos en la tabla cp
         if data['serial_id'] == MEAS1:
             self.cont_meas1+=1
@@ -289,3 +289,4 @@ class MainWindow(QMainWindow):
     def stop(self):
         # Finalizo timer
         self.timer.stop()
+        self.obj_data_uart.ser["Master"].close()

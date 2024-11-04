@@ -152,6 +152,8 @@ void loop()
   size_t sizeDataConcat = 0;
   //char dataReadEEPROM[MAX_EEPROM];
   //char aux_eeprom[MAX_EEPROM];
+  char dataSendApp[MAX_DATA_UART];
+  char dateTimeRTC[MAX_DATA_UART];
 
   i2cActive = false;
   /* Serial */
@@ -163,14 +165,14 @@ void loop()
   if(serial_id !=0){
     configFromApp(serial_id, value);  // Asigno dato segun id    
   }
-
-  sendToAppUart(STATE, "Read MEASURES");   
+  formatDataSend(dataSendApp, STATE, "Read MEASURES");
+  sendToAppUart(dataSendApp);   
   
   /* RTC */
   //datetimeNow(datetimeStr); //Obtengo datetime actual
   /* ENVIO DATETIME */
-  //formatDataSend(RTCSendApp, RTC, );
-  sendToAppUart(RTC, "2024-10-27 15:30:45");
+  formatDataSend(dataSendApp, RTC, "2024-10-27 15:30:45");
+  sendToAppUart(dataSendApp);
     
   if(i2cActive){
     /* I2C MEAS1 */
@@ -178,59 +180,18 @@ void loop()
     sendToSlaveC(STR_MEAS1); // Solicitud de data en pin PB3
     delay(100); // Pequeña espera para asegurar que el esclavo reciba el dato
     requestFromSlave(); // Respuesta de slave
-    //strcpy(meas1, dataRequest);
-    //commaToSpaceConverter(meas1);
-    //filterValue(meas1);
+    snprintf(meas1, MAX_DATA_UART, "2024-10-25 14:30:45 %s", dataRequest);
+    formatDataSend(dataSendApp, MEAS1, meas1);
+    sendToAppUart(dataSendApp);
 
-    /* I2C MEAS2 */
+    /* I2C MEAS2 
     sendToSlaveC(STR_MEAS2); // Enviar data a slave
     delay(100); // Pequeña espera para asegurar que el esclavo reciba el dato
     requestFromSlave(); // Respuesta de slave
-    //strcpy(meas2, dataRequest);
-    //commaToSpaceConverter(meas2);
-    //filterValue(meas2);
+    snprintf(meas2, MAX_DATA_UART, "2024-10-25 14:30:45 %s", dataRequest);
+    formatDataSend(dataSendApp, MEAS2, meas2);
+    sendToAppUart(dataSendApp); */
   }
-
-  /* ENVIO MEDICIONES A APP 
-    snprintf(dataConcat, MAX_DATA_UART, "%s %s %s", datetimeStr, meas1, meas2);  // concateno datos
-    sizeDataConcat = strlen(dataConcat);
-    formatDataSend(dataSendApp, RTC, dataConcat);
-    sendToAppUart(dataSendApp);*/
-
-
-  /* EEPROM
-    sizeEEPROM_total = analyzeEEPROMStorage(TOTAL_EEPROM);
-    sizeEEPROM_used = analyzeEEPROMStorage(USED_EEPROM);
-    sizeEEPROM_free = analyzeEEPROMStorage(FREE_EEPROM);
-    sizeEEPROM_used_per = (sizeEEPROM_used*100.0)/sizeEEPROM_total;
-
-    snprintf(strAux, MAX_DATA_UART, "%d", sizeEEPROM_used_per); // Conversion de int a str
-    formatDataSend(dataSendApp, EEPROM_USED, strAux);
-    sendToAppUart(dataSendApp);
-
-    if(sizeEEPROM_free >= sizeDataConcat){
-      formatDataSend(dataSendApp, STATE, "Write EEPROM");
-      sendToAppUart(dataSendApp);    
-      writeEEPROM(dataConcat, sizeDataConcat);  // solo guardo datetime, id y value de mediciones
-    }
-    else{
-      formatDataSend(dataSendApp, STATE, "Read EEPROM"); // Notificacion de vacio de EEPROM
-      sendToAppUart(dataSendApp);     
-      readEEPROM(dataReadEEPROM);
-
-      //snprintf(aux_eeprom, MAX_EEPROM, "%d,%s", EEPROM_DATA, dataReadEEPROM);
-      formatDataSendLong(EEPROM_DATA, dataReadEEPROM);
-      sendToAppUart(dataReadEEPROM);
-
-      formatDataSend(dataSendApp, STATE, "Clear EEPROM"); // Notificacion de vacio de EEPROM
-      sendToAppUart(dataSendApp); 
-      //clearEEPROM();
-      memset(dataReadEEPROM, 0, MAX_EEPROM);  // Rellena el array con ceros
-      address = 0; // ubico en primera celda de EEPROM, evitando data cortada
-      formatDataSend(dataSendApp, STATE, "EEPROM OK"); // Notificacion de vacio de EEPROM
-      sendToAppUart(dataSendApp); 
-    }
-  */
 }
 
 /**************** Funciones internas  *****************/
@@ -287,7 +248,7 @@ void datetimeNow(char *datetimeStr)
            now.hour(), now.minute(), now.second());
 }
 
-/**
+/**i2cActive
  * @brief Verficación conexion con RTC
  * @return nothing
  */
@@ -299,13 +260,11 @@ void configInitialRTC()
     Serial.println(F("NO SE ENCUENTRA RTC"));
     //while (1);
   }
-  Serial.println(F("ConfRTC 2"));
   /* Fijo datetime en caso de desconexion de la alimentacion */
   if (rtc.lostPower()){
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));// Fijar a fecha y hora de compilacion
     rtc.adjust(DateTime(2024, 9, 15, 21, 12, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
   }
-  Serial.println(F("Configuracion RTC FIN"));
 }
 
 /* I2C */
@@ -374,7 +333,7 @@ int requestFromSlave()
 
   /* Verifico datos recibidos*/
   //Serial.print("R-Slave: ");
-  Serial.println(dataRequest);
+  //Serial.println(dataRequest);
   return size_rta;
 }
 
@@ -382,33 +341,15 @@ int requestFromSlave()
 /**
  * @brief Enviar data app por UART, limita solo caracteres
  */
-void sendToAppUart(int serial_id, const char* data)
+void sendToAppUart(const char* data)
 {
-    bool flag_rtc = false;
-    bool flag_state = false;
-    char dataSendApp[MAX_DATA_UART]; // Str a enviar de Master a APP
-
-    formatDataSend(dataSendApp, serial_id, data);
-    
-    if((serial_id == RTC) && (strcmp(data, lastRTC)!=0)){
-      flag_rtc = true;
+  //Enviar solo la parte válida del mensaje
+  for (int i = 0; i < strlen(data); i++) {
+    if (data[i] >= 32 && data[i] <= 126) { // Solo caracteres imprimibles// Cod ASCII
+      Serial.print(data[i]);
     }
-    else if((serial_id == STATE) && (strcmp(data, lastState)!=0)){
-      flag_state = true;
-    }
-
-    if(flag_rtc==false && flag_state==false){
-      //Enviar solo la parte válida del mensaje
-      for (int i = 0; i < strlen(data); i++) {
-        if (data[i] >= 32 && data[i] <= 126) { // Solo caracteres imprimibles// Cod ASCII
-          Serial.print(data[i]);
-        }
-      }
-      Serial.println();  // Envía un salto de línea al final      
-    }
-    // Copia el nuevo mensaje en el buffer `ultimoMensaje`
-    //strncpy(lastMsj, data, MAX_DATA_I2C - 1);
-    //lastMsj[MAX_DATA_I2C - 1] = '\0';  // Asegura el carácter nulo al final  
+  }
+  Serial.println();  // Envía un salto de línea al final      
 }
 /**
  * @brief Respuesta data de app por UART

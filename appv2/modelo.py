@@ -24,7 +24,7 @@ import serial
 import re
 import time
 
-FREQ_BAUD = 115200
+FREQ_BAUD = 9600
 
 class DataProcessor():
     def filter_port(self, port_full):
@@ -65,7 +65,7 @@ class DataProcessor():
         return date, time, value1, value2
 
     def extract_meas(self, str_full):
-        datetime, value = str_full.split()
+        datetime, value = str_full.rsplit(" ", 1)
 
         return datetime, value
     

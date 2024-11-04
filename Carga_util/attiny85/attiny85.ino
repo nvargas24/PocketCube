@@ -24,8 +24,6 @@ volatile char receivedChar = '\0'; // Carácter recibido por I2C
 volatile bool lastState1 = LOW;     // Estado anterior del pin PB3
 volatile bool lastState2 = LOW;     // Estado anterior del pin PB4
 
-void formatSendCmd(char*, int, uint16_t);
-
 void setup() {
   TinyWireS.begin(ADDR_SLAVE_I2C);
   pinMode(PIN_MEAS1, INPUT); // Configura el pin PB3 como entrada
@@ -47,16 +45,15 @@ void loop() {
     
     // Verifico que MEAS solicita
     if (receivedChar == STR_MEAS2) {
-      formatSendCmd(dataRequest, MEAS2, pulseCount2);
+      snprintf(dataRequest, MAX_BUF_I2C, "%u", pulseCount2);
       sendDataMaster(dataRequest);
       pulseCount2 = 0; // Reinicia el contador después de enviar los datos
     }
     if (receivedChar == STR_MEAS1) {
-      formatSendCmd(dataRequest, MEAS1, pulseCount1);
+      snprintf(dataRequest, MAX_BUF_I2C, "%u", pulseCount1);
       sendDataMaster(dataRequest);
       pulseCount1 = 0; // Reinicia el contador después de enviar los datos
     } 
-
   }
 }
 
@@ -87,9 +84,4 @@ void sendDataMaster(char *message) {
     TinyWireS.send(message[i]); // Envía cada carácter del mensaje
     delay(100); // Retraso entre envíos
   }
-}
-
-void formatSendCmd(char* buf, int id, uint16_t data)
-{
-  snprintf(buf, MAX_BUF_I2C, "%d,%u", id, data);
 }
