@@ -137,6 +137,8 @@ class Graph_volt(FigureCanvas):
         self.ax.tick_params(axis='x', colors='0.4')  # Cambia el color de los valores en el eje x
         self.ax.tick_params(axis='y', colors='0.4') # Cambia el color de los valores en el eje y
 
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -168,6 +170,9 @@ class MainWindow(QMainWindow):
         self.ui.table_cp.setColumnWidth(1, 110)  # Tamaño para la segunda columna
         self.ui.table_dosis.setColumnWidth(1, 110)  # Tamaño para la segunda columna
 
+        # Ajuste de alto de fila segun contenido
+        self.ui.table_cp.resizeRowsToContents()
+
         # Creo objetos 
         self.obj_data_uart = ManagerDataUart()
         self.obj_data_processor = DataProcessor()
@@ -189,25 +194,24 @@ class MainWindow(QMainWindow):
         # Formato de reloj a LCD
         self.ui.lcd_time_rtc.display(f"{0:02d}:{0:02d}:{0:02d}")
 
-        # Callback de botones
-        self.ui.btn_init.clicked.connect(self.init)
-        self.ui.btn_stop.clicked.connect(self.stop)
-
         # Timer para actualizar grafico #REEMPLAZAR POR DATA DE TIMER ARDUINO
         self.timer = QTimer()
         self.timer.timeout.connect(self.timeout_1mseg)
 
         # Atributos de datos master y slave
-        self.data_master = {"serial_id": None, "value": None, "time": None}
-        self.data_slave = {"serial_id": None, "value": None, "time": None}
+        self.data_master = {"serial_id": None, "value": None}
+        self.data_slave = {"serial_id": None, "value": None}
 
         #TEST DATA
-        row_data = ["1", "24-10-24 13:23:12", "23"]
-        self.load_row_table(row_data, "cp")
         row_data = ["0~3", "24-10-24 13:23:16", "12,5","0.00255"]
         self.load_row_table(row_data, "dosis")
         
         self.cont_meas1=0 # contador de segundos al recibir datos de Prototipo
+
+        # Callback de botones
+        self.ui.btn_init.clicked.connect(self.init)
+        self.ui.btn_stop.clicked.connect(self.stop)
+
 
     def dispatch_serial_master_event(self, data):
         """
@@ -227,7 +231,7 @@ class MainWindow(QMainWindow):
             self.ui.table_cp.scrollToBottom()
 
         # cargar datos de RTC en display
-        if data['serial_id'] == RTC:
+        elif data['serial_id'] == RTC:
             datetime = data['value']
             date, time = datetime.split()
 
@@ -257,6 +261,7 @@ class MainWindow(QMainWindow):
 
         current_row = table.rowCount()
         table.insertRow(current_row)
+        table.setRowHeight(current_row, 9)
 
         # Insertar los datos en la nueva fila
         for column in range(len(row_data)):
@@ -276,14 +281,36 @@ class MainWindow(QMainWindow):
             self.dispatch_serial_master_event(self.data_master)
 
     def init(self):
-        # Inicio timer con actualizacion de datos cada 1seg
-        self.timer.start(TIMEOUT)
-
         # Asigno puertos
         port_m = self.ui.cbox_in_serial.currentText() # Leo puerto de combobox
         port_master = self.obj_data_processor.filter_port(port_m) # Master
+        
+        # Configuracion asignada por usuario
+        distance = round(self.ui.sbox_distancia.value(), 1)
+        select_unit_dist = self.ui.buttonGroup.checkedButton().text()
+        material = self.ui.cbox_material.currentText()
+        radation_intesity = round(self.ui.sbox_intensidad.value(), 1)
+        select_unit_radation = self.ui.buttonGroup_2.checkedButton().text()
+        interval_time = self.ui.sbox_time_intervalo.value()
+        select_unit_time = self.ui.buttonGroup_3.checkedButton().text()
 
-        # Incializo puerto serial
+        self.dict_cofig={
+            'distance': distance,
+            'unit_distance': select_unit_dist,
+            'material': material,
+            'rad_intesity': radation_intesity,
+            'unit_intensity': select_unit_radation,
+            'interval_time': interval_time,
+            'unit_time': select_unit_time
+        }
+
+        #self.convertion_unit(self.dict_cofig) # ver que conviene para la dosis
+        print(self.dict_cofig)
+
+        # Inicio timer con actualizacion de datos cada 1seg
+        self.timer.start(TIMEOUT)
+
+        # Inicializo puerto serial
         self.obj_data_uart.init_serial(port_master, "Master")
 
     def stop(self):

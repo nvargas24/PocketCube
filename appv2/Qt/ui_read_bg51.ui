@@ -204,11 +204,23 @@
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
                    </property>
+                   <property name="showGroupSeparator" stdset="0">
+                    <bool>false</bool>
+                   </property>
                    <property name="decimals">
                     <number>1</number>
                    </property>
+                   <property name="maximum">
+                    <double>100.000000000000000</double>
+                   </property>
                    <property name="singleStep">
                     <double>0.100000000000000</double>
+                   </property>
+                   <property name="stepType">
+                    <enum>QAbstractSpinBox::DefaultStepType</enum>
+                   </property>
+                   <property name="value">
+                    <double>0.000000000000000</double>
                    </property>
                   </widget>
                  </item>
@@ -235,7 +247,7 @@
                       <bool>true</bool>
                      </property>
                      <attribute name="buttonGroup">
-                      <string notr="true">buttonGroup_2</string>
+                      <string notr="true">buttonGroup</string>
                      </attribute>
                     </widget>
                    </item>
@@ -257,7 +269,7 @@
                       <string>m</string>
                      </property>
                      <attribute name="buttonGroup">
-                      <string notr="true">buttonGroup_2</string>
+                      <string notr="true">buttonGroup</string>
                      </attribute>
                     </widget>
                    </item>
@@ -414,7 +426,7 @@
                       <bool>true</bool>
                      </property>
                      <attribute name="buttonGroup">
-                      <string notr="true">buttonGroup</string>
+                      <string notr="true">buttonGroup_2</string>
                      </attribute>
                     </widget>
                    </item>
@@ -436,7 +448,7 @@
                       <string>mCi</string>
                      </property>
                      <attribute name="buttonGroup">
-                      <string notr="true">buttonGroup</string>
+                      <string notr="true">buttonGroup_2</string>
                      </attribute>
                     </widget>
                    </item>
@@ -514,6 +526,9 @@
                      <property name="checked">
                       <bool>true</bool>
                      </property>
+                     <attribute name="buttonGroup">
+                      <string notr="true">buttonGroup_3</string>
+                     </attribute>
                     </widget>
                    </item>
                    <item>
@@ -533,6 +548,9 @@
                      <property name="text">
                       <string>min</string>
                      </property>
+                     <attribute name="buttonGroup">
+                      <string notr="true">buttonGroup_3</string>
+                     </attribute>
                     </widget>
                    </item>
                   </layout>
@@ -1120,7 +1138,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>
