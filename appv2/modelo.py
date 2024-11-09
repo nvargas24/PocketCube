@@ -100,6 +100,16 @@ class DataProcessor():
     def convertion_unit(self, dict_data):
         pass
 
+    def calcule_cps(self, list_cp):
+        if not list_cp:  # Verifica si la lista está vacía
+            return 0
+        else:
+            prom = sum(list_cp) / len(list_cp)
+            return round(prom, 2)
+
+    def calcule_dosis(self):
+        pass
+
 class ManagerFile():
     def create_csv(self, data):
                 # Cargar los datos en un DataFrame

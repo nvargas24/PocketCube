@@ -146,7 +146,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.setWindowTitle("Simulador - Grupo SyCE UTN-FRH")
 
-        self.setFixedSize(1100, 650)
+        self.setFixedSize(1180, 650)
         #self.setWindowIcon(QIcon(".\Imagenes\logotipo_simple_utn_haedo.png"))
 
         # Cargo icono a app
@@ -169,7 +169,8 @@ class MainWindow(QMainWindow):
         self.ui.table_dosis.resizeColumnsToContents()
         self.ui.table_cp.setColumnWidth(1, 110)  # Tamaño para la segunda columna
         self.ui.table_dosis.setColumnWidth(1, 110)  # Tamaño para la segunda columna
-
+        self.ui.table_dosis.setColumnWidth(2, 60)  # Tamaño para la segunda columna
+        
         # Ajuste de alto de fila segun contenido
         self.ui.table_cp.resizeRowsToContents()
 
@@ -203,15 +204,27 @@ class MainWindow(QMainWindow):
         self.data_slave = {"serial_id": None, "value": None}
 
         #TEST DATA
-        row_data = ["0~3", "24-10-24 13:23:16", "12,5","0.00255"]
-        self.load_row_table(row_data, "dosis")
+        ##row_data = ["0~3", "24-10-24 13:23:16", "12,5","0.00255"]
+        ##self.load_row_table(row_data, "dosis")
         
         self.cont_meas1=0 # contador de segundos al recibir datos de Prototipo
+        self.dict_cofig={
+            'distance': None,
+            'unit_distance': None,
+            'material': None,
+            'rad_intesity': None,
+            'unit_intensity': None,
+            'interval_time': None,
+            'unit_time': None
+        }
+        self.list_cp_meas1 = []
 
         # Callback de botones
         self.ui.btn_init.clicked.connect(self.init)
         self.ui.btn_stop.clicked.connect(self.stop)
 
+        self.interval_init = 0
+        self.interval_fin = self.dict_cofig["interval_time"]
 
     def dispatch_serial_master_event(self, data):
         """
@@ -224,12 +237,35 @@ class MainWindow(QMainWindow):
         # cargo datos en la tabla cp
         if data['serial_id'] == MEAS1:
             self.cont_meas1+=1
+
+            # carga de datos en contador de pulsos
             datetime, meas1 = self.obj_data_processor.extract_meas(data['value'])
 
-            row_data = [f"{self.cont_meas1}", f"{datetime}", f"{meas1}"]
-            self.load_row_table(row_data, "cp")
+            self.list_cp_meas1.append(int(meas1))
+            row_data_cp = [f"{self.cont_meas1}", f"{datetime}", f"{meas1}"]     
+            self.load_row_table(row_data_cp, "cp")
+
             self.ui.table_cp.scrollToBottom()
 
+            # carga de datos en dosis segun se de time por usuario
+            if (self.cont_meas1 == self.interval_fin):
+                # calculo de cps
+                cps_meas1 = self.obj_data_processor.calcule_cps(self.list_cp_meas1)
+
+                row_data_dosis = [f"{self.interval_init}~{self.interval_fin}", 
+                                f"{datetime}" , 
+                                f"{cps_meas1:.2f}",
+                                "0.00255"]
+
+                self.load_row_table(row_data_dosis, "dosis")
+                self.ui.table_dosis.scrollToBottom()
+
+                # Seteo para nueva carga de intervalo
+                self.interval_init = self.interval_fin
+                self.interval_fin = self.interval_fin + self.dict_cofig["interval_time"]
+
+                self.list_cp_meas1.clear()
+            
         # cargar datos de RTC en display
         elif data['serial_id'] == RTC:
             datetime = data['value']
@@ -306,6 +342,11 @@ class MainWindow(QMainWindow):
 
         #self.convertion_unit(self.dict_cofig) # ver que conviene para la dosis
         print(self.dict_cofig)
+        
+        # Configuraciones segun carga de datos por usuario
+        self.interval_init = 0
+        self.interval_fin = self.dict_cofig["interval_time"]
+        ############## FALTAN LAS DEMAS
 
         # Inicio timer con actualizacion de datos cada 1seg
         self.timer.start(TIMEOUT)

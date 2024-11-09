@@ -17,13 +17,13 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1088, 635)
+        MainWindow.resize(1178, 635)
         MainWindow.setStyleSheet(u"background-color: rgb(230, 230, 230);")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayoutWidget_9 = QWidget(self.centralwidget)
         self.verticalLayoutWidget_9.setObjectName(u"verticalLayoutWidget_9")
-        self.verticalLayoutWidget_9.setGeometry(QRect(30, 30, 1031, 591))
+        self.verticalLayoutWidget_9.setGeometry(QRect(30, 30, 1131, 591))
         self.verticalLayout_8 = QVBoxLayout(self.verticalLayoutWidget_9)
         self.verticalLayout_8.setSpacing(15)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
@@ -282,7 +282,9 @@ class Ui_MainWindow(object):
         self.sbox_time_intervalo.setFont(font1)
         self.sbox_time_intervalo.setStyleSheet(u"background-color: rgb(255, 255, 255);")
         self.sbox_time_intervalo.setAlignment(Qt.AlignCenter)
+        self.sbox_time_intervalo.setMinimum(1)
         self.sbox_time_intervalo.setMaximum(60)
+        self.sbox_time_intervalo.setValue(1)
 
         self.horizontalLayout_6.addWidget(self.sbox_time_intervalo)
 
@@ -492,8 +494,8 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_14.addLayout(self.verticalLayout_4)
 
-        self.horizontalLayout_14.setStretch(0, 7)
-        self.horizontalLayout_14.setStretch(1, 7)
+        self.horizontalLayout_14.setStretch(0, 15)
+        self.horizontalLayout_14.setStretch(1, 16)
 
         self.verticalLayout_7.addLayout(self.horizontalLayout_14)
 
@@ -572,8 +574,8 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_15.addLayout(self.verticalLayout_6)
 
-        self.horizontalLayout_15.setStretch(0, 5)
-        self.horizontalLayout_15.setStretch(1, 5)
+        self.horizontalLayout_15.setStretch(0, 15)
+        self.horizontalLayout_15.setStretch(1, 16)
 
         self.verticalLayout_7.addLayout(self.horizontalLayout_15)
 

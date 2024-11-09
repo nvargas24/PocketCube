@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1088</width>
+    <width>1178</width>
     <height>635</height>
    </rect>
   </property>
@@ -22,7 +22,7 @@
      <rect>
       <x>30</x>
       <y>30</y>
-      <width>1031</width>
+      <width>1131</width>
       <height>591</height>
      </rect>
     </property>
@@ -499,8 +499,14 @@
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
                    </property>
+                   <property name="minimum">
+                    <number>1</number>
+                   </property>
                    <property name="maximum">
                     <number>60</number>
+                   </property>
+                   <property name="value">
+                    <number>1</number>
                    </property>
                   </widget>
                  </item>
@@ -672,7 +678,7 @@
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="7,7">
+          <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="15,16">
            <item>
             <layout class="QVBoxLayout" name="graph_out1"/>
            </item>
@@ -855,7 +861,7 @@
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="5,5">
+          <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="15,16">
            <item>
             <layout class="QVBoxLayout" name="graph_out2"/>
            </item>
@@ -1138,8 +1144,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_3"/>
  </buttongroups>
 </ui>

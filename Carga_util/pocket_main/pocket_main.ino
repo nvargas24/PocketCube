@@ -180,6 +180,7 @@ void loop()
     sendToSlaveC(STR_MEAS1); // Solicitud de data en pin PB3
     delay(100); // Pequeña espera para asegurar que el esclavo reciba el dato
     requestFromSlave(); // Respuesta de slave
+    filterValue(dataRequest);
     snprintf(meas1, MAX_DATA_UART, "2024-10-25 14:30:45 %s", dataRequest);
     formatDataSend(dataSendApp, MEAS1, meas1);
     sendToAppUart(dataSendApp);
