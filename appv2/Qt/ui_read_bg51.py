@@ -486,7 +486,7 @@ class Ui_MainWindow(object):
         font6.setPointSize(7)
         self.pbar_interval.setFont(font6)
         self.pbar_interval.setLayoutDirection(Qt.RightToLeft)
-        self.pbar_interval.setValue(50)
+        self.pbar_interval.setValue(0)
         self.pbar_interval.setAlignment(Qt.AlignCenter)
         self.pbar_interval.setTextVisible(True)
         self.pbar_interval.setOrientation(Qt.Horizontal)

@@ -340,6 +340,7 @@ class MainWindow(QMainWindow):
         self.interval_init = 0
         self.interval_fin = self.dict_cofig["interval_time"]
 
+
     def dispatch_serial_master_event(self, data):
         """
         Identifico datos recibidos en la trama
@@ -361,8 +362,10 @@ class MainWindow(QMainWindow):
 
             self.ui.table_cp.scrollToBottom()
 
-            # actualización de grafico de barras
+            # Actualización de grafico de barras
             self.graph1.update_graph(int(meas1), int(self.dict_cofig["interval_time"]))
+            # Actualización barra de progreso
+            self.ui.pbar_interval.setValue(len(self.list_cp_meas1)-1)
 
             # carga de datos en dosis segun se de time por usuario
             if (self.cont_meas1 == self.interval_fin):
@@ -475,6 +478,10 @@ class MainWindow(QMainWindow):
 
         # Inicializo puerto serial
         self.obj_data_uart.init_serial(port_master, "Master")
+
+        # Configuro limites de progressbar segun interval
+        self.ui.pbar_interval.setMaximum(int(self.dict_cofig["interval_time"]))
+        self.ui.pbar_interval.reset()
 
     def stop(self):
         # Finalizo timer
