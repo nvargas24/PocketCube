@@ -35,7 +35,119 @@ NAME_MEAS2 = "Meas2"
 
 TIMEOUT = 1
 
-class Graph_volt(FigureCanvas):
+class Graph_bar(FigureCanvas):
+    def __init__(self):
+        self.xlim_init = 0
+        self.xlim_fin = 15
+        self.ylim_init = -1
+        self.ylim_fin = 6
+
+        # Inicializo grilla
+        self.grid_lines_v = []
+        self.grid_lines_h = []
+
+        self.fig, self.ax = plt.subplots(1, dpi=82, figsize=(12,12), sharey=True, facecolor="none")
+        self.fig.subplots_adjust(left=.16, bottom=.2, right=.95, top=.95) #Ajuste de escala de grafica
+        super().__init__(self.fig)
+
+        self.set_graph_style()
+
+        # Listas para cargar datos
+        self.x_data = []
+        self.y_data = []
+
+        # Crear la línea inicial
+        self.bar = self.ax.bar([], [], picker=5)
+
+    def update_graph(self, new_y_value, interval_time):
+        """
+        Metodo para actualizar grafico
+        """
+        if self.x_data:
+            # Reseteo al llega al limite de intervalo
+            if self.x_data[-1] == interval_time:
+                self.x_data.clear()
+                self.y_data.clear() 
+
+        # Generar nuevo valor de datos
+        if self.x_data:
+            next_x = self.x_data[-1] + 1 # Agrego nueva pos en x en la lista
+        else:
+            next_x = self.xlim_init
+
+        self.x_data.append(next_x)
+        self.y_data.append(new_y_value)
+
+        print(f"x_data: {self.x_data}\ny_data: {self.y_data}")
+
+        # Actualizar datos de la línea
+        self.ax.clear()  # Limpiar el gráfico actual
+
+        self.xlim_fin = interval_time+1 # ajusto eje x segun config user
+
+        if self.ylim_fin < new_y_value:
+            self.ylim_fin = new_y_value+ round(new_y_value*0.1)
+
+        self.set_graph_style()  # Reaplicar el estilo después de limpiar
+        self.bars = self.ax.bar(self.x_data, self.y_data, picker=5)  # Dibujar nuevas barras
+
+        # Ajustar los límites si es necesario
+        #if next_x >= self.xlim_fin:
+        #    self.xlim_fin = next_x+1
+
+        self.draw()
+
+    def set_graph_style(self):
+        """
+        Metodo que asigna estilo al grafico
+        """
+        # Eliminar las líneas de la grilla existentes
+        for line in self.grid_lines_v:
+            line.remove()
+        for line in self.grid_lines_h:
+            line.remove()
+
+        self.grid_lines_v.clear()
+        self.grid_lines_h.clear()
+
+        # Establece nombres de ejes y tamanio
+        matplotlib.rcParams['font.size'] = 10
+        self.ax.set_xlabel("Time[s]", labelpad=1)
+        self.ax.set_ylabel("Count Pulse", labelpad=1)
+        self.ax.tick_params(axis='both', which='both', labelsize=7)
+   
+        # Establecer límites del eje X e Y
+        self.ax.set_xlim(self.xlim_init-1, self.xlim_fin)
+        self.ax.set_ylim(self.ylim_init, self.ylim_fin)
+
+        # Creo grilla
+        per_div = 1
+        #if self.xlim_fin > 50:
+        #    per_div = 1/20
+
+        step_value_x = round((self.xlim_fin-self.xlim_init)/((self.xlim_fin-self.xlim_init))*per_div)
+        step_value_y = round((self.ylim_fin-self.ylim_init)/10)
+
+        for i in range(self.xlim_init, self.xlim_fin, step_value_x):
+            line = self.ax.axvline(i, color='grey', linestyle='--', linewidth=0.25)
+            self.grid_lines_v.append(line)
+
+        for j in range(self.ylim_init, self.ylim_fin, step_value_y):   
+            line = self.ax.axhline(j, color='grey', linestyle='--', linewidth=0.25)
+            self.grid_lines_h.append(line)
+
+
+        # set colores bordes
+        self.ax.spines['bottom'].set_color('0.7')  # Eje x
+        self.ax.spines['left'].set_color('0.7')   # Eje y
+        self.ax.spines['top'].set_visible(False)    # Oculta el borde superior
+        self.ax.spines['right'].set_visible(False)  # Oculta el borde derecho
+        
+        # set colores ejes
+        self.ax.tick_params(axis='x', colors='0.4')  # Cambia el color de los valores en el eje x
+        self.ax.tick_params(axis='y', colors='0.4') # Cambia el color de los valores en el eje y
+
+class Graph_line(FigureCanvas):
     def __init__(self):
         self.xlim_init = 0
         self.xlim_fin = 15
@@ -186,8 +298,8 @@ class MainWindow(QMainWindow):
         self.ui.cbox_in_serial.addItems(list_ports)
 
         # Carga de graficos
-        self.graph1 = Graph_volt()
-        self.graph2 = Graph_volt()
+        self.graph1 = Graph_bar()
+        self.graph2 = Graph_line()
 
         self.ui.graph_out1.addWidget(self.graph1)
         self.ui.graph_out2.addWidget(self.graph2)
@@ -247,6 +359,9 @@ class MainWindow(QMainWindow):
 
             self.ui.table_cp.scrollToBottom()
 
+            # actualización de grafico de barras
+            self.graph1.update_graph(int(meas1), int(self.dict_cofig["interval_time"]))
+
             # carga de datos en dosis segun se de time por usuario
             if (self.cont_meas1 == self.interval_fin):
                 # calculo de cps
@@ -266,6 +381,7 @@ class MainWindow(QMainWindow):
 
                 self.list_cp_meas1.clear()
             
+
         # cargar datos de RTC en display
         elif data['serial_id'] == RTC:
             datetime = data['value']
