@@ -162,7 +162,7 @@ class Graph_line(FigureCanvas):
         self.grid_lines_h = []
 
         self.fig, self.ax = plt.subplots(1, dpi=82, figsize=(12,12), sharey=True, facecolor="none")
-        self.fig.subplots_adjust(left=.09, bottom=.2, right=.95, top=.95) #Ajuste de escala de grafica
+        self.fig.subplots_adjust(left=.16, bottom=.2, right=.95, top=.95) #Ajuste de escala de grafica
         super().__init__(self.fig)
 
         self.set_graph_style()
@@ -190,15 +190,14 @@ class Graph_line(FigureCanvas):
         # Actualizar datos de la línea
         self.line.set_data(self.x_data, self.y_data)
 
-        # Marca punto en grafico
-        if self.flag_send:
-            self.ax.scatter(next_x, new_y_value, c='red', s=10, alpha=0.8, picker=True, zorder=2)
-            self.flag_send = False
-
         # Ajustar los límites si es necesario
         if next_x >= self.xlim_fin:
             self.xlim_fin = next_x+1
         
+        self.ylim_fin = new_y_value+ round(new_y_value*0.1)
+        self.ylim_init = new_y_value- round(new_y_value*0.1)
+        print(f"ylim: {self.ylim_fin}, new_value:{new_y_value}")
+
         self.set_graph_style()
 
         self.draw()
@@ -218,8 +217,8 @@ class Graph_line(FigureCanvas):
 
         # Establece nombres de ejes y tamanio
         matplotlib.rcParams['font.size'] = 10
-        self.ax.set_xlabel("Time[s]", labelpad=1)
-        self.ax.set_ylabel("ADC[V]", labelpad=1)
+        self.ax.set_xlabel("Intervalos", labelpad=1)
+        self.ax.set_ylabel("Dosis[uS/seg]", labelpad=1)
         self.ax.tick_params(axis='both', which='both', labelsize=7)
    
         # Establecer límites del eje X e Y
@@ -234,9 +233,9 @@ class Graph_line(FigureCanvas):
             line = self.ax.axvline(i, color='grey', linestyle='--', linewidth=0.25)
             self.grid_lines_v.append(line)
 
-        for j in range(self.ylim_init, self.ylim_fin, step_value_y):   
-            line = self.ax.axhline(j, color='grey', linestyle='--', linewidth=0.25)
-            self.grid_lines_h.append(line)
+        #for j in range(self.ylim_init, self.ylim_fin, step_value_y):   
+        #    line = self.ax.axhline(j, color='grey', linestyle='--', linewidth=0.25)
+        #    self.grid_lines_h.append(line)
 
 
         # set colores bordes
@@ -366,14 +365,18 @@ class MainWindow(QMainWindow):
             if (self.cont_meas1 == self.interval_fin):
                 # calculo de cps
                 cps_meas1 = self.obj_data_processor.calcule_cps(self.list_cp_meas1)
+                dosis_meas1 = self.obj_data_processor.calcule_dosis(cps_meas1, self.dict_cofig)
 
                 row_data_dosis = [f"{self.interval_init}~{self.interval_fin}", 
                                 f"{datetime}" , 
                                 f"{cps_meas1:.2f}",
-                                "0.00255"]
+                                f"{dosis_meas1:.5f}"]
 
                 self.load_row_table(row_data_dosis, "dosis")
                 self.ui.table_dosis.scrollToBottom()
+
+                # Actulizacoón de grafico de linea
+                self.graph2.update_graph(dosis_meas1)
 
                 # Seteo para nueva carga de intervalo
                 self.interval_init = self.interval_fin

@@ -107,9 +107,10 @@ class DataProcessor():
             prom = sum(list_cp) / len(list_cp)
             return round(prom, 2)
 
-    def calcule_dosis(self):
-        pass
+    def calcule_dosis(self, cps, dict_config):
+        dosis = cps*dict_config["interval_time"]*0.0000001
 
+        return dosis
 class ManagerFile():
     def create_csv(self, data):
                 # Cargar los datos en un DataFrame
