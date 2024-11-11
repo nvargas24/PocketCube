@@ -351,9 +351,14 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_8)
 
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_3.addItem(self.verticalSpacer)
+
         self.verticalLayout_3.setStretch(0, 2)
         self.verticalLayout_3.setStretch(1, 11)
         self.verticalLayout_3.setStretch(2, 3)
+        self.verticalLayout_3.setStretch(3, 4)
 
         self.verticalLayout.addLayout(self.verticalLayout_3)
 
@@ -587,7 +592,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_16.setStretch(0, 11)
         self.horizontalLayout_16.setStretch(1, 1)
-        self.horizontalLayout_16.setStretch(2, 18)
+        self.horizontalLayout_16.setStretch(2, 21)
 
         self.verticalLayout_8.addLayout(self.horizontalLayout_16)
 

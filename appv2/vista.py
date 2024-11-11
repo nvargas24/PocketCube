@@ -151,8 +151,8 @@ class Graph_line(FigureCanvas):
     def __init__(self):
         self.xlim_init = 0
         self.xlim_fin = 15
-        self.ylim_init = -1
-        self.ylim_fin = 6
+        self.ylim_init = -0.0001
+        self.ylim_fin = 0.0001
 
         # Indicador en grafico
         self.flag_send = False
@@ -194,9 +194,11 @@ class Graph_line(FigureCanvas):
         if next_x >= self.xlim_fin:
             self.xlim_fin = next_x+1
         
-        self.ylim_fin = new_y_value+ round(new_y_value*0.1)
-        self.ylim_init = new_y_value- round(new_y_value*0.1)
-        print(f"ylim: {self.ylim_fin}, new_value:{new_y_value}")
+        if self.ylim_fin < new_y_value:
+            self.ylim_fin = new_y_value + round(new_y_value*0.5)
+        
+        if self.ylim_init > new_y_value:
+            self.ylim_init = new_y_value - round(new_y_value*0.1)
 
         self.set_graph_style()
 
@@ -279,8 +281,9 @@ class MainWindow(QMainWindow):
         self.ui.table_cp.resizeColumnsToContents()
         self.ui.table_dosis.resizeColumnsToContents()
         self.ui.table_cp.setColumnWidth(1, 110)  # Tamaño para la segunda columna
+        self.ui.table_dosis.setColumnWidth(0, 70)  # Tamaño para la primera columna
         self.ui.table_dosis.setColumnWidth(1, 110)  # Tamaño para la segunda columna
-        self.ui.table_dosis.setColumnWidth(2, 60)  # Tamaño para la segunda columna
+        self.ui.table_dosis.setColumnWidth(2, 60)  # Tamaño para la tercera columna
         
         # Ajuste de alto de fila segun contenido
         self.ui.table_cp.resizeRowsToContents()
