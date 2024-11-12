@@ -97,8 +97,23 @@ class DataProcessor():
                             + time.msec()
         return milliseconds_total
 
-    def convertion_unit(self, dict_data):
-        pass
+    def convertion_unit(self, dict_config):
+        # Estandarizar la distancia a metros
+        if dict_config['unit_distance'] == 'cm':
+            dict_config['distance'] = dict_config['distance'] / 100  # Convertir cm a metros
+            dict_config['unit_distance'] = 'm'  # Cambiar unidad a metros
+
+        # Estandarizar la intensidad a uCi
+        if dict_config['unit_intensity'] == 'mCi':
+            dict_config['rad_intensity'] = dict_config['rad_intensity'] * 1000  # Convertir mCi a uCi
+            dict_config['unit_intensity'] = 'uCi'  # Cambiar unidad a uCi
+
+        # Estandarizar el tiempo a segundos
+        if dict_config['unit_time'] == 'min':
+            dict_config['interval_time'] = dict_config['interval_time'] * 60  # Convertir minutos a segundos
+            dict_config['unit_time'] = 'seg'  # Cambiar unidad a segundos
+
+        return dict_config
 
     def calcule_cps(self, list_cp):
         if not list_cp:  # Verifica si la lista está vacía
@@ -133,11 +148,11 @@ class ManagerFile():
 
     def load_df(self, data, id_name):
         if id_name == "cp":
-            df_temporal = pd.DataFrame([data], columns=['Time', 'Intervalo', 'RTC', 'Count Pulse'])
-            self.df_acumulado_cp = pd.concat([self.df_acumulado_cp, df_temporal], ignore_index=True)
+            df_temporal1 = pd.DataFrame([data], columns=['Time', 'Intervalo', 'RTC', 'Count Pulse'])
+            self.df_acumulado_cp = pd.concat([self.df_acumulado_cp, df_temporal1], ignore_index=True)
         if id_name == "dosis":
-            df_temporal = pd.DataFrame([data], columns=['Intervalo', 'RTC', 'CPS', 'Dosis'])
-            self.df_acumulado_dosis = pd.concat([self.df_acumulado_cp, df_temporal], ignore_index=True)
+            df_temporal2 = pd.DataFrame([data], columns=['Intervalo', 'RTC', 'CPS', 'Dosis'])
+            self.df_acumulado_dosis = pd.concat([self.df_acumulado_dosis, df_temporal2], ignore_index=True)
 
     def export_csv_df(self, df, id_name):
         datetime_now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")

@@ -323,11 +323,11 @@ class MainWindow(QMainWindow):
         ##self.load_row_table(row_data, "dosis")
         
         self.cont_meas1=0 # contador de segundos al recibir datos de Prototipo
-        self.dict_cofig={
+        self.dict_config={
             'distance': None,
             'unit_distance': None,
             'material': None,
-            'rad_intesity': None,
+            'rad_intensity': None,
             'unit_intensity': None,
             'interval_time': None,
             'unit_time': None
@@ -340,7 +340,7 @@ class MainWindow(QMainWindow):
         self.ui.btn_csv.clicked.connect(self.create_csv)
 
         self.interval_init = 0
-        self.interval_fin = self.dict_cofig["interval_time"]
+        self.interval_fin = self.dict_config["interval_time"]
 
 
     def dispatch_serial_master_event(self, data):
@@ -372,7 +372,7 @@ class MainWindow(QMainWindow):
             self.obj_file.load_df(row_data_cp, "cp")
 
             # Actualización de grafico de barras
-            self.graph1.update_graph(int(meas1), int(self.dict_cofig["interval_time"]))
+            self.graph1.update_graph(int(meas1), int(self.dict_config["interval_time"]))
             # Actualización barra de progreso
             self.ui.pbar_interval.setValue(len(self.list_cp_meas1)-1)
 
@@ -380,7 +380,7 @@ class MainWindow(QMainWindow):
             if (self.cont_meas1 == self.interval_fin):
                 # calculo de cps
                 cps_meas1 = self.obj_data_processor.calcule_cps(self.list_cp_meas1)
-                dosis_meas1 = self.obj_data_processor.calcule_dosis(cps_meas1, self.dict_cofig)
+                dosis_meas1 = self.obj_data_processor.calcule_dosis(cps_meas1, self.dict_config)
 
                 row_data_dosis = [
                                     f"{self.interval_init}~{self.interval_fin}", 
@@ -397,7 +397,7 @@ class MainWindow(QMainWindow):
 
                 # Seteo para nueva carga de intervalo
                 self.interval_init = self.interval_fin
-                self.interval_fin = self.interval_fin + self.dict_cofig["interval_time"]
+                self.interval_fin = self.interval_fin + self.dict_config["interval_time"]
 
                 self.list_cp_meas1.clear()
             
@@ -466,22 +466,22 @@ class MainWindow(QMainWindow):
         interval_time = self.ui.sbox_time_intervalo.value()
         select_unit_time = self.ui.buttonGroup_3.checkedButton().text()
 
-        self.dict_cofig={
+        self.dict_config={
             'distance': distance,
             'unit_distance': select_unit_dist,
             'material': material,
-            'rad_intesity': radation_intesity,
+            'rad_intensity': radation_intesity,
             'unit_intensity': select_unit_radation,
             'interval_time': interval_time,
             'unit_time': select_unit_time
         }
 
-        #self.convertion_unit(self.dict_cofig) # ver que conviene para la dosis
-        print(self.dict_cofig)
+        self.dict_config = self.obj_data_processor.convertion_unit(self.dict_config)
+        print(self.dict_config)
         
         # Configuraciones segun carga de datos por usuario
         self.interval_init = 0
-        self.interval_fin = self.dict_cofig["interval_time"]
+        self.interval_fin = self.dict_config["interval_time"]
         ############## FALTAN LAS DEMAS
 
         # Inicio timer con actualizacion de datos cada 1seg
@@ -491,7 +491,7 @@ class MainWindow(QMainWindow):
         self.obj_data_uart.init_serial(port_master, "Master")
 
         # Configuro limites de progressbar segun interval
-        self.ui.pbar_interval.setMaximum(int(self.dict_cofig["interval_time"]))
+        self.ui.pbar_interval.setMaximum(int(self.dict_config["interval_time"]))
         self.ui.pbar_interval.reset()
 
     def stop(self):
