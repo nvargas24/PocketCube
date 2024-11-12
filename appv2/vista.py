@@ -37,7 +37,7 @@ TIMEOUT = 1
 
 class Graph_bar(FigureCanvas):
     def __init__(self):
-        self.xlim_init = 0
+        self.xlim_init = 1
         self.xlim_fin = 15
         self.ylim_init = -1
         self.ylim_fin = 6
@@ -78,7 +78,7 @@ class Graph_bar(FigureCanvas):
         self.x_data.append(next_x)
         self.y_data.append(new_y_value)
 
-        print(f"x_data: {self.x_data}\ny_data: {self.y_data}")
+        #print(f"x_data: {self.x_data}\ny_data: {self.y_data}")
 
         # Actualizar datos de la línea
         self.ax.clear()  # Limpiar el gráfico actual
@@ -336,6 +336,7 @@ class MainWindow(QMainWindow):
         # Callback de botones
         self.ui.btn_init.clicked.connect(self.init)
         self.ui.btn_stop.clicked.connect(self.stop)
+        self.ui.btn_csv.clicked.connect(self.create_csv)
 
         self.interval_init = 0
         self.interval_fin = self.dict_cofig["interval_time"]
@@ -357,10 +358,16 @@ class MainWindow(QMainWindow):
             datetime, meas1 = self.obj_data_processor.extract_meas(data['value'])
 
             self.list_cp_meas1.append(int(meas1))
-            row_data_cp = [f"{self.cont_meas1}", f"{datetime}", f"{meas1}"]     
-            self.load_row_table(row_data_cp, "cp")
+            row_data_cp = [
+                            f"{self.cont_meas1}", 
+                            f"{datetime}", 
+                            f"{meas1}"
+                        ]
 
+            self.load_row_table(row_data_cp, "cp") 
             self.ui.table_cp.scrollToBottom()
+
+            self.obj_file.load_df(row_data_cp, "cp")
 
             # Actualización de grafico de barras
             self.graph1.update_graph(int(meas1), int(self.dict_cofig["interval_time"]))
@@ -373,10 +380,12 @@ class MainWindow(QMainWindow):
                 cps_meas1 = self.obj_data_processor.calcule_cps(self.list_cp_meas1)
                 dosis_meas1 = self.obj_data_processor.calcule_dosis(cps_meas1, self.dict_cofig)
 
-                row_data_dosis = [f"{self.interval_init}~{self.interval_fin}", 
-                                f"{datetime}" , 
-                                f"{cps_meas1:.2f}",
-                                f"{dosis_meas1:.5f}"]
+                row_data_dosis = [
+                                    f"{self.interval_init}~{self.interval_fin}", 
+                                    f"{datetime}" , 
+                                    f"{cps_meas1:.2f}",
+                                    f"{dosis_meas1:.5f}"
+                                ]
 
                 self.load_row_table(row_data_dosis, "dosis")
                 self.ui.table_dosis.scrollToBottom()
@@ -487,3 +496,12 @@ class MainWindow(QMainWindow):
         # Finalizo timer
         self.timer.stop()
         self.obj_data_uart.ser["Master"].close()
+
+    def create_csv(self):
+        # Exporto CSV
+        self.obj_file.export_csv_df(self.obj_file.df_acumulado_cp, "CountPulse")
+        self.obj_file.export_csv_df(self.obj_file.df_acumulado_dosis, "Dosis")
+
+        # Vacio Dataframe para nueva carga
+        self.obj_file.clear_df(self.obj_file.df_acumulado_cp)
+        self.obj_file.clear_df(self.obj_file.df_acumulado_dosis)

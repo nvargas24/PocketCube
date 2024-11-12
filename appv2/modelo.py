@@ -112,6 +112,10 @@ class DataProcessor():
 
         return dosis
 class ManagerFile():
+    def __init__(self):
+        self.df_acumulado_cp = pd.DataFrame(columns=['Time', 'RTC', 'Count Pulse'])
+        self.df_acumulado_dosis = pd.DataFrame(columns=['Intervalo', 'RTC', 'CPS', 'Dosis'])
+
     def create_csv(self, data):
                 # Cargar los datos en un DataFrame
         df = pd.read_csv(StringIO(data), header=None)
@@ -126,6 +130,32 @@ class ManagerFile():
         # Guardar el DataFrame en un archivo CSV, con encabezados solo si el archivo no existe
         write_header = not pd.io.common.file_exists(csv_file_path)
         df.to_csv(csv_file_path, mode='a', index=False, header=write_header)
+
+    def load_df(self, data, id_name):
+        if id_name == "cp":
+            df_temporal = pd.DataFrame([data], columns=['Time', 'RTC', 'Count Pulse'])
+            self.df_acumulado_cp = pd.concat([self.df_acumulado_cp, df_temporal], ignore_index=True)
+        if id_name == "dosis":
+            df_temporal = pd.DataFrame([data], columns=['Intervalo', 'RTC', 'CPS', 'Dosis'])
+            self.df_acumulado_dosis = pd.concat([self.df_acumulado_cp, df_temporal], ignore_index=True)
+
+    def export_csv_df(self, df, id_name):
+        datetime_now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        name_file = f"regitro_{id_name}_{datetime_now}.csv"
+        try:
+            # Obtiene la ruta del escritorio del usuario
+            url_desktop = os.path.join(os.path.expanduser("~"), "Desktop")
+            url_file = os.path.join(url_desktop, name_file)
+            # Exporta el DataFrame al archivo CSV
+            df.to_csv(url_file, index=False)
+            print(f"DataFrame exportado con éxito a {name_file}")
+        except Exception as e:
+            print(f"Error al exportar el DataFrame: {e}")
+
+    def clear_df(self, df):
+        # Vacia el DataFrame manteniendo sus columnas
+        df.drop(df.index, inplace=True)
+        print("DataFrame vaciado con éxito")       
 
 class ManagerDataUart(DataProcessor):
     def __init__(self):
