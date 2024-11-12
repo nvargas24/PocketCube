@@ -129,7 +129,7 @@ void setup()
   Serial.begin(9600); // Frecuencia en baudios para serial
   Wire.begin(); // Inicializo comunicacion I2C
   //Wire.setClock(100000); // Configurar la frecuencia I2C a 100 kHz
-  //configInitialRTC(); // Inicializo configuiracion de RTC
+  configInitialRTC(); // Inicializo configuiracion de RTC
   configTimer();
   delay(1000); 
 }
@@ -169,9 +169,9 @@ void loop()
   sendToAppUart(dataSendApp);   
   
   /* RTC */
-  //datetimeNow(datetimeStr); //Obtengo datetime actual
+  datetimeNow(datetimeStr); //Obtengo datetime actual
   /* ENVIO DATETIME */
-  formatDataSend(dataSendApp, RTC, "2024-10-27 15:30:45");
+  formatDataSend(dataSendApp, RTC, datetimeStr);
   sendToAppUart(dataSendApp);
     
   if(i2cActive){
@@ -181,7 +181,7 @@ void loop()
     delay(100); // Pequeña espera para asegurar que el esclavo reciba el dato
     requestFromSlave(); // Respuesta de slave
     filterValue(dataRequest);
-    snprintf(meas1, MAX_DATA_UART, "2024-10-25 14:30:45 %s", dataRequest);
+    snprintf(meas1, MAX_DATA_UART, "%s %s", datetimeStr, dataRequest);
     formatDataSend(dataSendApp, MEAS1, meas1);
     sendToAppUart(dataSendApp);
 
@@ -264,7 +264,7 @@ void configInitialRTC()
   /* Fijo datetime en caso de desconexion de la alimentacion */
   if (rtc.lostPower()){
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));// Fijar a fecha y hora de compilacion
-    rtc.adjust(DateTime(2024, 9, 15, 21, 12, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
+    //rtc.adjust(DateTime(2024, 9, 15, 21, 12, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
   }
 }
 

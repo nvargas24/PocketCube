@@ -68,6 +68,8 @@ class Graph_bar(FigureCanvas):
             if self.x_data[-1] == interval_time:
                 self.x_data.clear()
                 self.y_data.clear() 
+                self.ylim_init = -1
+                self.ylim_fin = 6
 
         # Generar nuevo valor de datos
         if self.x_data:
@@ -400,6 +402,7 @@ class MainWindow(QMainWindow):
                 self.interval_fin = self.interval_fin + self.dict_config["interval_time"]
 
                 self.list_cp_meas1.clear()
+
             
 
         # cargar datos de RTC en display
