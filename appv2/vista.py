@@ -280,7 +280,8 @@ class MainWindow(QMainWindow):
         # Ajuste de ancho de columna segun contenido
         self.ui.table_cp.resizeColumnsToContents()
         self.ui.table_dosis.resizeColumnsToContents()
-        self.ui.table_cp.setColumnWidth(1, 110)  # Tamaño para la segunda columna
+        self.ui.table_cp.setColumnWidth(1, 70)  # Tamaño para la segunda columna
+        self.ui.table_cp.setColumnWidth(2, 110)  # Tamaño para la tervera columna
         self.ui.table_dosis.setColumnWidth(0, 70)  # Tamaño para la primera columna
         self.ui.table_dosis.setColumnWidth(1, 110)  # Tamaño para la segunda columna
         self.ui.table_dosis.setColumnWidth(2, 60)  # Tamaño para la tercera columna
@@ -360,6 +361,7 @@ class MainWindow(QMainWindow):
             self.list_cp_meas1.append(int(meas1))
             row_data_cp = [
                             f"{self.cont_meas1}", 
+                            f"{self.interval_init}~{self.interval_fin}",
                             f"{datetime}", 
                             f"{meas1}"
                         ]

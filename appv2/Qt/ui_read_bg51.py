@@ -421,8 +421,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_18 = QHBoxLayout()
         self.horizontalLayout_18.setObjectName(u"horizontalLayout_18")
         self.table_cp = QTableWidget(self.verticalLayoutWidget_9)
-        if (self.table_cp.columnCount() < 3):
-            self.table_cp.setColumnCount(3)
+        if (self.table_cp.columnCount() < 4):
+            self.table_cp.setColumnCount(4)
         font4 = QFont()
         font4.setPointSize(10)
         font4.setBold(True)
@@ -440,6 +440,10 @@ class Ui_MainWindow(object):
         __qtablewidgetitem2.setTextAlignment(Qt.AlignCenter);
         __qtablewidgetitem2.setFont(font4);
         self.table_cp.setHorizontalHeaderItem(2, __qtablewidgetitem2)
+        __qtablewidgetitem3 = QTableWidgetItem()
+        __qtablewidgetitem3.setTextAlignment(Qt.AlignCenter);
+        __qtablewidgetitem3.setFont(font4);
+        self.table_cp.setHorizontalHeaderItem(3, __qtablewidgetitem3)
         self.table_cp.setObjectName(u"table_cp")
         sizePolicy4 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy4.setHorizontalStretch(0)
@@ -517,18 +521,18 @@ class Ui_MainWindow(object):
         self.table_dosis = QTableWidget(self.verticalLayoutWidget_9)
         if (self.table_dosis.columnCount() < 4):
             self.table_dosis.setColumnCount(4)
-        __qtablewidgetitem3 = QTableWidgetItem()
-        __qtablewidgetitem3.setFont(font4);
-        self.table_dosis.setHorizontalHeaderItem(0, __qtablewidgetitem3)
         __qtablewidgetitem4 = QTableWidgetItem()
         __qtablewidgetitem4.setFont(font4);
-        self.table_dosis.setHorizontalHeaderItem(1, __qtablewidgetitem4)
+        self.table_dosis.setHorizontalHeaderItem(0, __qtablewidgetitem4)
         __qtablewidgetitem5 = QTableWidgetItem()
         __qtablewidgetitem5.setFont(font4);
-        self.table_dosis.setHorizontalHeaderItem(2, __qtablewidgetitem5)
+        self.table_dosis.setHorizontalHeaderItem(1, __qtablewidgetitem5)
         __qtablewidgetitem6 = QTableWidgetItem()
         __qtablewidgetitem6.setFont(font4);
-        self.table_dosis.setHorizontalHeaderItem(3, __qtablewidgetitem6)
+        self.table_dosis.setHorizontalHeaderItem(2, __qtablewidgetitem6)
+        __qtablewidgetitem7 = QTableWidgetItem()
+        __qtablewidgetitem7.setFont(font4);
+        self.table_dosis.setHorizontalHeaderItem(3, __qtablewidgetitem7)
         self.table_dosis.setObjectName(u"table_dosis")
         self.table_dosis.setFont(font5)
         self.table_dosis.setStyleSheet(u"background-color: rgb(255, 255, 255);")
@@ -679,17 +683,19 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem = self.table_cp.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Time[s]", None));
         ___qtablewidgetitem1 = self.table_cp.horizontalHeaderItem(1)
-        ___qtablewidgetitem1.setText(QCoreApplication.translate("MainWindow", u"RTC", None));
+        ___qtablewidgetitem1.setText(QCoreApplication.translate("MainWindow", u"Int.[s]", None));
         ___qtablewidgetitem2 = self.table_cp.horizontalHeaderItem(2)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("MainWindow", u"Count Pulse", None));
-        ___qtablewidgetitem3 = self.table_dosis.horizontalHeaderItem(0)
-        ___qtablewidgetitem3.setText(QCoreApplication.translate("MainWindow", u"Int.[s]", None));
-        ___qtablewidgetitem4 = self.table_dosis.horizontalHeaderItem(1)
-        ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"RTC", None));
-        ___qtablewidgetitem5 = self.table_dosis.horizontalHeaderItem(2)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"CPS", None));
-        ___qtablewidgetitem6 = self.table_dosis.horizontalHeaderItem(3)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("MainWindow", u"Dosis[uS/s]", None));
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("MainWindow", u"RTC", None));
+        ___qtablewidgetitem3 = self.table_cp.horizontalHeaderItem(3)
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("MainWindow", u"Count Pulse", None));
+        ___qtablewidgetitem4 = self.table_dosis.horizontalHeaderItem(0)
+        ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"Int.[s]", None));
+        ___qtablewidgetitem5 = self.table_dosis.horizontalHeaderItem(1)
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"RTC", None));
+        ___qtablewidgetitem6 = self.table_dosis.horizontalHeaderItem(2)
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("MainWindow", u"CPS", None));
+        ___qtablewidgetitem7 = self.table_dosis.horizontalHeaderItem(3)
+        ___qtablewidgetitem7.setText(QCoreApplication.translate("MainWindow", u"Dosis[uS/s]", None));
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"Estado:", None))
         self.label_state.setText(QCoreApplication.translate("MainWindow", u"Lectura", None))
         self.btn_view_serial.setText(QCoreApplication.translate("MainWindow", u"Ver Data Serial", None))

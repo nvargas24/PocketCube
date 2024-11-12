@@ -113,7 +113,7 @@ class DataProcessor():
         return dosis
 class ManagerFile():
     def __init__(self):
-        self.df_acumulado_cp = pd.DataFrame(columns=['Time', 'RTC', 'Count Pulse'])
+        self.df_acumulado_cp = pd.DataFrame(columns=['Time', 'Intervalo', 'RTC', 'Count Pulse'])
         self.df_acumulado_dosis = pd.DataFrame(columns=['Intervalo', 'RTC', 'CPS', 'Dosis'])
 
     def create_csv(self, data):
@@ -133,7 +133,7 @@ class ManagerFile():
 
     def load_df(self, data, id_name):
         if id_name == "cp":
-            df_temporal = pd.DataFrame([data], columns=['Time', 'RTC', 'Count Pulse'])
+            df_temporal = pd.DataFrame([data], columns=['Time', 'Intervalo', 'RTC', 'Count Pulse'])
             self.df_acumulado_cp = pd.concat([self.df_acumulado_cp, df_temporal], ignore_index=True)
         if id_name == "dosis":
             df_temporal = pd.DataFrame([data], columns=['Intervalo', 'RTC', 'CPS', 'Dosis'])
