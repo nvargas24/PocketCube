@@ -58,7 +58,12 @@ Los datos se muestran en uno de los siguientes formatos para optimizar tramas de
   
 ## Carga Útil
 ### Con Attiny85
-La Carga Útil opera en modo de conteo de pulso por PCINT: **Modo ISR** (PB3).
+La Carga Útil opera en modo de conteo de pulso por PCINT: **Modo ISR** (PB3 Habilitado).
+
+| Pin ATtiny85 | Tipo de pin   | Modo de operación | Función  |
+|--------------|---------------|-------------------|----------|
+| PB3          | PCINT3        | CHANGE            | MEAS1    |
+| PB4          | PCINT4        | CHANGE            | MEAS2    |
 
 - **Aclaración**: El Attiny por su limitaciones de pines, no se puede usar en simultaneo el uso de Interrupciones y el I2C, debido a que utilizan el mismo pin para los pulsos de clock (SCL), como alternativa cuenta con pines PCINT que son similares a las interrupciones pero no son configurables el metodo de detección de pulsos, solo admite por CHANGE. Tambien tener en cuenta que al no ser con las ISR no son precisos y presentan otra complicaciones.
 
@@ -71,7 +76,12 @@ Para cargar programas (Debuggear) al ATtiny85 con el Arduino UNO, ver sección [
 Esta sección describe el montaje de los ponchos para conectar los componentes del PocketCube.
 
 ### Con Arduino UNO
+Opera contando pulsos por ISR, interupciones por Hardware. A diferencia de los PCINT son mas precisos: **Modo ISR** (Pin 2 Habilitado).
 
+| Pin Arduino  | Tipo de pin   | Modo de operación | Función  |
+|--------------|---------------|-------------------|----------|
+| Pin2         | INT0          | RISING            | MEAS1    |
+| Pin3         | INT1          | RISING            | MEAS2    |
 
 ---
 
