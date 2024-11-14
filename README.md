@@ -89,13 +89,31 @@ Opera contando pulsos por ISR, interupciones por Hardware. A diferencia de los P
 
 ## Ejemplos de uso
 ### Con Arduino UNO
+#### Pasos previos
 1. Asegurarse de tener conectados todos ambas placas de desarrollo como se indica en el esquematico. En caso de *Pocket Main* la conexión ya esta realiza en el poncho.
-2. Cargar programa en Arduino UNO referido como *PocketMain* ![Programa_Arduino_Slave](Carga_util/pocket_slave/pocket_main.ino)
-3. Cargar programa en Arduino UNO referido como *Carga Útil* ![Programa_Arduino_Slave](Carga_util/pocket_slave/pocket_slave.ino)
+2. Cargar programa en Arduino UNO referido como *PocketMain* ( [Programa_PocketMain](Carga_util/pocket_slave/pocket_main.ino) )
+3. Cargar programa en Arduino UNO referido como *Carga Útil* ( [Programa_Carga_Útil](Carga_util/pocket_slave/pocket_slave.ino) )
 4. Conectar *PocketMain* a PC, y *Carga Útil* a la alimentación del *Pocket Main* o tambien puede ser alimentado por una fuente externa: PC o fuente de 5VDC.
 5. Asegurarse que la PC reconce los Arduinos, principalmete si se opera con un Arduino chino. Si alguno de los Arduino es chino instalar: 
-![URL_Arduino_chino](https://www.arduined.eu/ch340-windows-10-driver-download/). Verificarlo en *Adminitrador de dispositivos*.
-6. 
+[URL_Arduino_chino](https://www.arduined.eu/ch340-windows-10-driver-download/). Verificarlo en *Adminitrador de dispositivos*.
+
+Una vez finalizados los *Pasos previos*, acceder a la aplicación de escritorio.
+
+Al iniciar la aplicación detectara loos dispositivos conectados en los puertos. Seleccionar: **USB-SERIAL CH340** (si tiene como *PocketMain* el Arduino chino).
+
+
+
+
+Una vez seleccionado el dispositivo, ingresar el intervalo de tiempo para cada ventana de tiempo.
+
+
+
+
+Con esto configurado, click en *Iniciar* y empezara a correr el programa.
+
+Basicamente el *Pocket Main* empezara a solicitar lecturas realizadas a la *Carga Útil* cada **1 segundo** esto controlador por un TIMER interno. Estas lectura son indentificadas por la aplicación son procesadas y presentadas tanto en el gráfico de barras como en la tabla, el la duración de cada proceso dependera del intervalo de tiempo asignado por el usuario, el cual se podrá ver su progreso en una barra de carga.
+Al finalizar cada intervalor de tiempo, la aplicación procesa estos datos, obteniendo el promedio de estos en ese intervalo (CPS). Estos podrán tambien visualizarse en el grafico de lineas y en la otra tabla.
+Todos estos datos son visualizados en tiempo real, pero tambien registrados en un Dataframe el cual cuando el usuario lo solicite pueden exportarse como archivos CSV. 
 
 
 ## Pinouts de microcontroladores
