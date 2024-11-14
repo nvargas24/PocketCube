@@ -153,8 +153,8 @@ class Graph_line(FigureCanvas):
     def __init__(self):
         self.xlim_init = 0
         self.xlim_fin = 15
-        self.ylim_init = -0.0001
-        self.ylim_fin = 0.0001
+        self.ylim_init = -1
+        self.ylim_fin = 1
 
         # Indicador en grafico
         self.flag_send = False
@@ -222,7 +222,7 @@ class Graph_line(FigureCanvas):
         # Establece nombres de ejes y tamanio
         matplotlib.rcParams['font.size'] = 10
         self.ax.set_xlabel("Intervalos", labelpad=1)
-        self.ax.set_ylabel("Dosis[uS/seg]", labelpad=1)
+        self.ax.set_ylabel("CPS", labelpad=1)
         self.ax.tick_params(axis='both', which='both', labelsize=7)
    
         # Establecer límites del eje X e Y
@@ -261,7 +261,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.setWindowTitle("Simulador - Grupo SyCE UTN-FRH")
 
-        self.setFixedSize(1180, 650)
+        self.setFixedSize(1250, 650)
         #self.setWindowIcon(QIcon(".\Imagenes\logotipo_simple_utn_haedo.png"))
 
         # Cargo icono a app
@@ -282,10 +282,10 @@ class MainWindow(QMainWindow):
         # Ajuste de ancho de columna segun contenido
         self.ui.table_cp.resizeColumnsToContents()
         self.ui.table_dosis.resizeColumnsToContents()
-        self.ui.table_cp.setColumnWidth(1, 70)  # Tamaño para la segunda columna
-        self.ui.table_cp.setColumnWidth(2, 110)  # Tamaño para la tervera columna
-        self.ui.table_dosis.setColumnWidth(0, 70)  # Tamaño para la primera columna
-        self.ui.table_dosis.setColumnWidth(1, 110)  # Tamaño para la segunda columna
+        self.ui.table_cp.setColumnWidth(1, 85)  # Tamaño para la segunda columna
+        self.ui.table_cp.setColumnWidth(2, 140)  # Tamaño para la tervera columna
+        self.ui.table_dosis.setColumnWidth(0, 85)  # Tamaño para la primera columna
+        self.ui.table_dosis.setColumnWidth(1, 140)  # Tamaño para la segunda columna
         self.ui.table_dosis.setColumnWidth(2, 60)  # Tamaño para la tercera columna
         
         # Ajuste de alto de fila segun contenido
@@ -382,20 +382,20 @@ class MainWindow(QMainWindow):
             if (self.cont_meas1 == self.interval_fin):
                 # calculo de cps
                 cps_meas1 = self.obj_data_processor.calcule_cps(self.list_cp_meas1)
-                dosis_meas1 = self.obj_data_processor.calcule_dosis(cps_meas1, self.dict_config)
+                #dosis_meas1 = self.obj_data_processor.calcule_dosis(cps_meas1, self.dict_config)
 
                 row_data_dosis = [
                                     f"{self.interval_init}~{self.interval_fin}", 
                                     f"{datetime}" , 
                                     f"{cps_meas1:.2f}",
-                                    f"{dosis_meas1:.5f}"
+                                    "---"
                                 ]
 
                 self.load_row_table(row_data_dosis, "dosis")
                 self.ui.table_dosis.scrollToBottom()
 
                 # Actulizacoón de grafico de linea
-                self.graph2.update_graph(dosis_meas1)
+                self.graph2.update_graph(cps_meas1)
 
                 # Seteo para nueva carga de intervalo
                 self.interval_init = self.interval_fin

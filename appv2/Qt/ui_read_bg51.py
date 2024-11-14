@@ -17,13 +17,13 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1178, 635)
+        MainWindow.resize(1241, 635)
         MainWindow.setStyleSheet(u"background-color: rgb(230, 230, 230);")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayoutWidget_9 = QWidget(self.centralwidget)
         self.verticalLayoutWidget_9.setObjectName(u"verticalLayoutWidget_9")
-        self.verticalLayoutWidget_9.setGeometry(QRect(30, 30, 1131, 591))
+        self.verticalLayoutWidget_9.setGeometry(QRect(30, 30, 1191, 591))
         self.verticalLayout_8 = QVBoxLayout(self.verticalLayoutWidget_9)
         self.verticalLayout_8.setSpacing(15)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
@@ -112,6 +112,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.label_4 = QLabel(self.verticalLayoutWidget_2)
         self.label_4.setObjectName(u"label_4")
+        self.label_4.setEnabled(False)
         sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
@@ -123,6 +124,7 @@ class Ui_MainWindow(object):
 
         self.sbox_distancia = QDoubleSpinBox(self.verticalLayoutWidget_2)
         self.sbox_distancia.setObjectName(u"sbox_distancia")
+        self.sbox_distancia.setEnabled(False)
         sizePolicy1.setHeightForWidth(self.sbox_distancia.sizePolicy().hasHeightForWidth())
         self.sbox_distancia.setSizePolicy(sizePolicy1)
         self.sbox_distancia.setFont(font1)
@@ -144,6 +146,7 @@ class Ui_MainWindow(object):
         self.buttonGroup.setObjectName(u"buttonGroup")
         self.buttonGroup.addButton(self.rbtn_cm)
         self.rbtn_cm.setObjectName(u"rbtn_cm")
+        self.rbtn_cm.setEnabled(False)
         sizePolicy1.setHeightForWidth(self.rbtn_cm.sizePolicy().hasHeightForWidth())
         self.rbtn_cm.setSizePolicy(sizePolicy1)
         self.rbtn_cm.setFont(font1)
@@ -154,6 +157,7 @@ class Ui_MainWindow(object):
         self.rbtn_m = QRadioButton(self.verticalLayoutWidget_2)
         self.buttonGroup.addButton(self.rbtn_m)
         self.rbtn_m.setObjectName(u"rbtn_m")
+        self.rbtn_m.setEnabled(False)
         sizePolicy1.setHeightForWidth(self.rbtn_m.sizePolicy().hasHeightForWidth())
         self.rbtn_m.setSizePolicy(sizePolicy1)
         self.rbtn_m.setFont(font1)
@@ -173,6 +177,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.label = QLabel(self.verticalLayoutWidget_2)
         self.label.setObjectName(u"label")
+        self.label.setEnabled(False)
         sizePolicy2.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
         self.label.setSizePolicy(sizePolicy2)
         self.label.setFont(font)
@@ -181,6 +186,7 @@ class Ui_MainWindow(object):
 
         self.cbox_material = QComboBox(self.verticalLayoutWidget_2)
         self.cbox_material.setObjectName(u"cbox_material")
+        self.cbox_material.setEnabled(False)
         sizePolicy1.setHeightForWidth(self.cbox_material.sizePolicy().hasHeightForWidth())
         self.cbox_material.setSizePolicy(sizePolicy1)
         self.cbox_material.setFont(font1)
@@ -190,6 +196,7 @@ class Ui_MainWindow(object):
 
         self.label_cte_material = QLabel(self.verticalLayoutWidget_2)
         self.label_cte_material.setObjectName(u"label_cte_material")
+        self.label_cte_material.setEnabled(False)
         sizePolicy1.setHeightForWidth(self.label_cte_material.sizePolicy().hasHeightForWidth())
         self.label_cte_material.setSizePolicy(sizePolicy1)
         self.label_cte_material.setFont(font1)
@@ -208,6 +215,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.label_3 = QLabel(self.verticalLayoutWidget_2)
         self.label_3.setObjectName(u"label_3")
+        self.label_3.setEnabled(False)
         sizePolicy2.setHeightForWidth(self.label_3.sizePolicy().hasHeightForWidth())
         self.label_3.setSizePolicy(sizePolicy2)
         self.label_3.setFont(font)
@@ -216,6 +224,7 @@ class Ui_MainWindow(object):
 
         self.sbox_intensidad = QDoubleSpinBox(self.verticalLayoutWidget_2)
         self.sbox_intensidad.setObjectName(u"sbox_intensidad")
+        self.sbox_intensidad.setEnabled(False)
         sizePolicy1.setHeightForWidth(self.sbox_intensidad.sizePolicy().hasHeightForWidth())
         self.sbox_intensidad.setSizePolicy(sizePolicy1)
         self.sbox_intensidad.setFont(font1)
@@ -233,6 +242,7 @@ class Ui_MainWindow(object):
         self.buttonGroup_2.setObjectName(u"buttonGroup_2")
         self.buttonGroup_2.addButton(self.rbtn_uci)
         self.rbtn_uci.setObjectName(u"rbtn_uci")
+        self.rbtn_uci.setEnabled(False)
         sizePolicy1.setHeightForWidth(self.rbtn_uci.sizePolicy().hasHeightForWidth())
         self.rbtn_uci.setSizePolicy(sizePolicy1)
         font2 = QFont()
@@ -250,6 +260,7 @@ class Ui_MainWindow(object):
         self.rbtn_mci = QRadioButton(self.verticalLayoutWidget_2)
         self.buttonGroup_2.addButton(self.rbtn_mci)
         self.rbtn_mci.setObjectName(u"rbtn_mci")
+        self.rbtn_mci.setEnabled(False)
         sizePolicy1.setHeightForWidth(self.rbtn_mci.sizePolicy().hasHeightForWidth())
         self.rbtn_mci.setSizePolicy(sizePolicy1)
         self.rbtn_mci.setFont(font1)
@@ -504,7 +515,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_14.addLayout(self.verticalLayout_4)
 
         self.horizontalLayout_14.setStretch(0, 15)
-        self.horizontalLayout_14.setStretch(1, 16)
+        self.horizontalLayout_14.setStretch(1, 17)
 
         self.verticalLayout_7.addLayout(self.horizontalLayout_14)
 
@@ -584,7 +595,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_15.addLayout(self.verticalLayout_6)
 
         self.horizontalLayout_15.setStretch(0, 15)
-        self.horizontalLayout_15.setStretch(1, 16)
+        self.horizontalLayout_15.setStretch(1, 17)
 
         self.verticalLayout_7.addLayout(self.horizontalLayout_15)
 
@@ -624,6 +635,7 @@ class Ui_MainWindow(object):
 
         self.btn_formulas = QPushButton(self.verticalLayoutWidget_9)
         self.btn_formulas.setObjectName(u"btn_formulas")
+        self.btn_formulas.setEnabled(False)
         sizePolicy3.setHeightForWidth(self.btn_formulas.sizePolicy().hasHeightForWidth())
         self.btn_formulas.setSizePolicy(sizePolicy3)
         self.btn_formulas.setFont(font1)
@@ -679,7 +691,7 @@ class Ui_MainWindow(object):
         self.rbtn_min.setText(QCoreApplication.translate("MainWindow", u"min", None))
         self.btn_init.setText(QCoreApplication.translate("MainWindow", u"Iniciar", None))
         self.btn_stop.setText(QCoreApplication.translate("MainWindow", u"Finalizar", None))
-        self.lcd_date_rtc.setText(QCoreApplication.translate("MainWindow", u"24-02-2024", None))
+        self.lcd_date_rtc.setText("")
         ___qtablewidgetitem = self.table_cp.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Time[s]", None));
         ___qtablewidgetitem1 = self.table_cp.horizontalHeaderItem(1)
