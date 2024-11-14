@@ -353,6 +353,7 @@ class Ui_MainWindow(object):
 
         self.btn_stop = QPushButton(self.verticalLayoutWidget_9)
         self.btn_stop.setObjectName(u"btn_stop")
+        self.btn_stop.setEnabled(False)
         sizePolicy3.setHeightForWidth(self.btn_stop.sizePolicy().hasHeightForWidth())
         self.btn_stop.setSizePolicy(sizePolicy3)
         self.btn_stop.setFont(font1)
@@ -619,6 +620,7 @@ class Ui_MainWindow(object):
 
         self.btn_view_serial = QPushButton(self.verticalLayoutWidget_9)
         self.btn_view_serial.setObjectName(u"btn_view_serial")
+        self.btn_view_serial.setEnabled(False)
         sizePolicy3.setHeightForWidth(self.btn_view_serial.sizePolicy().hasHeightForWidth())
         self.btn_view_serial.setSizePolicy(sizePolicy3)
         self.btn_view_serial.setFont(font1)

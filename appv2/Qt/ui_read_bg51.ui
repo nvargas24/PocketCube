@@ -623,6 +623,9 @@
              </item>
              <item>
               <widget class="QPushButton" name="btn_stop">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                  <horstretch>0</horstretch>
@@ -1109,6 +1112,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="btn_view_serial">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
            <horstretch>0</horstretch>

@@ -21,7 +21,7 @@ import numpy as np
 from modelo import *
 
 from Qt.ui_read_bg51 import *
-
+from Qt.view_serial import *
 #--- ID
 MEAS1 = 1
 MEAS2 = 2
@@ -340,6 +340,8 @@ class MainWindow(QMainWindow):
         self.ui.btn_init.clicked.connect(self.init)
         self.ui.btn_stop.clicked.connect(self.stop)
         self.ui.btn_csv.clicked.connect(self.create_csv)
+        self.ui.btn_exit.clicked.connect(self.exit)
+        self.ui.btn_view_serial.clicked.connect(self.view_serial)
 
         self.interval_init = 0
         self.interval_fin = self.dict_config["interval_time"]
@@ -497,10 +499,18 @@ class MainWindow(QMainWindow):
         self.ui.pbar_interval.setMaximum(int(self.dict_config["interval_time"]))
         self.ui.pbar_interval.reset()
 
+        # habilito btn
+        self.ui.btn_view_serial.setEnabled(True)
+        self.ui.btn_stop.setEnabled(True)
+        self.ui.btn_init.setEnabled(False)
+
     def stop(self):
         # Finalizo timer
         self.timer.stop()
         self.obj_data_uart.ser["Master"].close()
+
+        self.ui.btn_stop.setEnabled(False)
+        self.ui.btn_init.setEnabled(True)
 
     def create_csv(self):
         # Exporto CSV
@@ -510,3 +520,25 @@ class MainWindow(QMainWindow):
         # Vacio Dataframe para nueva carga
         self.obj_file.clear_df(self.obj_file.df_acumulado_cp)
         self.obj_file.clear_df(self.obj_file.df_acumulado_dosis)
+
+    def exit(self):
+        QApplication.quit()  # Cierra la aplicación
+
+    def view_serial(self):
+        self.win_serial = SerialData(self.data_master)
+        self.win_serial.exec_()
+
+class SerialData(QDialog):
+    def __init__(self, data):
+        super().__init__()
+        self.ui = Ui_SerialData()
+        self.ui.setupUi(self)
+        self.setWindowTitle("Simulador - Grupo SyCE UTN-FRH")
+
+        self.setFixedSize(485, 420)
+        #self.setWindowIcon(QIcon(".\Imagenes\logotipo_simple_utn_haedo.png"))
+
+        # Cargo icono a app
+        self.setWindowIcon(QIcon(r'./Imagenes/logo_utn.png'))
+
+    
