@@ -6,26 +6,35 @@ La aplicación se encarga de monitorear las lecturas provenientes de un **1 pin 
 
 ### Características de la Aplicación
 ![win_app](Imagenes/win_app.jpg)
-- **Selección de puerto**: Se identifican los dispositivos conectados al ordenador, el usuario debe seleccionar el correspondiente al Arduino UNO (Pocket Main).
-  *ACLARACIÓN:* Seleccionar CH014 , arduino chino conectado actualmente en el poncho.
+- **Selección de puerto serie**: Se identifican los dispositivos conectados al ordenador, el usuario debe seleccionar el correspondiente al Arduino UNO (Pocket Main).
+  *ACLARACIÓN:* Seleccionar CH340 , arduino chino conectado actualmente en el poncho.
 
-- **Recepción de datos**: Solo se presentan los datos procesados y enviados por el **Arduino UNO** (Pocket Main) a través del puerto serial. 
-- **Ventanas de monitoreo**: Se cuenta con dos ventanas, para visualizar datos clasficados y ordenados desde la *Carga Útil*:
-- **Indicación de estado**: en forma simple el Arduino puede indicar algun estado en particular
+- **Menu de configuración**: Menu interactivo para usuario realizar la configuraciones necesarias para determinar el procesaimentos de lo datos a visualizar.
+- **Display DateTime**: Se cuenta con 2 display para mostrar tiempos
+  - **Display 1**: Muestra el horario actual registrada por PocketMain.
+  - **Display 2**: Muestra la fecha actual registrada por PocketMain.
+- **Ventana de monitoreo de pulsos**: Permite visualizar las mediciones solicitadas y realizadas por la *Carga Útil*. En esta ventana se cuentan con:
+  - **Grafico de barras**: Muestra los pulsos detectados por la *Carga Útil*, limitado por el intervalo de tiempo asignado por el usuario.
+  - **Tabla contador de pulsos**: Muestra el registro de datos ordenados a medida que el *Pocket Main* reciba datos (ver sección [Procesamiento de datos](#procesamiento-de-datos))
+  - **Barra de progreso**: Barra de carga que indica cuando se cumple el intervalo de tiempo asignado.
+- **Ventana de calculo de CPS**: Permite visualizar el promedio obtenido en cada intervalo de tiempo (CPS).
+  - **Grafico de lineas**: Muestra el avance de los CPS obtenidos en cada intervalo.
+  - **Tabla contador de pulsos**: Muestra el registro de los calculos obtenidos para cada intervalo.
+- **Indicador de estado**: en forma simple el Arduino puede indicar algun estado en particular
   - **Read EEPROM**: Lectura de memoria EEPROM
   - **Clear EEPROM**: Vacio de memoria EEPROM
   - **Read MEAS**: Lectura de datos matcheados con RTC
   - **Error**: Estado particular cuando no se reonoce ID
-
-- **Tablas de registro de datos**: Pariticularmente sólo presenta los datos recibidos en un formato extendido (ver sección [Procesamiento de datos](#procesamiento-de-datos)) 
-
-- **Barra de progreso**: Indica el espacio de la memoria EEPROM
-- **Displays LCD**: Se cuenta con 2 display para mostrar tiempos
-  - **Display 1**: Muestra el horario actual registrada por PocketMain.
-  - **Display 2**: Muestra la fecha actual registrada por PocketMain.
+- **Opciones de usuario**: Botones para interactuar con la aplicación.
+  - **Ver Data Serial**: Visualiza en un tabal todos los datos recibidos, no procesados, por la aplicación.**[No disponible]**
+  - **Exportar CSV**: Crea 2 archivos .csv , cada uno todos los datos registrados en la tablas de ambas ventanas de datos.
+  - **Formulas**: **[No disponible]**
+  - **Salir**: Cierra la aplicación y todos los procesos relacionados.
 
 ## Pocket Main
-Es el Arduino chino conectado con el poncho, con los modulos que se estara trabajando. Actualmente tiene cargado el programa para funcionar con la otro Arduino UNO como *Carga Útil*.
+El Arduino conectado con el poncho de módulos se lo considera el *Pocket Main*. 
+
+**ACLARACIÓN:**: Actualmente tiene cargado el programa para funcionar con la otro Arduino UNO como *Carga Útil*.
 
 ### Comunicación I2C con la Carga Útil
 Se utiliza el protocolo **I2C** para la comunicación entre el **Arduino UNO** (Pocket Main) y la **Carga Útil** (Arduino UNO o ATtiny85).
@@ -72,8 +81,10 @@ Para cargar programas (Debuggear) al ATtiny85 con el Arduino UNO, ver sección [
 #### Esquemáticos de Conexión
 ![Conexión_arduino_attiny85](Imagenes/Debug_Attiny85.jpg)
 
-#### Montaje de Ponchos
-Esta sección describe el montaje de los ponchos para conectar los componentes del PocketCube.
+#### Montaje de Poncho
+![Poncho Superior Attiny](Imagenes/frente_attiny.jpg)
+![Poncho Attiny con Arduino](Imagenes/attiny_poncho_arduino.jpg)
+
 
 ### Con Arduino UNO
 Opera contando pulsos por ISR, interupciones por Hardware. A diferencia de los PCINT son mas precisos: **Modo ISR** (Pin 2 Habilitado).
@@ -84,8 +95,10 @@ Opera contando pulsos por ISR, interupciones por Hardware. A diferencia de los P
 | Pin3         | INT1          | RISING            | MEAS2    |
 
 #### Esquemáticos de Conexión
-## falta agregar imagenes  ------ 
----
+![Esquematico Arduino-Arduino](Imagenes/conexion_arduino_arduino.jpg)
+#### Montaje de Pocket Main con Carga Útil
+![Conexión Arduino-Arduino 1](Imagenes/arduino_arduino1.jpg)
+![Conexión Arduino-Arduino 2](Imagenes/arduino_arduino2.jpg)
 
 ## Ejemplos de uso
 ### Con Arduino UNO
@@ -99,30 +112,28 @@ Opera contando pulsos por ISR, interupciones por Hardware. A diferencia de los P
 
 Una vez finalizados los *Pasos previos*, acceder a la aplicación de escritorio.
 
-Al iniciar la aplicación detectara loos dispositivos conectados en los puertos. Seleccionar: **USB-SERIAL CH340** (si tiene como *PocketMain* el Arduino chino).
+![Aplicación para sensor bg51](Imagenes/iniciar_app.jpg)
 
+1. Al iniciar la aplicación detectara loos dispositivos conectados en los puertos. Seleccionar: **USB-SERIAL CH340** (si tiene como *PocketMain* el Arduino chino).
 
+2. Una vez seleccionado el dispositivo, ingresar el intervalo de tiempo para cada ventana de tiempo.
 
+3. Con esto configurado, click en *Iniciar* y empezara a correr el programa.
 
-Una vez seleccionado el dispositivo, ingresar el intervalo de tiempo para cada ventana de tiempo.
+![Aplicación para sensor bg51 con datos](Imagenes/data_test.png)
 
+El *Pocket Main* empezara a solicitar lecturas realizadas a la *Carga Útil* cada **1 segundo** esto controlado por un TIMER interno. Estas lecturas son indentificadas por la aplicación, procesadas y presentadas tanto en el gráfico de barras como en la tabla. La duración de cada proceso dependera del intervalo de tiempo asignado por el usuario, el cual se podrá ver su progreso en una barra de carga.
 
+Al finalizar cada intervalo de tiempo, la aplicación procesa estos datos, obteniendo el promedio de estos (CPS). Estos podrán tambien visualizarse en el gráfico de lineas y en la tabla continua.
 
-
-Con esto configurado, click en *Iniciar* y empezara a correr el programa.
-
-Basicamente el *Pocket Main* empezara a solicitar lecturas realizadas a la *Carga Útil* cada **1 segundo** esto controlador por un TIMER interno. Estas lectura son indentificadas por la aplicación son procesadas y presentadas tanto en el gráfico de barras como en la tabla, el la duración de cada proceso dependera del intervalo de tiempo asignado por el usuario, el cual se podrá ver su progreso en una barra de carga.
-Al finalizar cada intervalor de tiempo, la aplicación procesa estos datos, obteniendo el promedio de estos en ese intervalo (CPS). Estos podrán tambien visualizarse en el grafico de lineas y en la otra tabla.
 Todos estos datos son visualizados en tiempo real, pero tambien registrados en un Dataframe el cual cuando el usuario lo solicite pueden exportarse como archivos CSV. 
 
+![Archivos generados](Imagenes/archivos_generados.jpg)
 
 ## Pinouts de microcontroladores
 ### Arduino Uno
 
 El **Arduino Uno** utiliza los siguientes pines para la comunicación I2C:
-
-- **SDA (Data):** Pin A4
-- **SCL (Clock):** Pin A5
 
 ![Pinout Arduino Uno](Imagenes/arduino_uno_pinout.avif)
 
@@ -142,10 +153,20 @@ Para cargar un programa en el **ATtiny85** utilizando un **Arduino UNO** como pr
 
 Conecta los pines del **Arduino UNO** a los del **ATtiny85** de la siguiente manera:
 
+
+| Pin Poncho ATtiny85 | Pin Arduino UNO   | Función  |      Descripción    |
+|---------------------|-------------------|----------|---------------------|
+| 1                   | 10                | SS       | Slave Select        |
+| 2                   | 11                | MOSI     | Master Out Slave In |
+| 3                   | 12                | MISO     | Master In Slave Out |
+| 4                   | 13                | SCK      | Serial Clock        |
+
 - **SS (Slave Select):** Pin 1 (Móodulo ATtiny85)
 - **MOSI (Master Out Slave In):** Pin 2 (Módulo ATtiny85)
 - **MISO (Master In Slave Out):** Pin 3 (Módulo ATtiny85)
 - **SCK (Serial Clock):** Pin 4 (Módulo ATtiny85)
+
+![Attiny Debugger con Arduino UNO](Imagenes/attiny_debugger.jpg)
 
 ### Carga del Programa "ArduinoISP"
 
