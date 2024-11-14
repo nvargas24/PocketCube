@@ -83,7 +83,20 @@ Opera contando pulsos por ISR, interupciones por Hardware. A diferencia de los P
 | Pin2         | INT0          | RISING            | MEAS1    |
 | Pin3         | INT1          | RISING            | MEAS2    |
 
+#### Esquemáticos de Conexión
+## falta agregar imagenes  ------ 
 ---
+
+## Ejemplos de uso
+### Con Arduino UNO
+1. Asegurarse de tener conectados todos ambas placas de desarrollo como se indica en el esquematico. En caso de *Pocket Main* la conexión ya esta realiza en el poncho.
+2. Cargar programa en Arduino UNO referido como *PocketMain* ![Programa_Arduino_Slave](Carga_util/pocket_slave/pocket_main.ino)
+3. Cargar programa en Arduino UNO referido como *Carga Útil* ![Programa_Arduino_Slave](Carga_util/pocket_slave/pocket_slave.ino)
+4. Conectar *PocketMain* a PC, y *Carga Útil* a la alimentación del *Pocket Main* o tambien puede ser alimentado por una fuente externa: PC o fuente de 5VDC.
+5. Asegurarse que la PC reconce los Arduinos, principalmete si se opera con un Arduino chino. Si alguno de los Arduino es chino instalar: 
+![URL_Arduino_chino](https://www.arduined.eu/ch340-windows-10-driver-download/). Verificarlo en *Adminitrador de dispositivos*.
+6. 
+
 
 ## Pinouts de microcontroladores
 ### Arduino Uno
