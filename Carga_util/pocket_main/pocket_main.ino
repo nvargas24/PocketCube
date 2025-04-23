@@ -129,7 +129,7 @@ void setup()
   Serial.begin(9600); // Frecuencia en baudios para serial
   Wire.begin(); // Inicializo comunicacion I2C
   //Wire.setClock(100000); // Configurar la frecuencia I2C a 100 kHz
-  configInitialRTC(); // Inicializo configuiracion de RTC
+  //configInitialRTC(); // Inicializo configuiracion de RTC
   configTimer();
   delay(1000); 
 }
@@ -169,14 +169,15 @@ void loop()
   sendToAppUart(dataSendApp);   
   
   /* RTC */
-  datetimeNow(datetimeStr); //Obtengo datetime actual
+  //datetimeNow(datetimeStr); //Obtengo datetime actual
   /* ENVIO DATETIME */
-  formatDataSend(dataSendApp, RTC, datetimeStr);
-  sendToAppUart(dataSendApp);
+  //formatDataSend(dataSendApp, RTC, datetimeStr);
+  //sendToAppUart(dataSendApp);
     
   if(i2cActive){
     /* I2C MEAS1 */
     /* Envio datos I2C */
+    Serial.println("Test..........");
     sendToSlaveC(STR_MEAS1); // Solicitud de data en pin PB3
     delay(100); // Pequeña espera para asegurar que el esclavo reciba el dato
     requestFromSlave(); // Respuesta de slave
@@ -298,9 +299,14 @@ void sendToSlave(const char *data)
  * @return nothing
  */
 void sendToSlaveC(char c){
+  Serial.println("1");
   Wire.beginTransmission(I2C_SLAVE_ADDR); // Comienza la transmisión hacia el esclavo con dirección 8
+  Serial.println("2");
   Wire.write(c); // Envía el carácter "1" - lectura PB3
+  Serial.println("3");
   Wire.endTransmission(); // Finaliza la transmisión
+  Serial.print("Envio: ");
+  Serial.println(c);
 }
 
 /**
@@ -514,6 +520,7 @@ ISR(TIMER1_COMPA_vect)
 {
   if(timerActive){
     i2cActive = true;
+    //Serial.println("Timer active");
   }
   else{
     i2cActive = false;
