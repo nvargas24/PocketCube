@@ -37,44 +37,24 @@
 
 /****** Encabezados *****/
 #include <Wire.h>
-#include "RTClib.h"
-#include <EEPROM.h>
 
 /*********************** Macros *********************/
 #define I2C_SLAVE_ADDR 0x08
 #define MAX_DATA_I2C 33
 #define MAX_DATA_UART 40
-#define MAX_DATA_RTC 20
-#define PIN_DAC1 25
-#define PIN_DAC2 26
-#define MAX_EEPROM 1024
-#define THRESHOLD (MAX_EEPROM*0.99) //Umbral para enviar datos cuando se llena en un 90%
 #define MAX_SIZE_MEAS 7
 
-#define TOTAL_EEPROM 0
-#define USED_EEPROM 1
-#define FREE_EEPROM 2
-
 #define MEAS1 1
-#define MEAS2 2
-#define RTC 3
-#define EEPROM_USED 4
-#define EEPROM_DATA 5
 #define STATE 6
 #define TIMER 7
 
 #define STR_MEAS1 '1'
-#define STR_MEAS2 '2'
 
 #define STOP_TIMER 0
 #define INIT_TIMER 1
 
 
 /****************** Variables globales ***************/ 
-/* RTC */
-RTC_DS3231 rtc; // Creo objeto RTC_DS1307 rtc;
-char datetimeStr[MAX_DATA_RTC];  //
-
 /* I2C */
 char dataRequest[MAX_DATA_I2C]; // Str respuesta de Slave
 char dataSend[MAX_DATA_I2C]; // Str a enviar de Master
@@ -89,17 +69,10 @@ char lastState[MAX_DATA_I2C] = ""; // Buffer para almacenar el último mensaje e
 bool i2cActive = false;
 bool timerActive = true;
 
-/* EEPROM */
-int address = 0;      // Dirección actual en la EEPROM
-
 /********* Declaracion de funciones internas *********/
 void formatDataSend(char* , int, char*);
 void formatDataSendLong(int, char*);
 void filterValue(char *);
-
-/* RTC */
-void configInitialRTC();
-void datetimeNow(char *);
 
 /* I2C */
 void sendToSlave(const char*);
@@ -110,14 +83,7 @@ int requestFromSlave();
 void requestFromAppUart(int*, float*);
 void sendToAppUart(const char*);
 void commaToSpaceConverter(char *);
-//void configFromApp(int , float );
 
-/* EEPROM */
-void writeEEPROM(char*, size_t);
-int stageUsedEEPROM();
-void clearEEPROM();
-void readEEPROM(char*);
-int analyzeEEPROMStorage(int);
 
 /****************** Funciones Arduino ****************/
 /**
@@ -128,8 +94,6 @@ void setup()
 {
   Serial.begin(9600); // Frecuencia en baudios para serial
   Wire.begin(); // Inicializo comunicacion I2C
-  //Wire.setClock(100000); // Configurar la frecuencia I2C a 100 kHz
-  //configInitialRTC(); // Inicializo configuiracion de RTC
   configTimer();
   delay(1000); 
 }
@@ -143,15 +107,7 @@ void loop()
 {
   char dataConcat[MAX_DATA_UART]; // Buf auxiliar para concatenar texto
   char meas1[MAX_SIZE_MEAS];
-  char meas2[MAX_SIZE_MEAS];
-  //int sizeEEPROM_total = 0;
-  //int sizeEEPROM_used = 0;
-  //int sizeEEPROM_used_per = 0;
-  //int sizeEEPROM_free = 0;
-  //char strAux[MAX_DATA_UART];
   size_t sizeDataConcat = 0;
-  //char dataReadEEPROM[MAX_EEPROM];
-  //char aux_eeprom[MAX_EEPROM];
   char dataSendApp[MAX_DATA_UART];
   char dateTimeRTC[MAX_DATA_UART];
 
@@ -159,20 +115,13 @@ void loop()
   /* Serial */
   requestFromAppUart(&serial_id, &value);
   delay(100);
-  //Serial.print(serial_id);
-  //Serial.print(",");
-  //Serial.println(value);
+
   if(serial_id !=0){
     configFromApp(serial_id, value);  // Asigno dato segun id    
   }
   formatDataSend(dataSendApp, STATE, "Read MEASURES");
   sendToAppUart(dataSendApp);   
   
-  /* RTC */
-  //datetimeNow(datetimeStr); //Obtengo datetime actual
-  /* ENVIO DATETIME */
-  //formatDataSend(dataSendApp, RTC, datetimeStr);
-  //sendToAppUart(dataSendApp);
     
   if(i2cActive){
     /* I2C MEAS1 */
@@ -186,13 +135,6 @@ void loop()
     formatDataSend(dataSendApp, MEAS1, meas1);
     sendToAppUart(dataSendApp);
 
-    /* I2C MEAS2 
-    sendToSlaveC(STR_MEAS2); // Enviar data a slave
-    delay(100); // Pequeña espera para asegurar que el esclavo reciba el dato
-    requestFromSlave(); // Respuesta de slave
-    snprintf(meas2, MAX_DATA_UART, "2024-10-25 14:30:45 %s", dataRequest);
-    formatDataSend(dataSendApp, MEAS2, meas2);
-    sendToAppUart(dataSendApp); */
   }
 }
 
@@ -236,38 +178,6 @@ void formatDataSend(char* buf, int id, char* str)
   snprintf(buf, MAX_DATA_UART, "%d,%s", id, str);
 }
 
-/* RTC */
-/**
- * @brief Formatear la fecha y hora como "YYYY-MM-DD HH:MM:SS"
- * @return str de fecha y hora
- */
-void datetimeNow(char *datetimeStr)
-{
-  DateTime now = rtc.now(); // Obtener fecha de RTC
-
-  snprintf(datetimeStr, MAX_DATA_RTC, "%04d-%02d-%02d %02d:%02d:%02d", 
-           now.year(), now.month(), now.day(), 
-           now.hour(), now.minute(), now.second());
-}
-
-/**i2cActive
- * @brief Verficación conexion con RTC
- * @return nothing
- */
-void configInitialRTC()
-{
-  Serial.println(F("Configuracion RTC INIT"));
-  /* Verifico deteccion de RTC */
-  while(!rtc.begin()){
-    Serial.println(F("NO SE ENCUENTRA RTC"));
-    //while (1);
-  }
-  /* Fijo datetime en caso de desconexion de la alimentacion */
-  if (rtc.lostPower()){
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));// Fijar a fecha y hora de compilacion
-    //rtc.adjust(DateTime(2024, 9, 15, 21, 12, 0)); // Fijar a fecha y hora específica. En el ejemplo, 3 de Enero de 2024 a las 18:00:00
-  }
-}
 
 /* I2C */
 /**
@@ -413,89 +323,6 @@ void commaToSpaceConverter(char *data)
   }
 }
 
-/* EEPROM */
-/**
- * @brief Cargar datos en memoria EEPROM
- * @return None
- */
-void writeEEPROM(char* data, size_t length)
-{
-  char dataWrite[length+2]; // considero 2 fines, ";": fin de msj "/0" fin de array
-
-  snprintf(dataWrite, length+2, "%s;", data);
-  
-  // Escribe los datos en la EEPROM
-  for (int i = 0; i < strlen(dataWrite); i++) {
-    EEPROM.write(address++, dataWrite[i]);
-  }
-
-  // Escribe el delimitador ';' al final
-  //if (address < MAX_EEPROM) {
-  //  EEPROM.write(address, ';');
-  //}
-}
-
-void readEEPROM(char* data)
-{ 
-  int address = 0;
-  int index = 0;
-
-  // Lee los datos desde la EEPROM hasta llenar el array o llegar al final de la EEPROM
-  while (address < MAX_EEPROM && index < MAX_EEPROM - 1) {
-    char c = EEPROM.read(address++);
-    data[index++] = c;
-  }
-
-  // Añade un carácter nulo al final del array para que sea una cadena de texto válida
-  data[index] = '\0';
-}
-
-/**
- * @brief Vaciar memoria EEPROM
- * @return None
- */
-void clearEEPROM() 
-{
-  //Serial.println("Vaciando EEPROM...");
-  for (int i = 0; i < MAX_EEPROM; i++) {
-    EEPROM.update(i, 0xFF);  // Escribir valor por defecto (0xFF) en toda la EEPROM
-  }
-  //Serial.println("EEPROM vaciada.");
-}
-
-/**
- * @brief Calculo de espacio de memoria EEPROM interna utilizada
- * @return used: espacio de memoria utilizado
- */
-int stageUsedEEPROM()
-{
-  int used = 0;
-  for (int i = 0; i < EEPROM.length(); i++) {
-    if (EEPROM.read(i) != 0xFF) {  // La EEPROM vacía tiene el valor 0xFF
-      used++;
-    }
-  }
-  return used; 
-}
-
-int analyzeEEPROMStorage(int type)
-{
-  int totalEEPROM = EEPROM.length();
-  int usedEEPROM = stageUsedEEPROM();
-  int freeEEPROM = totalEEPROM - usedEEPROM;
-
-
-  if(type == TOTAL_EEPROM){
-    return totalEEPROM;
-  }
-  else if(type == USED_EEPROM){
-    return usedEEPROM;
-  }
-  else if(type == FREE_EEPROM){
-    return freeEEPROM;
-  }
-
-}
 
 /**
  * @brief Configuración del temporizador 1
