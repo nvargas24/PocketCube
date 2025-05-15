@@ -131,7 +131,6 @@ void loop()
     delay(100); // Pequeña espera para asegurar que el esclavo reciba el dato
     requestFromSlave(); // Respuesta de slave
     filterValue(dataRequest);
-    snprintf(meas1, MAX_DATA_UART, "%s %s", datetimeStr, dataRequest);
     formatDataSend(dataSendApp, MEAS1, meas1);
     sendToAppUart(dataSendApp);
 
@@ -249,8 +248,8 @@ int requestFromSlave()
   size_rta = strlen(dataRequest);
 
   /* Verifico datos recibidos*/
-  //Serial.print("R-Slave: ");
-  //Serial.println(dataRequest);
+  Serial.print("R-Slave: ");
+  Serial.println(dataRequest);
   return size_rta;
 }
 

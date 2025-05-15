@@ -217,7 +217,7 @@ class ManagerDataUart(DataProcessor):
             if self.ser[port_name].in_waiting > 0 :
                 #time.sleep(0.01)
                 linea = self.ser[port_name].readline().decode('utf-8').strip()
-                #print(f"{port_name}: {linea}")
+                print(f"{port_name}: {linea}")
                 id_serial, value = self.extract_value(linea)
 
         except serial.SerialException as e:

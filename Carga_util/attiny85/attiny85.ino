@@ -35,11 +35,11 @@ void loop() {
   if (TinyWireS.available()) {
     delay(100);
     receivedChar = TinyWireS.receive(); // Recibe un carácter por I2C
-    
+
     // Verifico que MEAS solicita
     if (receivedChar == STR_MEAS1) {
       formatSendCmd(dataRequest, MEAS1, pulseCount1);
-      snprintf(dataRequest, MAX_BUF_I2C, "%u", pulseCount1);
+      //snprintf(dataRequest, MAX_BUF_I2C, "%u", pulseCount1);
       sendDataMaster(dataRequest);
       pulseCount1 = 0; // Reinicia el contador después de enviar los datos
     } 
