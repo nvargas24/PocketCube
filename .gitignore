@@ -21,3 +21,44 @@ __pycache__/
 
 # No ignorar los archivos .pdf en la carpeta específica
 !Datasheets/*.pdf
+
+# Archivos temporales y de usuario
+*.PrjPCBStructure
+*.IntLib
+*.SchDocPreview
+*.VersionControl
+*.Wrk
+*.DBLib
+*.Dblib
+
+# Logs y archivos de salida generados
+*.log
+*.out
+*.rep
+*.err
+
+# Archivos generados automáticamente
+*.PcbDocPreview
+*.PcbDocPCBPreview
+*.SchDocPreview
+*.TmpSchDoc
+*.TmpPcbDoc
+*.CacheLib
+*.tmp
+
+# Archivos de simulación
+*.ini
+*.sim
+
+# Archivos de resultados de fabricación/salida
+Project Outputs for */*
+
+# Carpetas comunes de salida
+__Previews/
+__Compiled/
+Project Logs/
+History/
+
+# Altium Designer settings (opcionales según el equipo)
+*.ProjectLogs
+*.Settings
