@@ -119,21 +119,19 @@ void loop()
   if(serial_id !=0){
     configFromApp(serial_id, value);  // Asigno dato segun id    
   }
-  formatDataSend(dataSendApp, STATE, "Read MEASURES");
-  sendToAppUart(dataSendApp);   
+  //formatDataSend(dataSendApp, STATE, "Read MEASURES");
+  //sendToAppUart(dataSendApp);   
   
     
   if(i2cActive){
     /* I2C MEAS1 */
     /* Envio datos I2C */
-    Serial.println("Test..........");
-    sendToSlaveC(STR_MEAS1); // Solicitud de data en pin PB3
-    delay(100); // Pequeña espera para asegurar que el esclavo reciba el dato
-    requestFromSlave(); // Respuesta de slave
-    filterValue(dataRequest);
-    formatDataSend(dataSendApp, MEAS1, meas1);
+    sendToSlaveC(STR_MEAS1); // Solicitud I2C pin PB3
+    delay(100);
+    requestFromSlave(); // Captura rta de Slave I2C
+    filterValue(dataRequest); // Extrae el valor después de la coma
+    formatDataSend(dataSendApp, MEAS1, dataRequest);
     sendToAppUart(dataSendApp);
-
   }
 }
 
@@ -208,14 +206,11 @@ void sendToSlave(const char *data)
  * @return nothing
  */
 void sendToSlaveC(char c){
-  Serial.println("1");
   Wire.beginTransmission(I2C_SLAVE_ADDR); // Comienza la transmisión hacia el esclavo con dirección 8
-  Serial.println("2");
   Wire.write(c); // Envía el carácter "1" - lectura PB3
-  Serial.println("3");
   Wire.endTransmission(); // Finaliza la transmisión
-  Serial.print("Envio: ");
-  Serial.println(c);
+  //Serial.print("-------Solicitud: ");
+  //Serial.println(c);
 }
 
 /**
@@ -248,8 +243,8 @@ int requestFromSlave()
   size_rta = strlen(dataRequest);
 
   /* Verifico datos recibidos*/
-  Serial.print("R-Slave: ");
-  Serial.println(dataRequest);
+  //Serial.print("R-Slave: ");
+  //Serial.println(dataRequest);
   return size_rta;
 }
 
