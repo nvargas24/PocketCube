@@ -261,7 +261,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.setWindowTitle("Datalogger BG51 - Grupo SyCE UTN-FRH")
 
-        self.setFixedSize(1250, 650)
+        self.setFixedSize(1050, 800)
         #self.setWindowIcon(QIcon(".\Imagenes\logotipo_simple_utn_haedo.png"))
 
         # Cargo icono a app
@@ -336,7 +336,7 @@ class MainWindow(QMainWindow):
         self.ui.btn_stop.clicked.connect(self.stop)
         self.ui.btn_csv.clicked.connect(self.create_csv)
         #self.ui.btn_exit.clicked.connect(self.exit)
-        self.ui.btn_view_serial.clicked.connect(self.view_serial)
+        #self.ui.btn_view_serial.clicked.connect(self.view_serial)
 
         self.interval_init = 0
         self.interval_fin = self.dict_config["interval_time"]
@@ -475,7 +475,7 @@ class MainWindow(QMainWindow):
         self.ui.pbar_interval.reset()
 
         # habilito btn
-        self.ui.btn_view_serial.setEnabled(True)
+        #self.ui.btn_view_serial.setEnabled(True)
         self.ui.btn_stop.setEnabled(True)
         self.ui.btn_init.setEnabled(False)
 
