@@ -358,7 +358,12 @@ class MainWindow(QMainWindow):
             value_meas = data['value']
             date, time , datetime_now = self.obj_data_processor.datetime_pc()
 
-            self.list_cp_meas1.append(value_meas)
+            # Actualizo Datetime de displays
+            self.ui.lcd_time_rtc.display(f"{time}")
+            self.ui.lcd_date_rtc.setText(f"{date}")  
+            
+            # Actualizo contador de pulsos
+            self.list_cp_meas1.append(int(value_meas))
             row_data_cp = [
                             f"{self.cont_meas1}", 
                             f"{self.interval_init}~{self.interval_fin}",
@@ -390,10 +395,6 @@ class MainWindow(QMainWindow):
 
                 self.load_row_table(row_data_dosis, "dosis")
                 self.ui.table_dosis.scrollToBottom()
-
-                # Actualizo Datetime de displays
-                self.ui.lcd_time_rtc.display(f"{time}")
-                self.ui.lcd_date_rtc.setText(f"{date}")  
 
                 # Actulizacoón de grafico de linea
                 self.graph2.update_graph(cps_meas1)

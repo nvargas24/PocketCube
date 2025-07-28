@@ -116,6 +116,9 @@ class DataProcessor():
         return dict_config
 
     def calcule_cps(self, list_cp):
+        print("Calculo de CPS")
+        print(f"Lista de CP: {list_cp}")   
+        
         if not list_cp:  # Verifica si la lista está vacía
             return 0
         else:
