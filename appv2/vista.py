@@ -259,7 +259,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowTitle("Simulador - Grupo SyCE UTN-FRH")
+        self.setWindowTitle("Datalogger BG51 - Grupo SyCE UTN-FRH")
 
         self.setFixedSize(1250, 650)
         #self.setWindowIcon(QIcon(".\Imagenes\logotipo_simple_utn_haedo.png"))
@@ -286,7 +286,7 @@ class MainWindow(QMainWindow):
         self.ui.table_cp.setColumnWidth(2, 140)  # Tamaño para la tervera columna
         self.ui.table_dosis.setColumnWidth(0, 85)  # Tamaño para la primera columna
         self.ui.table_dosis.setColumnWidth(1, 140)  # Tamaño para la segunda columna
-        self.ui.table_dosis.setColumnWidth(2, 60)  # Tamaño para la tercera columna
+        #self.ui.table_dosis.setColumnWidth(2, 60)  # Tamaño para la tercera columna
         
         # Ajuste de alto de fila segun contenido
         self.ui.table_cp.resizeRowsToContents()
@@ -326,11 +326,6 @@ class MainWindow(QMainWindow):
         
         self.cont_meas1=0 # contador de segundos al recibir datos de Prototipo
         self.dict_config={
-            'distance': None,
-            'unit_distance': None,
-            'material': None,
-            'rad_intensity': None,
-            'unit_intensity': None,
             'interval_time': None,
             'unit_time': None
         }
@@ -340,7 +335,7 @@ class MainWindow(QMainWindow):
         self.ui.btn_init.clicked.connect(self.init)
         self.ui.btn_stop.clicked.connect(self.stop)
         self.ui.btn_csv.clicked.connect(self.create_csv)
-        self.ui.btn_exit.clicked.connect(self.exit)
+        #self.ui.btn_exit.clicked.connect(self.exit)
         self.ui.btn_view_serial.clicked.connect(self.view_serial)
 
         self.interval_init = 0
@@ -360,14 +355,15 @@ class MainWindow(QMainWindow):
             self.cont_meas1+=1
 
             # carga de datos en contador de pulsos
-            datetime, meas1 = self.obj_data_processor.extract_meas(data['value'])
+            value_meas = data['value']
+            date, time , datetime_now = self.obj_data_processor.datetime_pc()
 
-            self.list_cp_meas1.append(int(meas1))
+            self.list_cp_meas1.append(value_meas)
             row_data_cp = [
                             f"{self.cont_meas1}", 
                             f"{self.interval_init}~{self.interval_fin}",
-                            f"{datetime}", 
-                            f"{meas1}"
+                            f"{datetime_now}", 
+                            f"{value_meas}"
                         ]
 
             self.load_row_table(row_data_cp, "cp") 
@@ -376,7 +372,7 @@ class MainWindow(QMainWindow):
             self.obj_file.load_df(row_data_cp, "cp")
 
             # Actualización de grafico de barras
-            self.graph1.update_graph(int(meas1), int(self.dict_config["interval_time"]))
+            self.graph1.update_graph(int(value_meas), int(self.dict_config["interval_time"]))
             # Actualización barra de progreso
             self.ui.pbar_interval.setValue(len(self.list_cp_meas1)-1)
 
@@ -385,16 +381,19 @@ class MainWindow(QMainWindow):
                 # calculo de cps
                 cps_meas1 = self.obj_data_processor.calcule_cps(self.list_cp_meas1)
                 #dosis_meas1 = self.obj_data_processor.calcule_dosis(cps_meas1, self.dict_config)
-
+                
                 row_data_dosis = [
                                     f"{self.interval_init}~{self.interval_fin}", 
-                                    f"{datetime}" , 
+                                    f"{datetime_now}" , 
                                     f"{cps_meas1:.2f}",
-                                    "---"
                                 ]
 
                 self.load_row_table(row_data_dosis, "dosis")
                 self.ui.table_dosis.scrollToBottom()
+
+                # Actualizo Datetime de displays
+                self.ui.lcd_time_rtc.display(f"{time}")
+                self.ui.lcd_date_rtc.setText(f"{date}")  
 
                 # Actulizacoón de grafico de linea
                 self.graph2.update_graph(cps_meas1)
@@ -405,27 +404,12 @@ class MainWindow(QMainWindow):
 
                 self.list_cp_meas1.clear()
 
-            
-
-        # cargar datos de RTC en display
-        elif data['serial_id'] == RTC:
-            datetime = data['value']
-            date, time = datetime.split()
-
-            # Muestro datos de RTC en display
-            self.ui.lcd_time_rtc.display(f"{time}")
-            self.ui.lcd_date_rtc.setText(f"{date}")  
-
         elif data["serial_id"] == STATE:
             self.ui.label_state.setText(data["value"])
+
         elif data["serial_id"] == EEPROM_USED:
             self.ui.prog_bar_eeprom_used.setValue(int(data["value"]))
-        #elif data["serial_id"] == EEPROM_DATA:
-        #    data = self.obj_data_processor.format_tocsv(data["value"])
-        #    print("Master: Concateno data de EEPROM a CSV")
-        #    print(data)
-        #    self.obj_file.create_csv(data)
-            # FALTA AGREGAR PARA CARGAR ARCHIVO CSV
+
         else:
             print("Master: ID NO IDENTIFICADO")
             print("Data Master: ", data)
@@ -463,25 +447,15 @@ class MainWindow(QMainWindow):
         port_master = self.obj_data_processor.filter_port(port_m) # Master
         
         # Configuracion asignada por usuario
-        distance = round(self.ui.sbox_distancia.value(), 1)
-        select_unit_dist = self.ui.buttonGroup.checkedButton().text()
-        material = self.ui.cbox_material.currentText()
-        radation_intesity = round(self.ui.sbox_intensidad.value(), 1)
-        select_unit_radation = self.ui.buttonGroup_2.checkedButton().text()
         interval_time = self.ui.sbox_time_intervalo.value()
         select_unit_time = self.ui.buttonGroup_3.checkedButton().text()
 
         self.dict_config={
-            'distance': distance,
-            'unit_distance': select_unit_dist,
-            'material': material,
-            'rad_intensity': radation_intesity,
-            'unit_intensity': select_unit_radation,
             'interval_time': interval_time,
             'unit_time': select_unit_time
         }
 
-        self.dict_config = self.obj_data_processor.convertion_unit(self.dict_config)
+        #self.dict_config = self.obj_data_processor.convertion_unit(self.dict_config)
         print(self.dict_config)
         
         # Configuraciones segun carga de datos por usuario

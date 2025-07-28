@@ -126,6 +126,18 @@ class DataProcessor():
         dosis = cps*dict_config["interval_time"]*0.0000001
 
         return dosis
+    
+    def datetime_pc(self):
+        """
+        Obtiene la fecha y hora actual del PC
+        """
+        now = datetime.now()
+        date = now.strftime("%Y-%m-%d")
+        time = now.strftime("%H:%M:%S")
+        datetime_now = now.strftime("%Y-%m-%d %H:%M:%S")
+
+        return date, time, datetime_now
+
 class ManagerFile():
     def __init__(self):
         self.df_acumulado_cp = pd.DataFrame(columns=['Time', 'Intervalo', 'RTC', 'Count Pulse'])
