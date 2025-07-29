@@ -551,7 +551,7 @@ class Ui_MainWindow(object):
         self.btn_stop.setText(QCoreApplication.translate("MainWindow", u"Finalizar", None))
         self.btn_reset.setText(QCoreApplication.translate("MainWindow", u"Nuevo \n"
 "ensayo", None))
-        self.btn_csv.setText(QCoreApplication.translate("MainWindow", u"Exportar .csv", None))
+        self.btn_csv.setText(QCoreApplication.translate("MainWindow", u"Exportar", None))
         ___qtablewidgetitem = self.table_cp.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Time[s]", None));
         ___qtablewidgetitem1 = self.table_cp.horizontalHeaderItem(1)

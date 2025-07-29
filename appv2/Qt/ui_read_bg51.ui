@@ -533,7 +533,7 @@ ensayo</string>
             </font>
            </property>
            <property name="text">
-            <string>Exportar .csv</string>
+            <string>Exportar</string>
            </property>
            <property name="checkable">
             <bool>false</bool>

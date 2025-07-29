@@ -334,8 +334,8 @@ class MainWindow(QMainWindow):
         self.ui.btn_init.clicked.connect(self.init)
         self.ui.btn_stop.clicked.connect(self.stop)
         self.ui.btn_csv.clicked.connect(self.create_csv)
-        #self.ui.btn_exit.clicked.connect(self.exit)
-        #self.ui.btn_view_serial.clicked.connect(self.view_serial)
+        self.ui.btn_reset.clicked.connect(self.reset_widget)
+        
 
         self.interval_init = 0
         self.interval_fin = self.dict_config["interval_time"]
@@ -348,10 +348,11 @@ class MainWindow(QMainWindow):
         # cargo datos en tabla serial
         #row_data = [f"{data['serial_id']}", f"{data['value']}"]
         #self.load_row_table(row_data, "serial")
-        
+
         # Detengo timer al llegar al intervalo de test
         if self.cont_meas1 == self.dict_config["interval_test"]:
-            self.stop()  
+            self.ui.pbar_interval.setValue(100)
+            self.stop()
                                                                                                                                                                                                                                                                                                         
         # cargo datos en la tabla cp
         if data['serial_id'] == MEAS1:
@@ -502,9 +503,41 @@ class MainWindow(QMainWindow):
     def exit(self):
         QApplication.quit()  # Cierra la aplicación
 
-    def view_serial(self):
-        self.win_serial = SerialData(self.data_master)
-        self.win_serial.exec_()
+    def reset_widget(self):
+        """
+        Resetea los widgets de la app
+        """
+        # Limpio tablas
+        self.ui.table_cp.clearContents()
+        self.ui.table_dosis.clearContents()
+        self.ui.table_cp.setRowCount(0)
+        self.ui.table_dosis.setRowCount(0)
+
+        # Limpio graficos
+        self.graph1.x_data.clear()
+        self.graph1.y_data.clear()
+        self.graph2.x_data.clear()
+        self.graph2.y_data.clear()
+
+        # Reseteo progressbar
+        self.ui.pbar_interval.reset()
+
+        # Reseteo configuracion de usuario
+        self.dict_config = {
+            'interval_time': None,
+            'unit_time': None,
+            'interval_test': None,
+            'unit_test': None
+        }
+
+        # Reseteo contador de pulsos
+        self.cont_meas1 = 0
+
+        self.ui.btn_reset.setEnabled(False)
+        self.ui.btn_csv.setEnabled(False)
+        self.ui.btn_init.setEnabled(True)
+
+
 
 class SerialData(QDialog):
     def __init__(self, data):
