@@ -98,27 +98,22 @@ class DataProcessor():
         return milliseconds_total
 
     def convertion_unit(self, dict_config):
-        # Estandarizar la distancia a metros
-        if dict_config['unit_distance'] == 'cm':
-            dict_config['distance'] = dict_config['distance'] / 100  # Convertir cm a metros
-            dict_config['unit_distance'] = 'm'  # Cambiar unidad a metros
-
-        # Estandarizar la intensidad a uCi
-        if dict_config['unit_intensity'] == 'mCi':
-            dict_config['rad_intensity'] = dict_config['rad_intensity'] * 1000  # Convertir mCi a uCi
-            dict_config['unit_intensity'] = 'uCi'  # Cambiar unidad a uCi
-
         # Estandarizar el tiempo a segundos
         if dict_config['unit_time'] == 'min':
             dict_config['interval_time'] = dict_config['interval_time'] * 60  # Convertir minutos a segundos
-            dict_config['unit_time'] = 'seg'  # Cambiar unidad a segundos
+            dict_config['unit_time'] = 's'  # Cambiar unidad a segundos
+        # Estandarizar el tiempo a segundos
+        if dict_config['unit_test'] == 'min':
+            dict_config['interval_test'] = dict_config['interval_test'] * 60  # Convertir minutos a segundos
+            dict_config['unit_test'] = 's'  # Cambiar unidad a segundos
 
         return dict_config
 
     def calcule_cps(self, list_cp):
-        print("Calculo de CPS")
-        print(f"Lista de CP: {list_cp}")   
-        
+        """
+        Calcula promedio de cps - en base a la cantidad de pulsos registrados en el intervalo establecido.
+        :param list_cp: Lista de valores de cps
+        """
         if not list_cp:  # Verifica si la lista está vacía
             return 0
         else:
@@ -147,7 +142,7 @@ class ManagerFile():
         self.df_acumulado_dosis = pd.DataFrame(columns=['Intervalo', 'RTC', 'CPS', 'Dosis'])
 
     def create_csv(self, data):
-                # Cargar los datos en un DataFrame
+        # Cargar los datos en un DataFrame
         df = pd.read_csv(StringIO(data), header=None)
 
         # Mostrar las primeras filas del DataFrame

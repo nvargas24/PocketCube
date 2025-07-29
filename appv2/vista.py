@@ -30,9 +30,6 @@ EEPROM_USED = 4
 EEPROM_DATA = 5
 STATE = 6
 
-NAME_MEAS1 = "Meas1"
-NAME_MEAS2 = "Meas2"
-
 TIMEOUT = 1
 
 class Graph_bar(FigureCanvas):
@@ -327,7 +324,9 @@ class MainWindow(QMainWindow):
         self.cont_meas1=0 # contador de segundos al recibir datos de Prototipo
         self.dict_config={
             'interval_time': None,
-            'unit_time': None
+            'unit_time': None,
+            'interval_test': None,
+            'unit_test': None
         }
         self.list_cp_meas1 = []
 
@@ -385,7 +384,6 @@ class MainWindow(QMainWindow):
             if (self.cont_meas1 == self.interval_fin):
                 # calculo de cps
                 cps_meas1 = self.obj_data_processor.calcule_cps(self.list_cp_meas1)
-                #dosis_meas1 = self.obj_data_processor.calcule_dosis(cps_meas1, self.dict_config)
                 
                 row_data_dosis = [
                                     f"{self.interval_init}~{self.interval_fin}", 
@@ -450,19 +448,20 @@ class MainWindow(QMainWindow):
         # Configuracion asignada por usuario
         interval_time = self.ui.sbox_time_intervalo.value()
         select_unit_time = self.ui.buttonGroup_3.checkedButton().text()
+        interval_test = self.ui.sbox_time_test.value()
+        select_unit_test = self.ui.buttonGroup.checkedButton().text()
 
-        self.dict_config={
-            'interval_time': interval_time,
-            'unit_time': select_unit_time
-        }
+        self.dict_config['interval_time'] = interval_time
+        self.dict_config['unit_time'] = select_unit_time
+        self.dict_config['interval_test'] = interval_test
+        self.dict_config['unit_test'] = select_unit_test
 
-        #self.dict_config = self.obj_data_processor.convertion_unit(self.dict_config)
+        self.dict_config = self.obj_data_processor.convertion_unit(self.dict_config)
         print(self.dict_config)
         
         # Configuraciones segun carga de datos por usuario
         self.interval_init = 0
         self.interval_fin = self.dict_config["interval_time"]
-        ############## FALTAN LAS DEMAS
 
         # Inicio timer con actualizacion de datos cada 1seg
         self.timer.start(TIMEOUT)
@@ -475,7 +474,6 @@ class MainWindow(QMainWindow):
         self.ui.pbar_interval.reset()
 
         # habilito btn
-        #self.ui.btn_view_serial.setEnabled(True)
         self.ui.btn_stop.setEnabled(True)
         self.ui.btn_init.setEnabled(False)
 
@@ -485,7 +483,8 @@ class MainWindow(QMainWindow):
         self.obj_data_uart.ser["Master"].close()
 
         self.ui.btn_stop.setEnabled(False)
-        self.ui.btn_init.setEnabled(True)
+        self.ui.btn_reset.setEnabled(True)
+        self.ui.btn_csv.setEnabled(True)
 
     def create_csv(self):
         # Exporto CSV
