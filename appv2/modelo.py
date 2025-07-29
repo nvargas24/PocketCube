@@ -139,38 +139,29 @@ class DataProcessor():
 class ManagerFile():
     def __init__(self):
         self.df_acumulado_cp = pd.DataFrame(columns=['Time', 'Intervalo', 'RTC', 'Count Pulse'])
-        self.df_acumulado_dosis = pd.DataFrame(columns=['Intervalo', 'RTC', 'CPS', 'Dosis'])
-
-    def create_csv(self, data):
-        # Cargar los datos en un DataFrame
-        df = pd.read_csv(StringIO(data), header=None)
-
-        # Mostrar las primeras filas del DataFrame
-        print(df)
-        # Renombrar las columnas
-        df.columns = ['Fecha', 'Hora', 'Meas1', 'Meas2']
-        # Ruta donde se guardará el archivo CSV
-        csv_file_path = 'data_output.csv'
-
-        # Guardar el DataFrame en un archivo CSV, con encabezados solo si el archivo no existe
-        write_header = not pd.io.common.file_exists(csv_file_path)
-        df.to_csv(csv_file_path, mode='a', index=False, header=write_header)
+        self.df_acumulado_cps = pd.DataFrame(columns=['Intervalo', 'RTC', 'CPS'])
 
     def load_df(self, data, id_name):
         if id_name == "cp":
             df_temporal1 = pd.DataFrame([data], columns=['Time', 'Intervalo', 'RTC', 'Count Pulse'])
             self.df_acumulado_cp = pd.concat([self.df_acumulado_cp, df_temporal1], ignore_index=True)
-        if id_name == "dosis":
-            df_temporal2 = pd.DataFrame([data], columns=['Intervalo', 'RTC', 'CPS', 'Dosis'])
-            self.df_acumulado_dosis = pd.concat([self.df_acumulado_dosis, df_temporal2], ignore_index=True)
+        if id_name == "cps":
+            df_temporal2 = pd.DataFrame([data], columns=['Intervalo', 'RTC', 'CPS'])
+            self.df_acumulado_cps = pd.concat([self.df_acumulado_cps, df_temporal2], ignore_index=True)
 
     def export_csv_df(self, df, id_name):
         datetime_now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        name_file = f"regitro_{id_name}_{datetime_now}.csv"
+        name_file = f"{id_name}_{datetime_now}.csv"
         try:
             # Obtiene la ruta del escritorio del usuario
             url_desktop = os.path.join(os.path.expanduser("~"), "Desktop")
-            url_file = os.path.join(url_desktop, name_file)
+
+            # Crea la carpeta "LogBG51" si no existe
+            url_log_folder = os.path.join(url_desktop, "LogBG51")
+            os.makedirs(url_log_folder, exist_ok=True)
+
+            url_file = os.path.join(url_log_folder, name_file)
+
             # Exporta el DataFrame al archivo CSV
             df.to_csv(url_file, index=False)
             print(f"DataFrame exportado con éxito a {name_file}")

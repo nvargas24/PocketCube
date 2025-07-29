@@ -372,7 +372,6 @@ class MainWindow(QMainWindow):
 
             self.load_row_table(row_data_cp, "cp") 
             self.ui.table_cp.scrollToBottom()
-
             self.obj_file.load_df(row_data_cp, "cp")
 
             # Actualización de grafico de barras
@@ -385,14 +384,15 @@ class MainWindow(QMainWindow):
                 # calculo de cps
                 cps_meas1 = self.obj_data_processor.calcule_cps(self.list_cp_meas1)
                 
-                row_data_dosis = [
+                row_data_cps = [
                                     f"{self.interval_init}~{self.interval_fin}", 
                                     f"{datetime_now}" , 
                                     f"{cps_meas1:.2f}",
                                 ]
 
-                self.load_row_table(row_data_dosis, "dosis")
+                self.load_row_table(row_data_cps, "cps")
                 self.ui.table_dosis.scrollToBottom()
+                self.obj_file.load_df(row_data_cps, "cps")
 
                 # Actulizacoón de grafico de linea
                 self.graph2.update_graph(cps_meas1)
@@ -416,7 +416,7 @@ class MainWindow(QMainWindow):
     def load_row_table(self, row_data, table):
         if table=="cp":
             table = self.ui.table_cp
-        elif table=="dosis":
+        elif table=="cps":
             table = self.ui.table_dosis
 
         current_row = table.rowCount()
@@ -489,11 +489,11 @@ class MainWindow(QMainWindow):
     def create_csv(self):
         # Exporto CSV
         self.obj_file.export_csv_df(self.obj_file.df_acumulado_cp, "CountPulse")
-        self.obj_file.export_csv_df(self.obj_file.df_acumulado_dosis, "Dosis")
+        self.obj_file.export_csv_df(self.obj_file.df_acumulado_cps, "CPS")
 
         # Vacio Dataframe para nueva carga
         self.obj_file.clear_df(self.obj_file.df_acumulado_cp)
-        self.obj_file.clear_df(self.obj_file.df_acumulado_dosis)
+        self.obj_file.clear_df(self.obj_file.df_acumulado_cps)
 
     def exit(self):
         QApplication.quit()  # Cierra la aplicación
