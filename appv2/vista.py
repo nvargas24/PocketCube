@@ -348,7 +348,11 @@ class MainWindow(QMainWindow):
         # cargo datos en tabla serial
         #row_data = [f"{data['serial_id']}", f"{data['value']}"]
         #self.load_row_table(row_data, "serial")
-                                                                                                                                                                                                                                                                                                                       
+        
+        # Detengo timer al llegar al intervalo de test
+        if self.cont_meas1 == self.dict_config["interval_test"]:
+            self.stop()  
+                                                                                                                                                                                                                                                                                                        
         # cargo datos en la tabla cp
         if data['serial_id'] == MEAS1:
             self.cont_meas1+=1
@@ -432,7 +436,7 @@ class MainWindow(QMainWindow):
     def timeout_1mseg(self):
         """
         Acciones a realizar cada vez que pasa un segundo
-        """      
+        """ 
         # Lectura de puerto serial
         self.data_master["serial_id"], self.data_master["value"]= self.obj_data_uart.reciv_serial("Master")
         
