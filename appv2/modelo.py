@@ -15,6 +15,7 @@ import pandas as pd
 from io import StringIO
 from PIL import Image 
 import pandas as pd
+from pathlib import Path
 #import jinja2
 #import pdfkit
 #import webbrowser
@@ -154,16 +155,16 @@ class ManagerFile():
         name_file = f"{id_name}_{datetime_now}.csv"
         try:
             # Obtiene la ruta del escritorio del usuario
-            url_desktop = os.path.join(os.path.expanduser("~"), "Desktop")
+            url_desktop = Path.home() / "Desktop"
 
             # Crea la carpeta "LogBG51" si no existe
-            url_log_folder = os.path.join(url_desktop, "LogBG51")
-            os.makedirs(url_log_folder, exist_ok=True)
+            url_log_folder =  url_desktop / "LogBG51"
+            url_log_folder.mkdir(exist_ok=True)
 
-            url_file = os.path.join(url_log_folder, name_file)
+            file_path = url_log_folder / name_file
 
             # Exporta el DataFrame al archivo CSV
-            df.to_csv(url_file, index=False)
+            df.to_csv(file_path, index=False)
             print(f"DataFrame exportado con éxito a {name_file}")
         except Exception as e:
             print(f"Error al exportar el DataFrame: {e}")
