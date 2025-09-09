@@ -1,0 +1,2 @@
+Actualmente utilizando Carga_util_V2-arduino en poncho - 30-08-2025
+Desarrollar V3 para PCB final a fabricar - ver medidas
