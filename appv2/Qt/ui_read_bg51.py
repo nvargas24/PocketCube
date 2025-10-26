@@ -3,15 +3,23 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_read_bg51.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.10.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QButtonGroup,
+    QComboBox, QFrame, QHBoxLayout, QHeaderView,
+    QLCDNumber, QLabel, QMainWindow, QProgressBar,
+    QPushButton, QRadioButton, QSizePolicy, QSpinBox,
+    QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -38,7 +46,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_12.setContentsMargins(20, 10, 20, 10)
         self.img_logo1 = QLabel(self.verticalLayoutWidget_9)
         self.img_logo1.setObjectName(u"img_logo1")
-        sizePolicy = QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.img_logo1.sizePolicy().hasHeightForWidth())
@@ -79,9 +87,8 @@ class Ui_MainWindow(object):
         self.lcd_date_rtc = QLabel(self.verticalLayoutWidget_9)
         self.lcd_date_rtc.setObjectName(u"lcd_date_rtc")
         font = QFont()
-        font.setFamily(u"Courier")
+        font.setFamilies([u"Courier"])
         font.setBold(True)
-        font.setWeight(75)
         self.lcd_date_rtc.setFont(font)
         self.lcd_date_rtc.setAlignment(Qt.AlignCenter)
 
@@ -101,23 +108,22 @@ class Ui_MainWindow(object):
         self.label_6 = QLabel(self.verticalLayoutWidget_9)
         self.label_6.setObjectName(u"label_6")
         font1 = QFont()
-        font1.setFamily(u"Segoe UI")
+        font1.setFamilies([u"Segoe UI"])
         font1.setPointSize(12)
         font1.setBold(True)
-        font1.setWeight(75)
         self.label_6.setFont(font1)
 
         self.horizontalLayout_9.addWidget(self.label_6)
 
         self.cbox_in_serial = QComboBox(self.verticalLayoutWidget_9)
         self.cbox_in_serial.setObjectName(u"cbox_in_serial")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.cbox_in_serial.sizePolicy().hasHeightForWidth())
         self.cbox_in_serial.setSizePolicy(sizePolicy1)
         font2 = QFont()
-        font2.setFamily(u"Segoe UI")
+        font2.setFamilies([u"Segoe UI"])
         font2.setPointSize(12)
         self.cbox_in_serial.setFont(font2)
         self.cbox_in_serial.setStyleSheet(u"background-color: rgb(255, 255, 255);")
@@ -137,7 +143,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
         self.label_5 = QLabel(self.verticalLayoutWidget_9)
         self.label_5.setObjectName(u"label_5")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.label_5.sizePolicy().hasHeightForWidth())
@@ -267,7 +273,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.btn_init = QPushButton(self.verticalLayoutWidget_9)
         self.btn_init.setObjectName(u"btn_init")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.btn_init.sizePolicy().hasHeightForWidth())
@@ -356,7 +362,6 @@ class Ui_MainWindow(object):
         font3 = QFont()
         font3.setPointSize(10)
         font3.setBold(True)
-        font3.setWeight(75)
         __qtablewidgetitem = QTableWidgetItem()
         __qtablewidgetitem.setTextAlignment(Qt.AlignCenter);
         __qtablewidgetitem.setFont(font3);
@@ -375,13 +380,13 @@ class Ui_MainWindow(object):
         __qtablewidgetitem3.setFont(font3);
         self.table_cp.setHorizontalHeaderItem(3, __qtablewidgetitem3)
         self.table_cp.setObjectName(u"table_cp")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy4.setHorizontalStretch(0)
         sizePolicy4.setVerticalStretch(0)
         sizePolicy4.setHeightForWidth(self.table_cp.sizePolicy().hasHeightForWidth())
         self.table_cp.setSizePolicy(sizePolicy4)
         font4 = QFont()
-        font4.setFamily(u"Segoe UI")
+        font4.setFamilies([u"Segoe UI"])
         font4.setPointSize(9)
         self.table_cp.setFont(font4)
         self.table_cp.setStyleSheet(u"background-color: rgb(255, 255, 255);")
@@ -390,7 +395,7 @@ class Ui_MainWindow(object):
         self.table_cp.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContentsOnFirstShow)
         self.table_cp.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_cp.setTabKeyNavigation(True)
-        self.table_cp.setProperty("showDropIndicator", True)
+        self.table_cp.setProperty(u"showDropIndicator", True)
         self.table_cp.setAlternatingRowColors(True)
         self.table_cp.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table_cp.setTextElideMode(Qt.ElideMiddle)
@@ -400,11 +405,11 @@ class Ui_MainWindow(object):
         self.table_cp.setCornerButtonEnabled(True)
         self.table_cp.setRowCount(0)
         self.table_cp.horizontalHeader().setCascadingSectionResizes(False)
-        self.table_cp.horizontalHeader().setProperty("showSortIndicator", False)
+        self.table_cp.horizontalHeader().setProperty(u"showSortIndicator", False)
         self.table_cp.horizontalHeader().setStretchLastSection(True)
         self.table_cp.verticalHeader().setVisible(False)
         self.table_cp.verticalHeader().setCascadingSectionResizes(False)
-        self.table_cp.verticalHeader().setProperty("showSortIndicator", False)
+        self.table_cp.verticalHeader().setProperty(u"showSortIndicator", False)
         self.table_cp.verticalHeader().setStretchLastSection(False)
 
         self.horizontalLayout_18.addWidget(self.table_cp)
@@ -416,7 +421,7 @@ class Ui_MainWindow(object):
         self.pbar_interval = QProgressBar(self.verticalLayoutWidget_9)
         self.pbar_interval.setObjectName(u"pbar_interval")
         font5 = QFont()
-        font5.setFamily(u"Segoe UI")
+        font5.setFamilies([u"Segoe UI"])
         font5.setPointSize(7)
         self.pbar_interval.setFont(font5)
         self.pbar_interval.setLayoutDirection(Qt.RightToLeft)
@@ -470,7 +475,7 @@ class Ui_MainWindow(object):
         self.table_dosis.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.table_dosis.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_dosis.setTabKeyNavigation(True)
-        self.table_dosis.setProperty("showDropIndicator", True)
+        self.table_dosis.setProperty(u"showDropIndicator", True)
         self.table_dosis.setDragDropOverwriteMode(True)
         self.table_dosis.setAlternatingRowColors(True)
         self.table_dosis.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -480,7 +485,7 @@ class Ui_MainWindow(object):
         self.table_dosis.horizontalHeader().setCascadingSectionResizes(True)
         self.table_dosis.horizontalHeader().setDefaultSectionSize(100)
         self.table_dosis.horizontalHeader().setHighlightSections(True)
-        self.table_dosis.horizontalHeader().setProperty("showSortIndicator", False)
+        self.table_dosis.horizontalHeader().setProperty(u"showSortIndicator", False)
         self.table_dosis.horizontalHeader().setStretchLastSection(True)
         self.table_dosis.verticalHeader().setVisible(False)
 

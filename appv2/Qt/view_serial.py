@@ -3,15 +3,21 @@
 ################################################################################
 ## Form generated from reading UI file 'view_serial.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.10.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QDialog, QFrame,
+    QHBoxLayout, QHeaderView, QPushButton, QSizePolicy,
+    QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 class Ui_SerialData(object):
     def setupUi(self, SerialData):
@@ -32,15 +38,13 @@ class Ui_SerialData(object):
         font = QFont()
         font.setPointSize(9)
         font.setBold(True)
-        font.setWeight(75)
         __qtablewidgetitem = QTableWidgetItem()
         __qtablewidgetitem.setTextAlignment(Qt.AlignCenter);
         __qtablewidgetitem.setFont(font);
         self.table_serial_2.setHorizontalHeaderItem(0, __qtablewidgetitem)
         font1 = QFont()
-        font1.setFamily(u"MS Shell Dlg 2")
+        font1.setFamilies([u"MS Shell Dlg 2"])
         font1.setBold(True)
-        font1.setWeight(75)
         __qtablewidgetitem1 = QTableWidgetItem()
         __qtablewidgetitem1.setTextAlignment(Qt.AlignCenter);
         __qtablewidgetitem1.setFont(font1);
@@ -85,13 +89,13 @@ class Ui_SerialData(object):
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.pushButton = QPushButton(self.verticalLayoutWidget)
         self.pushButton.setObjectName(u"pushButton")
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton.sizePolicy().hasHeightForWidth())
         self.pushButton.setSizePolicy(sizePolicy)
         font3 = QFont()
-        font3.setFamily(u"Segoe UI")
+        font3.setFamilies([u"Segoe UI"])
         font3.setPointSize(10)
         self.pushButton.setFont(font3)
 
