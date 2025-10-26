@@ -1,0 +1,14 @@
+# Requirements for PocketCube (based on appv2/modelo.py)
+# Recommended Python version: 3.8+
+
+pandas>=1.5
+Pillow>=9.0
+pyserial>=3.5
+#PySide2>=5
+matplotlib>=3.6
+numpy>=1.24
+
+# Optional / commented (imports that were commented out in the source)
+# jinja2>=3.0
+# pdfkit>=1.0   # note: pdfkit usually requires wkhtmltopdf installed on the system
+# If you need webbrowser/base64 functionality those are in the Python stdlib
