@@ -8,9 +8,9 @@ __email__ = "nahuvargas24@gmail.com"
 __copyright__ = "Copyright 2024"
 __version__ = "0.0.1"
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QApplication, QDialog
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
