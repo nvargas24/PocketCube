@@ -44,7 +44,7 @@ class Graph_bar(FigureCanvas):
         self.grid_lines_h = []
 
         self.fig, self.ax = plt.subplots(1, dpi=82, figsize=(12,12), sharey=True, facecolor="none")
-        self.fig.subplots_adjust(left=.16, bottom=.2, right=.95, top=.95) #Ajuste de escala de grafica
+        self.fig.subplots_adjust(left=.16, bottom=.1, right=.95, top=.99) #Ajuste de escala de grafica
         super().__init__(self.fig)
 
         self.set_graph_style()
@@ -161,7 +161,7 @@ class Graph_line(FigureCanvas):
         self.grid_lines_h = []
 
         self.fig, self.ax = plt.subplots(1, dpi=82, figsize=(12,12), sharey=True, facecolor="none")
-        self.fig.subplots_adjust(left=.16, bottom=.2, right=.95, top=.95) #Ajuste de escala de grafica
+        self.fig.subplots_adjust(left=.16, bottom=.1, right=.95, top=.99) #Ajuste de escala de grafica
         super().__init__(self.fig)
 
         self.set_graph_style()
