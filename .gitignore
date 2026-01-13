@@ -1,5 +1,6 @@
 # Ignorar carpetas de caché de Python
 __pycache__/
+*.pyc
 
 # Ignorar todos los archivos
 *.pdf
@@ -62,3 +63,7 @@ History/
 # Altium Designer settings (opcionales según el equipo)
 *.ProjectLogs
 *.Settings
+
+# Entornos virtuales
+.venv/
+venv/
