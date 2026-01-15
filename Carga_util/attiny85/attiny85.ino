@@ -58,7 +58,8 @@ void loop() {
     delay(100);
     
     // Recibe el carácter enviado por el master
-    receivedChar = TinyWireS.receive();
+    // ******* IMPORTANTE ******* // Recibe el comando I2C para saber cantidad de pulsos
+    receivedChar = TinyWireS.receive();   
     
     // Si el master solicita MEAS1 ('1'), envía el contador de pulsos
     if (receivedChar == STR_MEAS1) {
