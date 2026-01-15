@@ -5,21 +5,16 @@
 #include <Wire.h>
 
 /**
- * @brief Módulo autónomo de adquisición de datos PocketCube
- * @details No depende de una app externa. La adquisición es automática
+ * @brief Módulo simplificado de adquisición autónoma de datos PocketCube
+ * @details Adquisición automática cada 1 segundo, sin dependencias externas
  * @author Grupo SyCE - PocketCube
  */
 
 // Constantes públicas
 #define I2C_SLAVE_ADDR 0x08
 #define MAX_DATA_I2C 33
-#define MAX_SIZE_MEAS 7
 
 #define STR_MEAS1 '1'
-
-// Valores de sensores disponibles
-#define SENSOR_MEAS1 1
-#define SENSOR_STATE 6
 
 /*** Macros de Tiempos Predefinidos (en segundos) ***/
 #define TIME_10_SEC    10
@@ -39,7 +34,7 @@
 
 /**
  * @brief Inicializa el módulo autónomo
- * @details Configura I2C, Timer y comienza la adquisición automática
+ * @details Configura I2C y timer para lecturas automáticas cada 1 segundo
  * @return void
  */
 void pocketAutoInit();
@@ -52,71 +47,29 @@ void pocketAutoInit();
 void pocketAutoUpdate();
 
 /**
- * @brief Inicia la adquisición de datos automática
- * @details El timer genera interrupciones periódicamente
+ * @brief Inicia la adquisición automática de datos
  * @return void
  */
 void pocketAutoStart();
 
 /**
  * @brief Detiene la adquisición de datos
- * @details Desactiva el timer
  * @return void
  */
 void pocketAutoStop();
 
 /**
- * @brief Verifica si la adquisición está activa
- * @return true si está activa, false en caso contrario
- */
-bool pocketAutoIsRunning();
-
-/**
- * @brief Configura el intervalo de lectura en segundos
- * @param seconds Segundos entre lecturas (mínimo 1, máximo 255)
- * @return true si se configuró correctamente, false si el valor es inválido
- */
-bool pocketAutoSetInterval(uint8_t seconds);
-
-/**
- * @brief Obtiene el intervalo actual en segundos
- * @return Intervalo en segundos
- */
-uint8_t pocketAutoGetInterval();
-
-/**
- * @brief Obtiene la última lectura de datos
- * @param sensorId ID del sensor (SENSOR_MEAS1, SENSOR_STATE)
- * @param buffer Buffer donde se guardará el resultado
+ * @brief Obtiene el último dato recibido
+ * @param buffer Buffer donde se guardará el dato (solo el valor, sin ID)
  * @param bufferSize Tamaño del buffer
- * @return Tamaño de datos copiados, 0 si no hay datos disponibles
+ * @return Tamaño de datos copiados, 0 si no hay datos
  */
-int pocketAutoGetLastReading(uint8_t sensorId, char* buffer, int bufferSize);
+int pocketAutoGetData(char* buffer, int bufferSize);
 
 /**
- * @brief Define una función callback para ejecutar cuando hay nuevos datos
- * @details Se ejecuta cuando se recibe una lectura completa del esclavo
- * @param callback Función: void callback(int sensorId, const char* data)
- * @return void
- */
-void pocketAutoSetDataCallback(void (*callback)(int, const char*));
-
-/**
- * @brief Fuerza una lectura inmediata (no espera el timer)
- * @return void
- */
-void pocketAutoReadNow();
-
-/**
- * @brief Obtiene el estado de conexión con el esclavo I2C
- * @return true si hay comunicación, false en caso contrario
+ * @brief Verifica si hay conexión con el esclavo I2C
+ * @return true si conectado, false en caso contrario
  */
 bool pocketAutoIsConnected();
-
-/**
- * @brief Reinicia la comunicación I2C
- * @return void
- */
-void pocketAutoResetConnection();
 
 #endif // POCKET_AUTONOMOUS_H
