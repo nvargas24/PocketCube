@@ -182,6 +182,7 @@ Antes de cargar cualquier programa en el **ATtiny85**, asegúrate de que el IDE 
 1. Ve a **Preferencias** en el IDE de Arduino.
 2. En el campo **Gestor de URLs Adicionales de Tarjetas**, añade la siguiente URL:
 https://mcudude.github.io/MiniCore/package_MCUdude_MiniCore_index.json
+https://raw.githubusercontent.com/damellis/attiny/ide-1.6.x-boards-manager/package_damellis_attiny_index.json
 3. Descargar libreria TinyWireS: 
 https://playground.arduino.cc/uploads/Code/TinyWireS/index.zip
 4. Descomprimir el .zip y agregar a la carpeta ***libraries*** de Arduino
