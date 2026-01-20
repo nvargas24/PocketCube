@@ -32,7 +32,6 @@
 /**
  * @author Grupo SyCE - PocketCube
  * @authors Ing. Vargas Nahuel 
- * @authors Vargas Santiago
  */
 
 /****** Encabezados *****/
@@ -41,51 +40,33 @@
 /*********************** Macros *********************/
 #define I2C_SLAVE_ADDR 0x08
 #define MAX_DATA_I2C 33
-#define MAX_DATA_UART 40
-#define MAX_SIZE_MEAS 7
 
-#define MEAS1 1
-#define STATE 6
-#define TIMER 7
 #define HOW_CP 8
 
 #define STR_MEAS1 '1'
 #define STR_COUNT '8'
 
-#define STOP_TIMER 0
-#define INIT_TIMER 1
-
-
 /****************** Variables globales ***************/ 
 /* I2C */
 char dataRequest[MAX_DATA_I2C]; // Str respuesta de Slave
-char dataSend[MAX_DATA_I2C]; // Str a enviar de Master
 
 /* UART */
 int serial_id = 0;
 int value = 0;
-char lastRTC[MAX_DATA_I2C] = ""; // Buffer para almacenar el último mensaje enviado
-char lastState[MAX_DATA_I2C] = ""; // Buffer para almacenar el último mensaje enviado
 
 /* TIMER */
 bool i2cActive = false;
-bool timerActive = true;
 
 /********* Declaracion de funciones internas *********/
-void formatDataSend(char* , int, char*);
-void formatDataSendLong(int, char*);
 void filterValue(char *);
 
 /* I2C */
-void sendToSlave(const char*);
 void sendToSlaveC(char);
 int requestFromSlave();
 
 /* UART */
-void requestFromAppUart(int*, float*);
+void requestFromAppUart(int*, int*);
 void sendToAppUart(const char*);
-void commaToSpaceConverter(char *);
-
 
 /****************** Funciones Arduino ****************/
 /**
@@ -106,12 +87,6 @@ void setup()
  */
 void loop() 
 {
-  char dataConcat[MAX_DATA_UART]; // Buf auxiliar para concatenar texto
-  char meas1[MAX_SIZE_MEAS];
-  size_t sizeDataConcat = 0;
-  char dataSendApp[MAX_DATA_UART];
-  char dateTimeRTC[MAX_DATA_UART];
-
   i2cActive = false;
   /* Serial */
   requestFromAppUart(&serial_id, &value);
@@ -120,10 +95,7 @@ void loop()
   if(serial_id !=0){
     configFromSerial(serial_id, value);  // Asigno dato segun id    
   }
-  //formatDataSend(dataSendApp, STATE, "Read MEASURES");
-  //sendToAppUart(dataSendApp);   
-  
-    
+
   if(i2cActive){
     Serial.println("Arduino solicita a ATtiny CPS");
     /* I2C MEAS1 */
@@ -136,15 +108,6 @@ void loop()
     Serial.print("ATtiny conto: ");
     Serial.print(dataRequest);
     Serial.println(" pulsos");
-
-    /*sendToSlaveC(STR_COUNT); // Solicitud I2C estado de TIMER
-    delay(100);
-    requestFromSlave(); // Captura rta de Slave I2C
-    filterValue(dataRequest); // Extrae el valor después de la coma
-    
-    Serial.print("TIMER ATtiny conto: ");
-    Serial.print(dataRequest);
-    Serial.println(" segundos");*/
 
     serial_id = 0;
   }
@@ -162,58 +125,6 @@ void filterValue(char *str)
       int offset = commaPtr - str; // Calcula el desplazamiento
       strcpy(str, commaPtr+1); // Copia el resto del array sobre el inicio
   }
-}
-
-void formatDataSendLong(int id, char* str)
-{
-  char text[3];
-  int textoLen;
-  int arrayLen;
-
-  snprintf(text, 3, "%d,", id);
-
-  textoLen = strlen(text);
-  arrayLen = strlen(str);
-  
-  for (int i = arrayLen; i >= 0; i--) {
-    str[i + textoLen] = str[i]; // Desplaza el contenido
-  }
-
-  // Copia el nuevo texto al inicio del array
-  for (int i = 0; i < textoLen; i++) {
-    str[i] = text[i];
-  }
-
-}
-void formatDataSend(char* buf, int id, char* str)
-{
-  snprintf(buf, MAX_DATA_UART, "%d,%s", id, str);
-}
-
-
-/* I2C */
-/**
- * @brief Enviar data a slave I2C
- * @return nothing
- */
-void sendToSlave(const char *data)
-{
-  /* Verificacion de datos a enviar */
-  Serial.print("S-Slave: ");
-  Serial.println(data);
-
-  /* Envio datos I2C */
-  Wire.beginTransmission(I2C_SLAVE_ADDR);
-  // Envía solo los datos válidos
-  for (size_t i = 0; i < strlen(data); i++) {
-    if (data[i] >= 32 && data[i] <= 126) { // Solo caracteres imprimibles// Cod ASCII
-      Wire.write((uint8_t)data[i]);
-    } 
-    else {
-      Wire.write(' '); // Reemplazar caracteres no imprimibles con un espacio
-    }
-  }
-  Wire.endTransmission();
 }
 
 /**
@@ -277,6 +188,7 @@ void sendToAppUart(const char* data)
   }
   Serial.println();  // Envía un salto de línea al final      
 }
+
 /**
  * @brief Respuesta data de app por UART
  * @return id y value
@@ -310,20 +222,5 @@ void configFromSerial(int serial_id, int cmd)
     Serial.print("id: ");
     Serial.print(serial_id);
     Serial.println(" ; ID NO RECONOCIDO PARA CONFIG");
-  }
-}
-
-/**
- * @brief Conversion de comas a espacios para adjuntar a trama de datos
- * @return None
- */
-void commaToSpaceConverter(char *data)
-{
-  // Recorrer el array para encontrar la coma y reemplazarla por un espacio
-  for (int i = 0; i < strlen(data); i++) {
-      if (data[i] == ',') {
-          data[i] = ' ';
-          break; // Salir del bucle después de encontrar y reemplazar la coma
-      }
   }
 }
