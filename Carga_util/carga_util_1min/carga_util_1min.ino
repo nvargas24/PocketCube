@@ -19,17 +19,22 @@
 #define MAX_BUF_I2C 33  // Tamaño máximo del buffer I2C
 
 // IDs de datos (igual que en Pocket Main)
-#define MEAS1 1   // ID para contador de pulsos MEAS1
-#define STATE 6   // ID para estado (no usado aquí)
-#define COUNT 8   // ID para segundos de ATtiny
+#define CPM 1   // ID para contador de pulsos acumulado en el ultimo minuto
+#define CPS_NOW 2   // ID para pulsos por segundo acumulado durante ese minuto
+#define TIME 3   // ID para segundos transcurridos
+#define CPS_NOW_ACCUM 4   // ID para pulsos por segundo acumulado durante ese minuto
 
-// Comando I2C para solicitar MEAS1
-#define STR_MEAS1 '1'
-#define STR_COUNT '8'
+// Comando I2C recibidos
+#define STR_CPM '1'
+#define STR_CPS_NOW '2'
+#define STR_TIME '3'
+#define STR_CPS_NOW_ACUMM '4'
 
 // Variables globales volátiles (usadas en ISR)
 volatile uint16_t pulseCount1 = 0;  // Contador de pulsos en PB3
 volatile uint16_t pulseCount_1min = 0;  // Contador de pulsos acumulado cada 60 segundos
+volatile uint16_t previousPulseCount = 0;  // Contador anterior para calcular pulsos por segundo
+volatile uint16_t currentPulses = 0;  // Pulsos en el último segundo (no acumulado)
 volatile char receivedChar = '\0';  // Carácter recibido por I2C
 volatile bool lastState1 = LOW;     // Estado anterior del pin PB3 para detectar flancos
 static uint16_t secondCounter = 0;
@@ -61,6 +66,10 @@ void loop() {
   if (currentTime - lastSecondTime >= 10000) {
     lastSecondTime = currentTime;
     
+    // Calcula pulsos en el último segundo
+    currentPulses = pulseCount1 - previousPulseCount;
+    previousPulseCount = pulseCount1;
+    
     // Incrementa contador de segundos
     secondCounter++;
     
@@ -69,6 +78,7 @@ void loop() {
       pulseCount_1min = pulseCount1;  // Asigna valor acumulado
       pulseCount1 = 0;                // Resetea para nuevo conteo
       secondCounter = 0;
+      previousPulseCount = 0;         // Resetea también el contador anterior
     }
   }
   
@@ -77,15 +87,23 @@ void loop() {
     delay(10);
     receivedChar = TinyWireS.receive();   
     
-    if (receivedChar == STR_MEAS1) {
-      formatSendCmd(dataRequest, MEAS1, pulseCount_1min);
+    if (receivedChar == STR_CPM) {
+      formatSendCmd(dataRequest, CPM, pulseCount_1min);
       sendDataMaster(dataRequest);
     } 
-    /*if (receivedChar == STR_COUNT) {
-      formatSendCmd(dataRequest, COUNT, secondCounter);
+    if (receivedChar == STR_CPS_NOW) {
+      formatSendCmd(dataRequest, CPS_NOW, currentPulses);
       sendDataMaster(dataRequest);
-    } */
-    
+    } 
+    if (receivedChar == STR_TIME) {
+      formatSendCmd(dataRequest, TIME, secondCounter);
+      sendDataMaster(dataRequest);
+    } 
+    if (receivedChar == STR_CPS_NOW_ACUMM) {
+      formatSendCmd(dataRequest, CPS_NOW_ACCUM, pulseCount1);
+      sendDataMaster(dataRequest);
+    }
+
   }
 }
 
