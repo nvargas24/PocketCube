@@ -41,21 +41,23 @@
 #define I2C_SLAVE_ADDR 0x08
 #define MAX_DATA_I2C 33
 
-#define HOW_CP 8
+#define NO_CMD 0
+#define CMD_I2C 1
 
-#define STR_MEAS1 '1'
-#define STR_COUNT '8'
+#define CPS 1
+#define TIME 2
+
+#define R_CPS '1'
+#define R_TIME '2'
 
 /****************** Variables globales ***************/ 
 /* I2C */
 char dataRequest[MAX_DATA_I2C]; // Str respuesta de Slave
 
 /* UART */
-int serial_id = 0;
+int serial_id = NO_CMD;
 int value = 0;
 
-/* TIMER */
-bool i2cActive = false;
 
 /********* Declaracion de funciones internas *********/
 void filterValue(char *);
@@ -63,6 +65,7 @@ void filterValue(char *);
 /* I2C */
 void sendToSlaveC(char);
 int requestFromSlave();
+void requestI2C(const uint8_t);
 
 /* UART */
 void requestFromAppUart(int*, int*);
@@ -87,32 +90,24 @@ void setup()
  */
 void loop() 
 {
-  i2cActive = false;
+  serial_id = NO_CMD;
+  value = NO_CMD; 
   /* Serial */
-  requestFromAppUart(&serial_id, &value);
+  ///////// estructura :: #1, #2   : id, value /////////
+  requestFromAppUart(&serial_id, &value); // Captura instruccion por UART para que realice el Arduino
   delay(100);
 
-  if(serial_id !=0){
-    configFromSerial(serial_id, value);  // Asigno dato segun id    
+  if(serial_id == CMD_I2C){
+    Serial.print("------> Arduino solicita a ATtiny por I2C : ");
+    requestI2C(value);
+  }
+  else if(serial_id != NO_CMD){
+    Serial.print("------> ERROR: id: ");
+    Serial.print(serial_id);
+    Serial.println(" ; ID NO RECONOCIDO PARA CONFIG");
   }
 
-  if(i2cActive){
-    Serial.println("Arduino solicita a ATtiny CPS");
-    /* I2C MEAS1 */
-    /* Envio datos I2C */
-    sendToSlaveC(STR_MEAS1); // Solicitud I2C pin PB3
-    delay(100);
-    requestFromSlave(); // Captura rta de Slave I2C
-    filterValue(dataRequest); // Extrae el valor después de la coma
-    
-    Serial.print("ATtiny conto: ");
-    Serial.print(dataRequest);
-    Serial.println(" pulsos");
-
-    serial_id = 0;
-  }
 }
-
 /**************** Funciones internas  *****************/
 void filterValue(char *str)
 {
@@ -196,7 +191,7 @@ void sendToAppUart(const char* data)
 void requestFromAppUart(int* id, int* value)
 {
   if (Serial.available()){
-    String input_cmd = Serial.readStringUntil('/n');
+    String input_cmd = Serial.readStringUntil('\n');
     // Procesar la cadena recibida en formato "id,value"
     int delimiterIndex = input_cmd.indexOf(','); // Buscar la coma que separa id y value
     if (delimiterIndex > 0) {
@@ -209,18 +204,34 @@ void requestFromAppUart(int* id, int* value)
     }
   }
 }
+
+
 /**
  * @brief Configuracion a realizar en Arduino
  */
-void configFromSerial(int serial_id, int cmd)
+void requestI2C(const uint8_t cmd)
 { 
-  if(serial_id == HOW_CP){
-    i2cActive = true;
-  }
+  /* I2C Contador de pulsos por segundos */
+  if(cmd == CPS){
+    Serial.println("contador de pulsos"); 
+    sendToSlaveC(R_CPS); // Solicitud I2C pin PB3
+    delay(100);
 
-  else{
-    Serial.print("id: ");
-    Serial.print(serial_id);
-    Serial.println(" ; ID NO RECONOCIDO PARA CONFIG");
+    requestFromSlave(); // Captura rta de Slave I2C
+    filterValue(dataRequest); // Extrae el valor después de la coma
+    Serial.print("----> CPS: ");
+    Serial.println(dataRequest);
+  }
+  /* I2C segundos transcurridos */
+  else if(cmd == TIME){
+    Serial.println("tiempo trancurrido en segundos"); 
+    sendToSlaveC(R_TIME); // Solicitud I2C contador de segundos en ATtiny
+    delay(100);
+
+    requestFromSlave(); // Captura rta de Slave I2C
+    filterValue(dataRequest); // Extrae el valor después de la coma
+    Serial.print("----> TIME: ");
+    Serial.print(dataRequest);
+    Serial.println("segundos");
   }
 }
