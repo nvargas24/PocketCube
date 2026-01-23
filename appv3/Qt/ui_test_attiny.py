@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(880, 583)
+        MainWindow.resize(880, 591)
         font = QFont()
         font.setPointSize(20)
         font.setBold(True)
@@ -124,6 +124,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.horizontalLayout_18 = QHBoxLayout()
         self.horizontalLayout_18.setObjectName(u"horizontalLayout_18")
+        self.horizontalLayout_18.setContentsMargins(-1, -1, -1, 30)
         self.table_cpm = QTableWidget(self.verticalLayoutWidget_9)
         if (self.table_cpm.columnCount() < 4):
             self.table_cpm.setColumnCount(4)
@@ -187,7 +188,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_14.addLayout(self.verticalLayout_4)
 
         self.horizontalLayout_14.setStretch(0, 25)
-        self.horizontalLayout_14.setStretch(1, 18)
+        self.horizontalLayout_14.setStretch(1, 24)
 
         self.verticalLayout_7.addLayout(self.horizontalLayout_14)
 
@@ -201,6 +202,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_6 = QVBoxLayout()
         self.verticalLayout_6.setSpacing(3)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.verticalLayout_6.setContentsMargins(-1, -1, -1, 30)
         self.table_cps = QTableWidget(self.verticalLayoutWidget_9)
         if (self.table_cps.columnCount() < 4):
             self.table_cps.setColumnCount(4)
@@ -246,7 +248,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_15.addLayout(self.verticalLayout_6)
 
         self.horizontalLayout_15.setStretch(0, 25)
-        self.horizontalLayout_15.setStretch(1, 18)
+        self.horizontalLayout_15.setStretch(1, 24)
 
         self.verticalLayout_7.addLayout(self.horizontalLayout_15)
 
@@ -258,13 +260,14 @@ class Ui_MainWindow(object):
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setSpacing(2)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(-1, -1, -1, 30)
         self.horizontalLayout_9 = QHBoxLayout()
         self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
         self.label_6 = QLabel(self.verticalLayoutWidget_9)
         self.label_6.setObjectName(u"label_6")
         font4 = QFont()
         font4.setFamilies([u"Segoe UI"])
-        font4.setPointSize(12)
+        font4.setPointSize(10)
         font4.setBold(True)
         self.label_6.setFont(font4)
 
@@ -279,7 +282,7 @@ class Ui_MainWindow(object):
         self.cbox_in_serial.setSizePolicy(sizePolicy2)
         font5 = QFont()
         font5.setFamilies([u"Segoe UI"])
-        font5.setPointSize(12)
+        font5.setPointSize(10)
         self.cbox_in_serial.setFont(font5)
         self.cbox_in_serial.setStyleSheet(u"background-color: rgb(255, 255, 255);")
 
@@ -294,8 +297,9 @@ class Ui_MainWindow(object):
         self.groupBox_2.setObjectName(u"groupBox_2")
         self.verticalLayoutWidget_2 = QWidget(self.groupBox_2)
         self.verticalLayoutWidget_2.setObjectName(u"verticalLayoutWidget_2")
-        self.verticalLayoutWidget_2.setGeometry(QRect(10, 20, 184, 202))
+        self.verticalLayoutWidget_2.setGeometry(QRect(10, 20, 241, 161))
         self.verticalLayout_3 = QVBoxLayout(self.verticalLayoutWidget_2)
+        self.verticalLayout_3.setSpacing(2)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_3 = QHBoxLayout()
@@ -318,6 +322,7 @@ class Ui_MainWindow(object):
         self.time_test.setSizePolicy(sizePolicy3)
         self.time_test.setFont(font6)
         self.time_test.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.time_test.setStyleSheet(u"background-color: rgb(255, 255, 255);")
         self.time_test.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.time_test.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.UpDownArrows)
         self.time_test.setCalendarPopup(False)
@@ -333,7 +338,10 @@ class Ui_MainWindow(object):
         self.btn_init.setObjectName(u"btn_init")
         sizePolicy3.setHeightForWidth(self.btn_init.sizePolicy().hasHeightForWidth())
         self.btn_init.setSizePolicy(sizePolicy3)
-        self.btn_init.setFont(font5)
+        font7 = QFont()
+        font7.setFamilies([u"Segoe UI"])
+        font7.setPointSize(12)
+        self.btn_init.setFont(font7)
 
         self.verticalLayout_3.addWidget(self.btn_init)
 
@@ -362,7 +370,7 @@ class Ui_MainWindow(object):
         self.btn_stop.setEnabled(False)
         sizePolicy3.setHeightForWidth(self.btn_stop.sizePolicy().hasHeightForWidth())
         self.btn_stop.setSizePolicy(sizePolicy3)
-        self.btn_stop.setFont(font5)
+        self.btn_stop.setFont(font7)
 
         self.verticalLayout_3.addWidget(self.btn_stop)
 
@@ -371,7 +379,7 @@ class Ui_MainWindow(object):
         self.btn_export.setEnabled(False)
         sizePolicy3.setHeightForWidth(self.btn_export.sizePolicy().hasHeightForWidth())
         self.btn_export.setSizePolicy(sizePolicy3)
-        self.btn_export.setFont(font5)
+        self.btn_export.setFont(font7)
         self.btn_export.setCheckable(False)
 
         self.verticalLayout_3.addWidget(self.btn_export)
@@ -389,8 +397,9 @@ class Ui_MainWindow(object):
         self.groupBox.setObjectName(u"groupBox")
         self.verticalLayoutWidget = QWidget(self.groupBox)
         self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
-        self.verticalLayoutWidget.setGeometry(QRect(10, 30, 181, 138))
+        self.verticalLayoutWidget.setGeometry(QRect(10, 30, 241, 156))
         self.verticalLayout_2 = QVBoxLayout(self.verticalLayoutWidget)
+        self.verticalLayout_2.setSpacing(2)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.btn_last_CPM = QPushButton(self.verticalLayoutWidget)
@@ -398,7 +407,7 @@ class Ui_MainWindow(object):
         self.btn_last_CPM.setEnabled(True)
         sizePolicy3.setHeightForWidth(self.btn_last_CPM.sizePolicy().hasHeightForWidth())
         self.btn_last_CPM.setSizePolicy(sizePolicy3)
-        self.btn_last_CPM.setFont(font5)
+        self.btn_last_CPM.setFont(font7)
 
         self.verticalLayout_2.addWidget(self.btn_last_CPM)
 
@@ -406,7 +415,7 @@ class Ui_MainWindow(object):
         self.btn_accum_CPS.setObjectName(u"btn_accum_CPS")
         sizePolicy3.setHeightForWidth(self.btn_accum_CPS.sizePolicy().hasHeightForWidth())
         self.btn_accum_CPS.setSizePolicy(sizePolicy3)
-        self.btn_accum_CPS.setFont(font5)
+        self.btn_accum_CPS.setFont(font7)
 
         self.verticalLayout_2.addWidget(self.btn_accum_CPS)
 
@@ -414,47 +423,53 @@ class Ui_MainWindow(object):
         self.btn_time_s.setObjectName(u"btn_time_s")
         sizePolicy3.setHeightForWidth(self.btn_time_s.sizePolicy().hasHeightForWidth())
         self.btn_time_s.setSizePolicy(sizePolicy3)
-        self.btn_time_s.setFont(font5)
+        self.btn_time_s.setFont(font7)
 
         self.verticalLayout_2.addWidget(self.btn_time_s)
 
-        self.horizontalLayout_2 = QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.verticalLayout_9 = QVBoxLayout()
+        self.verticalLayout_9.setSpacing(1)
+        self.verticalLayout_9.setObjectName(u"verticalLayout_9")
         self.label = QLabel(self.verticalLayoutWidget)
         self.label.setObjectName(u"label")
-        self.label.setFont(font6)
+        font8 = QFont()
+        font8.setPointSize(10)
+        self.label.setFont(font8)
 
-        self.horizontalLayout_2.addWidget(self.label)
+        self.verticalLayout_9.addWidget(self.label)
 
         self.txt_rta_attiny = QLineEdit(self.verticalLayoutWidget)
         self.txt_rta_attiny.setObjectName(u"txt_rta_attiny")
         self.txt_rta_attiny.setEnabled(False)
         sizePolicy1.setHeightForWidth(self.txt_rta_attiny.sizePolicy().hasHeightForWidth())
         self.txt_rta_attiny.setSizePolicy(sizePolicy1)
-        self.txt_rta_attiny.setFont(font6)
+        font9 = QFont()
+        font9.setPointSize(8)
+        self.txt_rta_attiny.setFont(font9)
         self.txt_rta_attiny.setStyleSheet(u"background-color: rgb(255, 255, 255);")
 
-        self.horizontalLayout_2.addWidget(self.txt_rta_attiny)
+        self.verticalLayout_9.addWidget(self.txt_rta_attiny)
 
-        self.horizontalLayout_2.setStretch(0, 1)
-        self.horizontalLayout_2.setStretch(1, 6)
+        self.verticalLayout_9.setStretch(0, 1)
+        self.verticalLayout_9.setStretch(1, 1)
 
-        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
+        self.verticalLayout_2.addLayout(self.verticalLayout_9)
 
+        self.verticalLayout_2.setStretch(0, 1)
         self.verticalLayout_2.setStretch(1, 1)
         self.verticalLayout_2.setStretch(2, 1)
-        self.verticalLayout_2.setStretch(3, 1)
+        self.verticalLayout_2.setStretch(3, 4)
 
         self.verticalLayout.addWidget(self.groupBox)
 
         self.verticalLayout.setStretch(0, 1)
-        self.verticalLayout.setStretch(1, 12)
-        self.verticalLayout.setStretch(2, 9)
+        self.verticalLayout.setStretch(1, 11)
+        self.verticalLayout.setStretch(2, 12)
 
         self.horizontalLayout_16.addLayout(self.verticalLayout)
 
-        self.horizontalLayout_16.setStretch(0, 25)
-        self.horizontalLayout_16.setStretch(1, 8)
+        self.horizontalLayout_16.setStretch(0, 60)
+        self.horizontalLayout_16.setStretch(1, 27)
 
         self.verticalLayout_8.addLayout(self.horizontalLayout_16)
 

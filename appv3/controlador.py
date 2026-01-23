@@ -26,7 +26,6 @@ if __name__ == "__main__":
             background-color: #1E1E1E;
             color: #000000;        /* Texto negro */
             font-family: Segoe UI;
-            font-size: 10pt;
         }
 
         /* Widgets deshabilitados */

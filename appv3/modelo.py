@@ -222,6 +222,8 @@ class ManagerDataUart(DataProcessor):
     def reciv_serial(self, port_name):
         id_serial = None
         value = None
+        linea = ""
+
         try:
             if self.ser[port_name].in_waiting > 0 :
                 #time.sleep(0.01)
@@ -233,7 +235,7 @@ class ManagerDataUart(DataProcessor):
             print(f"Error en {port_name}/n")
             print(e)
 
-        return id_serial, value
+        return id_serial, value, linea
     
     def close_ports(self, event):
         if self.ser["Master"]:

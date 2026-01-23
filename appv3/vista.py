@@ -361,7 +361,9 @@ class MainWindow(QMainWindow):
         #---- Reloj de ensayo
         if self.duration_test_seconds <= 0:
             self.stop()
-        
+
+
+        #--- Acciones a realizar cada 1 segundo
         if self.count1s:
             ##---- Reloj de ensayo
             self.duration_test_seconds -= 1
@@ -371,6 +373,14 @@ class MainWindow(QMainWindow):
             s_d_test = self.duration_test_seconds%60
 
             self.ui.lcd_time_duration.display(f"{h_d_test:02d}:{min_d_test:02d}:{s_d_test:02d}")
+
+            #---- Captura de datos por serial
+            _,_,self.request_serial = self.obj_data_uart.reciv_serial("Master")
+            if "---->" in self.request_serial:
+                data_serial = self.request_serial.split("---->")[1].strip()
+                print(f"Datos serial:{data_serial}")
+
+                self.ui.txt_rta_attiny.setText(f"{data_serial}") # carga en widget
 
     def init(self):
         # Asigno puertos
