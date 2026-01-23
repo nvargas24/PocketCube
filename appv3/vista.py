@@ -348,15 +348,29 @@ class MainWindow(QMainWindow):
         OBS.: Se dispara en 'self.init' y se finaliza con 'self.stop'(donde se resetea todos los widgets)
         """
         #--- Contador de segundos
-        self.count1ms=+1
+        self.count1s = 0
+        self.count1ms += 1
         if self.count1ms >= 1000:
-            self.count1s=+1
+            self.count1s += 1
             self.count1ms = 0 
             
         #---- Reloj de PC
         self.ui.lcd_time_pc.display(f"{self.obj_data_processor.datetime_pc()[TIME_MS_PC]}")
         self.ui.lcd_date_pc.setText(f"{self.obj_data_processor.datetime_pc()[DATE_PC]}")
 
+        #---- Reloj de ensayo
+        if self.duration_test_seconds <= 0:
+            self.stop()
+        
+        if self.count1s:
+            ##---- Reloj de ensayo
+            self.duration_test_seconds -= 1
+
+            h_d_test = self.duration_test_seconds//3600
+            min_d_test = (self.duration_test_seconds%3600)//60
+            s_d_test = self.duration_test_seconds%60
+
+            self.ui.lcd_time_duration.display(f"{h_d_test:02d}:{min_d_test:02d}:{s_d_test:02d}")
 
     def init(self):
         # Asigno puertos
@@ -366,17 +380,29 @@ class MainWindow(QMainWindow):
         # Inicializo puerto serial
         self.obj_data_uart.init_serial(port_master, "Master") #Master es el Arduino
 
+        # Ingreso durancion de ensayo [hh]:[mm] y en segundos (para temporizador)
+        time_duration_test = self.ui.time_test.time()
+        self.ui.lcd_time_duration.display(time_duration_test.toString("HH:mm:ss"))
+        self.duration_test_seconds = (time_duration_test.hour()*3600 +
+                                      time_duration_test.minute()*60 +
+                                      time_duration_test.second()
+                                      )
+
+        # Habilito btn
+        self.ui.btn_stop.setEnabled(True)
+        self.ui.btn_init.setEnabled(False)
+
         # Inicio QTimer
         self.timer.start(1)  # Intervalo de 1 milisegundo
 
-        # habilito btn
-        self.ui.btn_stop.setEnabled(True)
-        self.ui.btn_init.setEnabled(False)
 
     def stop(self):
         self.reset_widget()
 
         self.obj_data_uart.ser["Master"].close()
+        self.timer.stop()
+
+        self.ui.lcd_time_duration.display(f"{0:02d}:{0:02d}:{0:02d}")
 
         self.ui.btn_stop.setEnabled(False)
         self.ui.btn_export.setEnabled(True)
