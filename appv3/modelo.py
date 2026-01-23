@@ -167,12 +167,26 @@ class ManagerDataUart(DataProcessor):
         }
 
     def list_port_com(self):
+        """
+        Lista puertos COM disponibles
+        """
         list_ports = []
 
-        ports = serial.tools.list_ports.comports()
-        for port in ports:
-            list_ports.append(port.description)
+        try:
+            ports = serial.tools.list_ports.comports()
+
+            if not ports:
+                return []  # o podés devolver None / ["No hay puertos disponibles"]
+
+            for port in ports:
+                list_ports.append(port.description)
+
+        except Exception as e:
+            print(f"Error al listar puertos COM: {e}")
+            return []  # fallback seguro
+
         return list_ports
+    
 
     def init_serial(self, port_num, port_name):
         try:
@@ -185,10 +199,18 @@ class ManagerDataUart(DataProcessor):
             print(e)
 
     def send_serial(self, port_name, id_serial, value):
+        """
+        Envia datos por puerto serial seleccionado
+        
+        :param port_name: puerto COM a utilizar
+        :param id_serial: ID de servicio solicitado a Arduino (ej.:I2C)
+        :param value: comando a enviar 
+        """
         try:
-            # Estructuro dato a enviar a formato CSV
-            buf = f"{id_serial},{value:.02f}"
-            #print(f"Enviar a {port_name}: {buf}")
+            #### Estructuro dato a enviar a formato CSV
+            #### buf = f"{id_serial},{value:.02f}"
+            buf = f"{id_serial},{value}"
+            print(f"Enviar a {port_name}: {buf}")
             # Envio datos por serial
             self.ser[port_name].write(buf.encode())
             time.sleep(0.01)
