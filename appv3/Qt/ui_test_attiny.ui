@@ -182,7 +182,7 @@
                   </font>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">background-color: rgb(255, 255, 255);</string>
+                  <string notr="true">background-color: rgb(250, 250, 250);</string>
                  </property>
                  <property name="frameShape">
                   <enum>QFrame::Shape::Box</enum>
@@ -249,7 +249,7 @@
                  </attribute>
                  <column>
                   <property name="text">
-                   <string>Time[s]</string>
+                   <string>#</string>
                   </property>
                   <property name="font">
                    <font>
@@ -257,21 +257,13 @@
                     <bold>true</bold>
                    </font>
                   </property>
-                  <property name="background">
-                   <color>
-                    <red>255</red>
-                    <green>255</green>
-                    <blue>255</blue>
-                   </color>
-                  </property>
                  </column>
                  <column>
                   <property name="text">
-                   <string>#</string>
+                   <string>Seg.</string>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>10</pointsize>
                     <bold>true</bold>
                    </font>
                   </property>
@@ -289,7 +281,7 @@
                  </column>
                  <column>
                   <property name="text">
-                   <string>CMP</string>
+                   <string>CPS</string>
                   </property>
                   <property name="font">
                    <font>
@@ -328,7 +320,7 @@
                 </font>
                </property>
                <property name="styleSheet">
-                <string notr="true">background-color: rgb(255, 255, 255);</string>
+                <string notr="true">background-color: rgb(250, 250, 250);</string>
                </property>
                <property name="frameShape">
                 <enum>QFrame::Shape::Box</enum>
@@ -400,6 +392,17 @@
                </column>
                <column>
                 <property name="text">
+                 <string>Min</string>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <bold>true</bold>
+                 </font>
+                </property>
+               </column>
+               <column>
+                <property name="text">
                  <string>Datetime</string>
                 </property>
                 <property name="font">
@@ -411,18 +414,7 @@
                </column>
                <column>
                 <property name="text">
-                 <string>Time</string>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                  <bold>true</bold>
-                 </font>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>CPS</string>
+                 <string>CPM</string>
                 </property>
                 <property name="font">
                  <font>

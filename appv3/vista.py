@@ -47,7 +47,7 @@ class Graph_bar(FigureCanvas):
         self.grid_lines_h = []
 
         self.fig, self.ax = plt.subplots(1, dpi=82, figsize=(12,12), sharey=True, facecolor="none")
-        self.fig.subplots_adjust(left=.16, bottom=.15, right=.95, top=.99) #Ajuste de escala de grafica
+        self.fig.subplots_adjust(left=.16, bottom=.15, right=.95, top=.90) #Ajuste de escala de grafica
         super().__init__(self.fig)
 
         self.set_graph_style()
@@ -114,6 +114,7 @@ class Graph_bar(FigureCanvas):
 
         # Establece nombres de ejes y tamanio
         matplotlib.rcParams['font.size'] = 10
+        self.ax.set_title("CPS") #####VER-----
         self.ax.set_xlabel("Time[s]", labelpad=1)
         self.ax.set_ylabel("Count Pulse", labelpad=1)
         self.ax.tick_params(axis='both', which='both', labelsize=7)
@@ -161,7 +162,7 @@ class Graph_line(FigureCanvas):
         self.grid_lines_h = []
 
         self.fig, self.ax = plt.subplots(1, dpi=82, figsize=(12,12), sharey=True, facecolor="none")
-        self.fig.subplots_adjust(left=.16, bottom=.15, right=.95, top=.99) #Ajuste de escala de grafica
+        self.fig.subplots_adjust(left=.16, bottom=.15, right=.95, top=.90) #Ajuste de escala de grafica
         super().__init__(self.fig)
 
         self.set_graph_style()
@@ -218,8 +219,9 @@ class Graph_line(FigureCanvas):
 
         # Establece nombres de ejes y tamanio
         matplotlib.rcParams['font.size'] = 10
-        self.ax.set_xlabel("Intervalos", labelpad=1)
-        self.ax.set_ylabel("CPS", labelpad=1)
+        self.ax.set_title("CPM")
+        self.ax.set_xlabel("Time[min]", labelpad=1)
+        self.ax.set_ylabel("Count Pulse", labelpad=1)
         self.ax.tick_params(axis='both', which='both', labelsize=7)
    
         # Establecer límites del eje X e Y
@@ -277,11 +279,17 @@ class MainWindow(QMainWindow):
         # Ajuste de ancho de columna segun contenido
         self.ui.table_cpm.resizeColumnsToContents()
         self.ui.table_cps.resizeColumnsToContents()
-        self.ui.table_cpm.setColumnWidth(1, 85)  # Tamaño para la segunda columna
-        self.ui.table_cpm.setColumnWidth(2, 140)  # Tamaño para la tervera columna
-        self.ui.table_cps.setColumnWidth(0, 85)  # Tamaño para la primera columna
-        self.ui.table_cps.setColumnWidth(1, 140)  # Tamaño para la segunda columna
-        #self.ui.table_cps.setColumnWidth(2, 60)  # Tamaño para la tercera columna
+        
+        
+        self.ui.table_cpm.setColumnWidth(0, 10)  # Tamaño para la primera columna
+        self.ui.table_cpm.setColumnWidth(1, 10)  # Tamaño para la segunda columna
+        self.ui.table_cpm.setColumnWidth(2, 140)  # Tamaño para la tercera columna
+        self.ui.table_cpm.setColumnWidth(3, 40)  # Tamaño para la cuarta columna
+
+        self.ui.table_cps.setColumnWidth(0, 10)  # Tamaño para la primera columna
+        self.ui.table_cps.setColumnWidth(1, 10)  # Tamaño para la segunda columna
+        self.ui.table_cps.setColumnWidth(2, 140)  # Tamaño para la tercera columna
+        self.ui.table_cps.setColumnWidth(3, 40)  # Tamaño para la cuarta columna
         
         # Ajuste de alto de fila segun contenido
         self.ui.table_cpm.resizeRowsToContents()
