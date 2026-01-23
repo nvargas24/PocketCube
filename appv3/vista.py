@@ -8,6 +8,7 @@ __email__ = "nahuvargas24@gmail.com"
 __copyright__ = "Copyright 2024"
 __version__ = "0.0.1"
 
+# Librerias para graficos
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QApplication, QDialog
@@ -16,23 +17,23 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import matplotlib
 
-from modelo import *
-
 from Qt.ui_test_attiny import *
 
+# Librerias propias
+from modelo import *
+
+# Extraccion de datetime
 TIME_MS_PC = 1
 DATE_PC = 0 
 
+# Solcitud a cmd de servicio a Arduino
 NO_CMD = 0
 CMD_I2C = 1
-
+# Comando especifico del servicio solicitado
 CPM = 1
 CPS_NOW = 2
 TIME = 3
 CPS_NOW_ACCUM = 4
-
-#--- ID
-MEAS1 = 1
 
 class Graph_bar(FigureCanvas):
     def __init__(self):
