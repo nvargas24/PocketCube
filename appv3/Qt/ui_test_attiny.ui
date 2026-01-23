@@ -129,7 +129,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="lcd_date_rtc">
+          <widget class="QLabel" name="lcd_date_pc">
            <property name="font">
             <font>
              <family>Courier</family>

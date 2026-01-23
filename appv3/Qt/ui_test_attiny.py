@@ -88,15 +88,15 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addWidget(self.lcd_time_pc)
 
-        self.lcd_date_rtc = QLabel(self.verticalLayoutWidget_9)
-        self.lcd_date_rtc.setObjectName(u"lcd_date_rtc")
+        self.lcd_date_pc = QLabel(self.verticalLayoutWidget_9)
+        self.lcd_date_pc.setObjectName(u"lcd_date_pc")
         font1 = QFont()
         font1.setFamilies([u"Courier"])
         font1.setBold(True)
-        self.lcd_date_rtc.setFont(font1)
-        self.lcd_date_rtc.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lcd_date_pc.setFont(font1)
+        self.lcd_date_pc.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.verticalLayout_5.addWidget(self.lcd_date_rtc)
+        self.verticalLayout_5.addWidget(self.lcd_date_pc)
 
         self.verticalLayout_5.setStretch(0, 6)
         self.verticalLayout_5.setStretch(1, 1)
@@ -471,7 +471,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.img_logo1.setText("")
         self.img_logo2.setText("")
-        self.lcd_date_rtc.setText("")
+        self.lcd_date_pc.setText("")
         ___qtablewidgetitem = self.table_cpm.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Time[s]", None));
         ___qtablewidgetitem1 = self.table_cpm.horizontalHeaderItem(1)
