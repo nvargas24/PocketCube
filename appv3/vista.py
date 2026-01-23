@@ -20,6 +20,17 @@ from modelo import *
 
 from Qt.ui_test_attiny import *
 
+TIME_MS_PC = 1
+DATE_PC = 0 
+
+NO_CMD = 0
+CMD_I2C = 1
+
+CPM = 1
+CPS_NOW = 2
+TIME = 3
+CPS_NOW_ACCUM = 4
+
 #--- ID
 MEAS1 = 1
 
@@ -237,7 +248,6 @@ class Graph_line(FigureCanvas):
         self.ax.tick_params(axis='x', colors='0.4')  # Cambia el color de los valores en el eje x
         self.ax.tick_params(axis='y', colors='0.4') # Cambia el color de los valores en el eje y
 
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -284,6 +294,7 @@ class MainWindow(QMainWindow):
         list_ports = self.obj_data_uart.list_port_com()
         list_ports.insert(0, " ")
 
+        print(f"Puertos COM disponibles: {list_ports}")
         self.ui.cbox_in_serial.addItems(list_ports)
 
         # Carga de graficos
@@ -297,18 +308,28 @@ class MainWindow(QMainWindow):
         self.ui.lcd_time_pc.display(f"{0:02d}:{0:02d}:{0:02d}.{0:03d}")
         self.ui.lcd_time_duration.display(f"{0:02d}:{0:02d}:{0:02d}")
 
+        # Creo QTimer para actualizar datos cada milisegundo
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_data)
+
+        ## Contadores para segundos y ms una vez iniciado el QTIMER
+        self.count1ms = 0
+        self.count1s = 0
+
         # Callback de botones
         self.ui.btn_init.clicked.connect(self.init)
         self.ui.btn_stop.clicked.connect(self.stop)
         self.ui.btn_export.clicked.connect(self.create_csv)
-        #self.ui.btn_reset.clicked.connect(self.reset_widget)
 
-
+        self.ui.btn_accum_CPS.clicked.connect(lambda: self.manual_request("CPS"))
+        self.ui.btn_last_CPM.clicked.connect(lambda: self.manual_request("CPM"))
+        self.ui.btn_time_s.clicked.connect(lambda: self.manual_request("TIME_S"))
+    
     def load_row_table(self, row_data, table):
         if table=="cp":
-            table = self.ui.table_cp
+            table = self.ui.table_cpm
         elif table=="cps":
-            table = self.ui.table_dosis
+            table = self.ui.table_cps
 
         current_row = table.rowCount()
         table.insertRow(current_row)
@@ -320,6 +341,21 @@ class MainWindow(QMainWindow):
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             table.setItem(current_row, column, item)
 
+    def update_data(self):
+        """
+        Actualiza datos en widgets cada 1 ms 
+        OBS.: Se dispara en 'self.init' y se finaliza con 'self.stop'(donde se resetea todos los widgets)
+        """
+        #--- Contador de segundos
+        self.count1ms=+1
+        if self.count1ms >= 1000:
+            self.count1s=+1
+            self.count1ms = 0 
+            
+        #---- Reloj de PC
+        self.ui.lcd_time_pc.display(f"{self.obj_data_processor.datetime_pc()[TIME_MS_PC]}")
+        self.ui.lcd_date_pc.setText(f"{self.obj_data_processor.datetime_pc()[DATE_PC]}")
+
 
     def init(self):
         # Asigno puertos
@@ -327,22 +363,22 @@ class MainWindow(QMainWindow):
         port_master = self.obj_data_processor.filter_port(port_m) # Master
         
         # Inicializo puerto serial
-        self.obj_data_uart.init_serial(port_master, "Master")
+        self.obj_data_uart.init_serial(port_master, "Master") #Master es el Arduino
 
-        # Configuro limites de progressbar segun interval
-        self.ui.pbar_interval.setMaximum(int(self.dict_config["interval_time"]))
-        self.ui.pbar_interval.reset()
+        # Inicio QTimer
+        self.timer.start(1)  # Intervalo de 1 milisegundo
 
         # habilito btn
         self.ui.btn_stop.setEnabled(True)
         self.ui.btn_init.setEnabled(False)
 
     def stop(self):
+        self.reset_widget()
+
         self.obj_data_uart.ser["Master"].close()
 
         self.ui.btn_stop.setEnabled(False)
-        self.ui.btn_reset.setEnabled(True)
-        self.ui.btn_csv.setEnabled(True)
+        self.ui.btn_export.setEnabled(True)
 
     def create_csv(self):
         # Exporto CSV
@@ -353,6 +389,18 @@ class MainWindow(QMainWindow):
         self.obj_file.clear_df(self.obj_file.df_acumulado_cp)
         self.obj_file.clear_df(self.obj_file.df_acumulado_cps)
 
+    def manual_request(self, mode):
+        """
+        Envia solicitud manual por uart a Arduino
+        """
+        if mode == "CPS":
+            self.obj_data_uart.send_serial("Master", CMD_I2C, CPS_NOW_ACCUM)
+        elif mode == "CPM":
+            self.obj_data_uart.send_serial("Master", CMD_I2C, CPM)
+        elif mode == "TIME_S":
+            self.obj_data_uart.send_serial("Master", CMD_I2C, TIME)
+            
+
     def exit(self):
         QApplication.quit()  # Cierra la aplicación
 
@@ -361,10 +409,10 @@ class MainWindow(QMainWindow):
         Resetea los widgets de la app
         """
         # Limpio tablas
-        self.ui.table_cp.clearContents()
-        self.ui.table_dosis.clearContents()
-        self.ui.table_cp.setRowCount(0)
-        self.ui.table_dosis.setRowCount(0)
+        self.ui.table_cpm.clearContents()
+        self.ui.table_cps.clearContents()
+        self.ui.table_cpm.setRowCount(0)
+        self.ui.table_cps.setRowCount(0)
 
         # Limpio graficos
         self.graph1.x_data.clear()
@@ -372,12 +420,8 @@ class MainWindow(QMainWindow):
         self.graph2.x_data.clear()
         self.graph2.y_data.clear()
 
-        # Reseteo progressbar
-        self.ui.pbar_interval.reset()
-
         # Reseteo contador de pulsos
         self.cont_meas1 = 0
 
-        self.ui.btn_reset.setEnabled(False)
-        self.ui.btn_csv.setEnabled(False)
+        self.ui.btn_export.setEnabled(False)
         self.ui.btn_init.setEnabled(True)
