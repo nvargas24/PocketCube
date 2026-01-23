@@ -52,7 +52,7 @@ void loop()
   /* Serial */
   ///////// estructura :: #1, #2   : id, value /////////
   requestFromAppUart(&serial_id, &value); // Captura instruccion por UART para que realice el Arduino
-  delay(100);
+  delay(10);
 
   if(serial_id == CMD_I2C){
     Serial.print("----> Solcitud I2C : ");

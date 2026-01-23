@@ -127,7 +127,7 @@ void sendDataMaster(char *message) {
   // Envía cada carácter del mensaje
   for (int i = 0; message[i] != '\0'; i++) {
     TinyWireS.send(message[i]);
-    delay(100); // Delay entre envíos para estabilidad
+    delay(10); // Delay entre envíos para estabilidad
   }
 }
 
