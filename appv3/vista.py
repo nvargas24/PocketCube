@@ -301,7 +301,7 @@ class MainWindow(QMainWindow):
 
         # Carga de puertos disponibles en combobox
         list_ports = self.obj_data_uart.list_port_com()
-        list_ports.insert(0, " ")
+        #list_ports.insert(0, " ")
 
         print(f"Puertos COM disponibles: {list_ports}")
         self.ui.cbox_in_serial.addItems(list_ports)
@@ -370,7 +370,6 @@ class MainWindow(QMainWindow):
         if self.duration_test_seconds <= 0:
             self.stop()
 
-
         #--- Acciones a realizar cada 1 segundo
         if self.count1s:
             ##---- Reloj de ensayo
@@ -406,9 +405,16 @@ class MainWindow(QMainWindow):
                                       time_duration_test.second()
                                       )
 
-        # Habilito btn
+        # Des/habilito btn
         self.ui.btn_stop.setEnabled(True)
         self.ui.btn_init.setEnabled(False)
+        self.ui.btn_export.setEnabled(False)
+        self.ui.btn_accum_CPS.setEnabled(True)
+        self.ui.btn_last_CPM.setEnabled(True)
+        self.ui.btn_time_s.setEnabled(True)
+
+        self.ui.cbox_in_serial.setEnabled(False)
+        self.ui.time_test.setEnabled(False)
 
         # Inicio QTimer
         self.timer.start(1)  # Intervalo de 1 milisegundo
@@ -470,3 +476,10 @@ class MainWindow(QMainWindow):
 
         self.ui.btn_export.setEnabled(False)
         self.ui.btn_init.setEnabled(True)
+        self.ui.btn_accum_CPS.setEnabled(False)
+        self.ui.btn_last_CPM.setEnabled(False)
+        self.ui.btn_time_s.setEnabled(False)
+
+        self.ui.cbox_in_serial.setEnabled(True)
+        self.ui.txt_rta_attiny.clear()
+        self.ui.time_test.setEnabled(True)
