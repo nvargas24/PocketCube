@@ -34,6 +34,12 @@ CPM = 1
 CPS_NOW = 2
 TIME = 3
 CPS_NOW_ACCUM = 4
+CPS_TIME = 5 # id , [TIME] [CPS_NOW]  
+CPM_TIME = 6 # id , [TIME] [CPM]
+
+SEND_CPS_APP = 8 # id cargar en datos CPS
+SEND_CPM_APP = 9 # id cargar en datos CPM
+SEND_LINE_APP = 7 # id para cargar qline de solictudes manuales
 
 class Graph_bar(FigureCanvas):
     def __init__(self):
@@ -325,6 +331,9 @@ class MainWindow(QMainWindow):
         self.count1ms = 0
         self.count1s = 0
 
+        # Bandera para controlar espera de respuesta de Arduino   
+        self.waiting_response = False  
+        
         # Callback de botones
         self.ui.btn_init.clicked.connect(self.init)
         self.ui.btn_stop.clicked.connect(self.stop)
@@ -355,11 +364,13 @@ class MainWindow(QMainWindow):
         Actualiza datos en widgets cada 1 ms 
         OBS.: Se dispara en 'self.init' y se finaliza con 'self.stop'(donde se resetea todos los widgets)
         """
-        #--- Contador de segundos
-        self.count1s = 0
+        id_serial = None
+        value_serial = None
+        request_serial = None
+
+        #--- Reseteo contador de ms cada 1 segundo
         self.count1ms += 1
         if self.count1ms >= 1000:
-            self.count1s += 1
             self.count1ms = 0 
             
         #---- Reloj de PC
@@ -370,8 +381,35 @@ class MainWindow(QMainWindow):
         if self.duration_test_seconds <= 0:
             self.stop()
 
-        #--- Acciones a realizar cada 1 segundo
-        if self.count1s:
+        #--- Se analiza BUFFER UART por si hay datos
+        if self.count1ms % 100 == 0:
+            print(f"+++ Escucha habilitado ---- flag: {self.waiting_response}")
+            id_serial, value_serial, request_serial = self.obj_data_uart.reciv_serial("Master")
+            print(f"===========ID serial recibido: {id_serial}, valor: {value_serial}, request:{request_serial}")  
+            #self.waiting_response = False
+            #print("-------- Despues de habilitar escuchar")
+
+        #--- Identifico si se recibe algo de algun ID serial    
+        if id_serial != None:
+            print(f"****** Identificado para cargar en widgets ---- flag: {self.waiting_response}")
+            print(f"Datos serial de {id_serial}:{value_serial}")
+            self.waiting_response = False  # Reseteo bandera de espera de respuesta
+            if id_serial == SEND_LINE_APP:
+                self.ui.txt_rta_attiny.setText(f"{value_serial}") # carga en widget
+            elif id_serial == CPM_TIME:
+                print(f"Cargar a tabla CPM +++++:{request_serial}")
+            elif id_serial == CPS_TIME:
+                print(f"Cargar a tabla CPS +++++:{request_serial}")
+
+        #--- Solicitudes para tablas CPM y CPS cada 100ms
+        if not self.waiting_response: # Si no estoy esperando respuesta de arduino
+            if self.count1ms == 500:
+                self.manual_request("CPS_TIME")
+            if self.count1ms == 900:
+                self.manual_request("CPM_TIME")
+            
+
+        if self.count1ms == 0: #--- Acciones a realizar cada 1 segundo
             ##---- Reloj de ensayo
             self.duration_test_seconds -= 1
 
@@ -381,13 +419,7 @@ class MainWindow(QMainWindow):
 
             self.ui.lcd_time_duration.display(f"{h_d_test:02d}:{min_d_test:02d}:{s_d_test:02d}")
 
-            #---- Captura de datos por serial
-            _,_,self.request_serial = self.obj_data_uart.reciv_serial("Master")
-            if "---->" in self.request_serial:
-                data_serial = self.request_serial.split("---->")[1].strip()
-                print(f"Datos serial:{data_serial}")
 
-                self.ui.txt_rta_attiny.setText(f"{data_serial}") # carga en widget
 
     def init(self):
         # Asigno puertos
@@ -444,13 +476,22 @@ class MainWindow(QMainWindow):
         """
         Envia solicitud manual por uart a Arduino
         """
+        print(f"============= Solicitud de *{mode}* ---- flag: {self.waiting_response}")
         if mode == "CPS":
             self.obj_data_uart.send_serial("Master", CMD_I2C, CPS_NOW_ACCUM)
+            self.waiting_response = True
         elif mode == "CPM":
             self.obj_data_uart.send_serial("Master", CMD_I2C, CPM)
+            self.waiting_response = True
         elif mode == "TIME_S":
             self.obj_data_uart.send_serial("Master", CMD_I2C, TIME)
-            
+            self.waiting_response = True
+        elif mode == "CPS_TIME":
+            self.obj_data_uart.send_serial("Master", CMD_I2C, CPS_TIME)
+            self.waiting_response = True
+        elif mode == "CPM_TIME":
+            self.obj_data_uart.send_serial("Master", CMD_I2C, CPM_TIME)
+            self.waiting_response = True
 
     def exit(self):
         QApplication.quit()  # Cierra la aplicación

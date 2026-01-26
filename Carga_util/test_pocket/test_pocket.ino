@@ -55,7 +55,7 @@ void loop()
   delay(10);
 
   if(serial_id == CMD_I2C){
-    Serial.print("----> Solcitud I2C : ");
+    Serial.print("----> Solicitud I2C : ");
     requestI2C(value);
   }
   else if(serial_id != NO_CMD){

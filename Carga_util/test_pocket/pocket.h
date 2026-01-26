@@ -8,7 +8,9 @@
 #define I2C_SLAVE_ADDR 0x08
 #define MAX_DATA_I2C 33
 
-#define SEND_APP 7
+#define SEND_LINE_APP 7
+#define SEND_CPS_APP 8
+#define SEND_CPM_APP 9
 
 #define NO_CMD 0
 #define CMD_I2C 1

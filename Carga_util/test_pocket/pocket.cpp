@@ -3,6 +3,8 @@
 /****************** Variables globales ***************/ 
 /* I2C */
 char dataRequest[MAX_DATA_I2C]; // Str respuesta de Slave
+char aux[MAX_DATA_I2C]; // para complementar texto a valor
+
 
 /* UART */
 int serial_id = NO_CMD;
@@ -73,10 +75,10 @@ int requestFromSlave()
 /**
  * @brief Enviar data app por UART, limita solo caracteres
  */
-void sendToAppUart(const char* data)
+void sendToAppUart(const int id_widget_app, const char* data)
 {
   // Enviar ID de APP
-  Serial.print(SEND_APP);
+  Serial.print(id_widget_app);
   Serial.print(",");
 
   //Enviar solo la parte válida del mensaje
@@ -119,9 +121,11 @@ void requestI2C(const uint8_t cmd)
     Serial.println("CP acumulado en ultimo minuto"); 
     sendToSlaveC(R_CPM); // Solicitud I2C pin PB3
     delay(10);
-
     requestFromSlave(); // Captura rta de Slave I2C
     filterValue(dataRequest); // Extrae el valor después de la coma
+
+    snprintf(aux, MAX_DATA_I2C,"CP en ultimo min: %s", dataRequest);
+    sendToAppUart(SEND_LINE_APP, aux); // Envia a APP  
     Serial.print("----> CPM: ");
   }
   /* I2C CPS acumulados */
@@ -129,9 +133,11 @@ void requestI2C(const uint8_t cmd)
     Serial.println("CPS en este minuto"); 
     sendToSlaveC(R_CPS_NOW); // Solicitud I2C contador de segundos en ATtiny
     delay(10);
-
     requestFromSlave(); // Captura rta de Slave I2C
     filterValue(dataRequest); // Extrae el valor después de la coma
+
+    snprintf(aux, MAX_DATA_I2C, "CPS en este minuto: %s", dataRequest);
+    sendToAppUart(SEND_LINE_APP, aux); // Envia a APP'
     Serial.print("----> CPS_NOW: ");
   }
   /* I2C CPS acumulados */
@@ -139,9 +145,11 @@ void requestI2C(const uint8_t cmd)
     Serial.println("CPS acumulado actualmente"); 
     sendToSlaveC(R_CPS_NOW_ACUMM); // Solicitud I2C contador de segundos en ATtiny
     delay(10);
-
     requestFromSlave(); // Captura rta de Slave I2C
     filterValue(dataRequest); // Extrae el valor después de la coma
+
+    snprintf(aux, MAX_DATA_I2C,"CPS acumulados: %s", dataRequest);
+    sendToAppUart(SEND_LINE_APP, aux); // Envia a APP
     Serial.print("----> CPS_NOW_ACUMM: ");
   }
   /* I2C segundos transcurridos */
@@ -149,35 +157,37 @@ void requestI2C(const uint8_t cmd)
     Serial.println("tiempo trancurrido"); 
     sendToSlaveC(R_TIME); // Solicitud I2C contador de segundos en ATtiny
     delay(10);
-
     requestFromSlave(); // Captura rta de Slave I2C
     filterValue(dataRequest); // Extrae el valor después de la coma
+
+    snprintf(aux, MAX_DATA_I2C,"Tiempo Attiny (segundos): %s", dataRequest);
+    sendToAppUart(SEND_LINE_APP, aux); // Envia a APP
     Serial.print("----> TIME (segundos): ");
   }
   /* I2C segundos transcurridos + CPS*/
   else if(cmd == CPS_TIME){
-    Serial.println("tiempo trancurrido + CPS"); 
+    Serial.println("CPS + tiempo trancurrido"); 
     sendToSlaveC(R_CPS_TIME); // Solicitud I2C contador de segundos en ATtiny
     delay(10);
-
     requestFromSlave(); // Captura rta de Slave I2C
-    filterValue(dataRequest); // Extrae el valor después de la coma
-     //// obs: se puede crear un filter parecido al de coma  para separar cps y time
-    Serial.print("----> CPS_TIME: ");
-  }
+    filterValue(dataRequest); // Extrae el valor después de la coma      //// obs: se puede crear un filter parecido al de coma  para separar cps y time
 
+    sendToAppUart(SEND_CPS_APP, dataRequest); // Envia a APP
+    Serial.print("----> CPS_TIME: ");
+
+  }
   /* I2C segundos transcurridos + CPM*/
   else if(cmd == CPM_TIME){
-    Serial.println("tiempo trancurrido + CPM"); 
+    Serial.println("CPM + tiempo trancurrido"); 
     sendToSlaveC(R_CPM_TIME); // Solicitud I2C contador de segundos en ATtiny
     delay(10);
-
     requestFromSlave(); // Captura rta de Slave I2C
-    filterValue(dataRequest); // Extrae el valor después de la coma
-     //// obs: se puede crear un filter parecido al de coma  para separar cps y time
+    filterValue(dataRequest); // Extrae el valor después de la coma  //// obs: se puede crear un filter parecido al de coma  para separar cps y time
+     
+    sendToAppUart(SEND_CPM_APP, dataRequest); // Envia a APP 
     Serial.print("----> CPM_TIME: ");
   }
   
   Serial.println(dataRequest); // Envia por terminal
-  sendToAppUart(dataRequest); // Envia a APP
+  
 }
