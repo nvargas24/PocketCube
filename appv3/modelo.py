@@ -122,6 +122,8 @@ class DataProcessor():
 
         return date, time, datetime_now
 
+
+        
 class ManagerFile():
     def __init__(self):
         self.df_acumulado_cp = pd.DataFrame(columns=['Time', 'Intervalo', 'RTC', 'Count Pulse'])
@@ -164,6 +166,11 @@ class ManagerDataUart(DataProcessor):
         self.ser = {
             "Master": None,
             "Slave": None
+        }
+
+        self.register_timeout_serial = {
+            "last": time.time() , 
+            "now": time.time()
         }
 
     def list_port_com(self):
@@ -245,3 +252,21 @@ class ManagerDataUart(DataProcessor):
         event.accept()
 
 
+    ### Para TIMEOUT en caso de no recibir respuesta Serial
+    def register_request_time(self, register):
+        """
+        Registro time que se envia dato para calcular TIMEOUT
+        """
+        self.register_timeout_serial[register] = time.time()
+
+    def flag_timeout(self, timeout):
+        
+        diff_time = time.time() - self.register_timeout_serial["last"] 
+
+        #print(f"=====TIMEOUT : {timeout}  --- DIFF : {diff_time}")
+
+        if diff_time > timeout:
+            print("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+")
+            return True
+        else:
+            return False
