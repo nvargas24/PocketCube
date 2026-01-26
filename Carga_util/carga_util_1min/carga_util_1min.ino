@@ -2,6 +2,7 @@
  * @file attiny85.ino
  * @brief Código para ATtiny85 como carga útil en PocketCube
  * @details Cuenta pulsos en PB3 usando PCINT y responde a solicitudes I2C del Pocket Main
+ *          El conteo de tiempo se realiza con TIMER0 (sin millis)
  * @author Grupo SyCE - PocketCube
  */
 
@@ -9,150 +10,203 @@
 #include <avr/io.h>
 #include <TinyWireS.h>
 
-// Configuración I2C
-#define ADDR_SLAVE_I2C 0x08  // Dirección del esclavo I2C (misma que Pocket Main)
+/* =========================
+   Configuración I2C
+   ========================= */
+#define ADDR_SLAVE_I2C 0x08
 
-// Pines para sensores
-#define PIN_MEAS1 PB3  // Pin PB3 para detectar pulsos de MEAS1 (PCINT3)
+/* =========================
+   Pines
+   ========================= */
+#define PIN_MEAS1 PB3   // PCINT3
 
-// Buffers y constantes
-#define MAX_BUF_I2C 33  // Tamaño máximo del buffer I2C
+/* =========================
+   Buffers
+   ========================= */
+#define MAX_BUF_I2C 33
 
-// IDs de datos (igual que en Pocket Main)
-#define CPM 1   // ID para contador de pulsos acumulado en el ultimo minuto
-#define CPS_NOW 2   // ID para pulsos por segundo acumulado durante ese minuto
-#define TIME 3   // ID para segundos transcurridos
-#define CPS_NOW_ACCUM 4   // ID para pulsos por segundo acumulado durante ese minuto
-#define CPS_TIME 5   // ID para pulsos por segundo y tiempo transcurrido
-#define CPM_TIME 6   // ID para contador de pulsos acumulado en el ultimo minuto    
+/* =========================
+   IDs de datos
+   ========================= */
+#define CPM            1
+#define CPS_NOW        2
+#define TIME           3
+#define CPS_NOW_ACCUM  4
+#define CPS_TIME       5
+#define CPM_TIME       6
 
-// Comando I2C recibidos
-#define STR_CPM '1'
-#define STR_CPS_NOW '2'
-#define STR_TIME '3'
-#define STR_CPS_NOW_ACUMM '4'
-#define STR_CPS_TIME '5'
-#define STR_CPM_TIME '6'  
+/* =========================
+   Comandos I2C
+   ========================= */
+#define STR_CPM             '1'
+#define STR_CPS_NOW         '2'
+#define STR_TIME            '3'
+#define STR_CPS_NOW_ACUMM   '4'
+#define STR_CPS_TIME        '5'
+#define STR_CPM_TIME        '6'
 
-// Variables globales volátiles (usadas en ISR)
-volatile uint16_t pulseCount1 = 0;  // Contador de pulsos en PB3
-volatile uint16_t pulseCount_1min = 0;  // Contador de pulsos acumulado cada 60 segundos
-volatile uint16_t previousPulseCount = 0;  // Contador anterior para calcular pulsos por segundo
-volatile uint16_t currentPulses = 0;  // Pulsos en el último segundo (no acumulado)
-volatile char receivedChar = '\0';  // Carácter recibido por I2C
-volatile bool lastState1 = LOW;     // Estado anterior del pin PB3 para detectar flancos
+/* =========================
+   Variables globales
+   ========================= */
+volatile uint16_t pulseCount1 = 0;
+volatile uint16_t pulseCount_1min = 0;
+volatile uint16_t previousPulseCount = 0;
+volatile uint16_t currentPulses = 0;
+
+volatile bool lastState1 = LOW;
+volatile char receivedChar = '\0';
+
+/* ---- Tiempo por TIMER ---- */
+volatile uint16_t msCounter = 0;
+volatile bool oneSecondFlag = false;
 static uint16_t secondCounter = 0;
 
-// Prototipos de funciones
-void formatSendCmd(char*, int, uint16_t);
-void formatSendCmdLong(char*, int, uint16_t, uint16_t);
+/* =========================
+   Prototipos
+   ========================= */
+void setupTimer0_1s(void);
+void sendDataMaster(char *message);
+void formatSendCmd(char* buf, int id, uint16_t data);
+void formatSendCmdLong(char* buf, int id, uint16_t data, uint16_t data2);
 
+/* =========================
+   SETUP
+   ========================= */
 void setup() {
-  // Inicializa I2C como esclavo en la dirección especificada
   TinyWireS.begin(ADDR_SLAVE_I2C);
-  
-  // Configura PB3 como entrada para detectar pulsos
+
   pinMode(PIN_MEAS1, INPUT);
-  
-  // Configura interrupciones PCINT para PB3
-  GIMSK |= (1 << PCIE);      // Habilita interrupciones por cambio de pin (PCIE)
-  PCMSK |= (1 << PIN_MEAS1); // Habilita PCINT3 para PB3
-  
-  // Habilita interrupciones globales
+
+  /* --- PCINT PB3 --- */
+  GIMSK |= (1 << PCIE);
+  PCMSK |= (1 << PIN_MEAS1);
+
+  setupTimer0_1s();
+
   sei();
 }
 
+/* =========================
+   LOOP
+   ========================= */
 void loop() {
   char dataRequest[MAX_BUF_I2C] = "\0";
-  char dataAux[MAX_BUF_I2C] = "\0";
-  static unsigned long lastSecondTime = 0;
-  unsigned long currentTime = millis();
-  
-  // Polling cada 1 segundo (10000 ms real en ATtiny85)
-  if (currentTime - lastSecondTime >= 10000) {
-    lastSecondTime = currentTime;
-    
-    // Calcula pulsos en el último segundo
+
+  /* ---- Evento de 1 segundo ---- */
+  if (oneSecondFlag) {
+    oneSecondFlag = false;
+
     currentPulses = pulseCount1 - previousPulseCount;
     previousPulseCount = pulseCount1;
-    
-    // Incrementa contador de segundos
+
     secondCounter++;
-    
-    // Cada 60 segundos acumula pulsos
+
     if (secondCounter >= 60) {
-      pulseCount_1min = pulseCount1;  // Asigna valor acumulado
-      pulseCount1 = 0;                // Resetea para nuevo conteo
+      pulseCount_1min = pulseCount1;
+      pulseCount1 = 0;
+      previousPulseCount = 0;
       secondCounter = 0;
-      previousPulseCount = 0;         // Resetea también el contador anterior
     }
   }
-  
-  // Verifica si el master I2C envió datos
+
+  /* ---- Recepción I2C ---- */
   if (TinyWireS.available()) {
-    delay(10);
-    receivedChar = TinyWireS.receive();   
-    
-    if (receivedChar == STR_CPM) {
-      formatSendCmd(dataRequest, CPM, pulseCount_1min);
-      sendDataMaster(dataRequest);
-    } 
-    if (receivedChar == STR_CPS_NOW) {
-      formatSendCmd(dataRequest, CPS_NOW, currentPulses);
-      sendDataMaster(dataRequest);
-    } 
-    if (receivedChar == STR_TIME) {
-      formatSendCmd(dataRequest, TIME, secondCounter);
-      sendDataMaster(dataRequest);
-    } 
-    if (receivedChar == STR_CPS_NOW_ACUMM) {
-      formatSendCmd(dataRequest, CPS_NOW_ACCUM, pulseCount1);
-      sendDataMaster(dataRequest);
+    receivedChar = TinyWireS.receive();
+
+    switch (receivedChar) {
+      case STR_CPM:
+        formatSendCmd(dataRequest, CPM, pulseCount_1min);
+        break;
+
+      case STR_CPS_NOW:
+        formatSendCmd(dataRequest, CPS_NOW, currentPulses);
+        break;
+
+      case STR_TIME:
+        formatSendCmd(dataRequest, TIME, secondCounter);
+        break;
+
+      case STR_CPS_NOW_ACUMM:
+        formatSendCmd(dataRequest, CPS_NOW_ACCUM, pulseCount1);
+        break;
+
+      case STR_CPS_TIME:
+        formatSendCmdLong(dataRequest, CPS_TIME, currentPulses, secondCounter);
+        break;
+
+      case STR_CPM_TIME:
+        formatSendCmdLong(dataRequest, CPM_TIME, pulseCount_1min, secondCounter);
+        break;
+
+      default:
+        return;
     }
-    if (receivedChar == STR_CPS_TIME) {
-      formatSendCmdLong(dataRequest, CPS_TIME, currentPulses, secondCounter);
-      sendDataMaster(dataRequest);
-    }
-    if (receivedChar == STR_CPM_TIME) {
-      formatSendCmdLong(dataRequest, CPM_TIME, pulseCount_1min, secondCounter);
-      sendDataMaster(dataRequest);
-    }
+
+    sendDataMaster(dataRequest);
   }
 }
 
-// ISR para interrupciones PCINT (cambio de estado en pines)
+/* =========================
+   ISR PCINT – Pulsos
+   ========================= */
 ISR(PCINT0_vect) {
-  // Lee el estado actual del pin PB3
   bool currentState1 = bit_is_set(PINB, PIN_MEAS1);
 
-  // Detecta flanco ascendente (LOW a HIGH) para contar pulso
   if (currentState1 && !lastState1) {
-    pulseCount1++; // Incrementa el contador de pulsos
+    pulseCount1++;
   }
 
-  // Actualiza el estado anterior para la próxima interrupción
   lastState1 = currentState1;
 }
 
-// Función para enviar datos al master I2C
-// TinyWireS.send() envía byte a byte
-void sendDataMaster(char *message) {
-  // Envía cada carácter del mensaje
-  for (int i = 0; message[i] != '\0'; i++) {
-    TinyWireS.send(message[i]);
-    delay(10); // Delay entre envíos para estabilidad
+/* =========================
+   ISR TIMER0 – 1 ms
+   ========================= */
+ISR(TIMER0_COMPA_vect) {
+  msCounter++;
+
+  if (msCounter >= 1000) {
+    msCounter = 0;
+    oneSecondFlag = true;
   }
 }
 
-//------ Funciones para formatear el comando de respuesta
-// Formato: "ID,valor" (ej: "1,42")
-void formatSendCmd(char* buf, int id, uint16_t data)
-{
+/* =========================
+   Configuración TIMER0
+   ========================= */
+void setupTimer0_1s(void) {
+  cli();
+
+  TCCR0A = (1 << WGM01);                   // CTC
+  TCCR0B = (1 << CS01) | (1 << CS00);      // Prescaler 64
+
+  /* ATtiny85 @ 8MHz:
+     8MHz / 64 = 125kHz
+     125kHz / 125 = 1kHz -> 1ms
+  */
+  OCR0A = 124;
+
+  TIMSK |= (1 << OCIE0A);
+
+  sei();
+}
+
+/* =========================
+   Envío I2C
+   ========================= */
+void sendDataMaster(char *message) {
+  for (uint8_t i = 0; message[i] != '\0'; i++) {
+    TinyWireS.send(message[i]);
+  }
+}
+
+/* =========================
+   Formateo de mensajes
+   ========================= */
+void formatSendCmd(char* buf, int id, uint16_t data) {
   snprintf(buf, MAX_BUF_I2C, "%d,%u", id, data);
 }
 
-// Formato: "ID,valor valor2" (ej: "1,42 2")
-void formatSendCmdLong(char* buf, int id, uint16_t data, uint16_t data2)
-{
+void formatSendCmdLong(char* buf, int id, uint16_t data, uint16_t data2) {
   snprintf(buf, MAX_BUF_I2C, "%d,%u %u", id, data, data2);
 }
