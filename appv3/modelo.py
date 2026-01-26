@@ -266,7 +266,6 @@ class ManagerDataUart(DataProcessor):
         #print(f"=====TIMEOUT : {timeout}  --- DIFF : {diff_time}")
 
         if diff_time > timeout:
-            print("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+")
             return True
         else:
             return False

@@ -22,7 +22,8 @@ from Qt.ui_test_attiny import *
 # Librerias propias
 from modelo import *
 
-TIMEOUT = 3.0 # Tiempo de espera para proxima solicitud - si no se recibe respuesta
+# Tiempo de espera para proxima solicitud - si no se recibe respuesta
+TIMEOUT = 3.0 
 
 # Extraccion de datetime
 TIME_MS_PC = 1
@@ -36,9 +37,10 @@ CPM = 1
 CPS_NOW = 2
 TIME = 3
 CPS_NOW_ACCUM = 4
-CPS_TIME = 5 # id , [TIME] [CPS_NOW]  
-CPM_TIME = 6 # id , [TIME] [CPM]
+CPS_TIME = 5 # id , [CPS_NOW] [TIME]   
+CPM_TIME = 6 # id , [CPM] [TIME] 
 
+# Identifican widget a cargar datos
 SEND_CPS_APP = 8 # id cargar en datos CPS
 SEND_CPM_APP = 9 # id cargar en datos CPM
 SEND_LINE_APP = 7 # id para cargar qline de solictudes manuales
@@ -375,7 +377,7 @@ class MainWindow(QMainWindow):
         if self.count1ms >= 1000:
             self.count1ms = 0 
         
-        # Libera solicitud UART para volver a pedir si supera TIMEOUT
+        ### --- Libera solicitud UART para volver a pedir si supera TIMEOUT
         if self.obj_data_uart.flag_timeout(TIMEOUT):
             self.waiting_response = False
        
@@ -391,7 +393,7 @@ class MainWindow(QMainWindow):
         if self.count1ms % 100 == 0:
             #print(f"+++ Escucha habilitado ---- flag: {self.waiting_response}")
             id_serial, value_serial, request_serial = self.obj_data_uart.reciv_serial("Master")
-            ##print(f"===========ID serial recibido: {id_serial}, valor: {value_serial}, request:{request_serial}")  
+            print(f"===========ID serial recibido: {id_serial}, valor: {value_serial}, request:{request_serial}")  
             #self.waiting_response = False
             #print("-------- Despues de habilitar escuchar")
 
@@ -402,10 +404,19 @@ class MainWindow(QMainWindow):
             self.waiting_response = False  # Reseteo bandera de espera de respuesta
             if id_serial == SEND_LINE_APP:
                 self.ui.txt_rta_attiny.setText(f"{value_serial}") # carga en widget
-            elif id_serial == CPM_TIME:
-                print(f"Cargar a tabla CPM +++++:{request_serial}")
-            elif id_serial == CPS_TIME:
-                print(f"Cargar a tabla CPS +++++:{request_serial}")
+            elif id_serial == SEND_CPM_APP:
+                cpm = value_serial.split(" ")[0]
+                time = value_serial.split(" ")[1]
+                print("***********test load CPM+TIME")
+                print(f"Cargar a tabla CPM {cpm}")
+                print(f"Cargar a tabla TIME {time}")
+                
+            elif id_serial == SEND_CPS_APP:
+                cps = value_serial.split(" ")[0]
+                time = value_serial.split(" ")[1]
+                print("***********test load CPS+TIME")
+                print(f"Cargar a tabla CPM {cps}")
+                print(f"Cargar a tabla TIME {time}")
 
         #--- Solicitudes para tablas CPM y CPS cada 100ms
         if not self.waiting_response: # Si no estoy esperando respuesta de arduino
