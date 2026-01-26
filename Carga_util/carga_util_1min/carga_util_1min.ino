@@ -23,12 +23,16 @@
 #define CPS_NOW 2   // ID para pulsos por segundo acumulado durante ese minuto
 #define TIME 3   // ID para segundos transcurridos
 #define CPS_NOW_ACCUM 4   // ID para pulsos por segundo acumulado durante ese minuto
+#define CPS_TIME 5   // ID para pulsos por segundo y tiempo transcurrido
+#define CPM_TIME 6   // ID para contador de pulsos acumulado en el ultimo minuto    
 
 // Comando I2C recibidos
 #define STR_CPM '1'
 #define STR_CPS_NOW '2'
 #define STR_TIME '3'
 #define STR_CPS_NOW_ACUMM '4'
+#define STR_CPS_TIME '5'
+#define STR_CPM_TIME '6'  
 
 // Variables globales volátiles (usadas en ISR)
 volatile uint16_t pulseCount1 = 0;  // Contador de pulsos en PB3
@@ -41,6 +45,7 @@ static uint16_t secondCounter = 0;
 
 // Prototipos de funciones
 void formatSendCmd(char*, int, uint16_t);
+void formatSendCmdLong(char*, int, uint16_t, uint16_t);
 
 void setup() {
   // Inicializa I2C como esclavo en la dirección especificada
@@ -59,6 +64,7 @@ void setup() {
 
 void loop() {
   char dataRequest[MAX_BUF_I2C] = "\0";
+  char dataAux[MAX_BUF_I2C] = "\0";
   static unsigned long lastSecondTime = 0;
   unsigned long currentTime = millis();
   
@@ -103,7 +109,14 @@ void loop() {
       formatSendCmd(dataRequest, CPS_NOW_ACCUM, pulseCount1);
       sendDataMaster(dataRequest);
     }
-
+    if (receivedChar == STR_CPS_TIME) {
+      formatSendCmdLong(dataRequest, CPS_TIME, currentPulses, secondCounter);
+      sendDataMaster(dataRequest);
+    }
+    if (receivedChar == STR_CPM_TIME) {
+      formatSendCmdLong(dataRequest, CPM_TIME, pulseCount_1min, secondCounter);
+      sendDataMaster(dataRequest);
+    }
   }
 }
 
@@ -131,9 +144,15 @@ void sendDataMaster(char *message) {
   }
 }
 
-// Función para formatear el comando de respuesta
+//------ Funciones para formatear el comando de respuesta
 // Formato: "ID,valor" (ej: "1,42")
 void formatSendCmd(char* buf, int id, uint16_t data)
 {
   snprintf(buf, MAX_BUF_I2C, "%d,%u", id, data);
+}
+
+// Formato: "ID,valor valor2" (ej: "1,42 2")
+void formatSendCmdLong(char* buf, int id, uint16_t data, uint16_t data2)
+{
+  snprintf(buf, MAX_BUF_I2C, "%d,%u %u", id, data, data2);
 }

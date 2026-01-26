@@ -75,6 +75,10 @@ int requestFromSlave()
  */
 void sendToAppUart(const char* data)
 {
+  // Enviar ID de APP
+  Serial.print(SEND_APP);
+  Serial.print(",");
+
   //Enviar solo la parte válida del mensaje
   for (int i = 0; i < strlen(data); i++) {
     if (data[i] >= 32 && data[i] <= 126) { // Solo caracteres imprimibles// Cod ASCII
@@ -114,7 +118,7 @@ void requestI2C(const uint8_t cmd)
   if(cmd == CPM){
     Serial.println("CP acumulado en ultimo minuto"); 
     sendToSlaveC(R_CPM); // Solicitud I2C pin PB3
-    delay(100);
+    delay(10);
 
     requestFromSlave(); // Captura rta de Slave I2C
     filterValue(dataRequest); // Extrae el valor después de la coma
@@ -124,7 +128,7 @@ void requestI2C(const uint8_t cmd)
   else if(cmd == CPS_NOW){
     Serial.println("CPS en este minuto"); 
     sendToSlaveC(R_CPS_NOW); // Solicitud I2C contador de segundos en ATtiny
-    delay(100);
+    delay(10);
 
     requestFromSlave(); // Captura rta de Slave I2C
     filterValue(dataRequest); // Extrae el valor después de la coma
@@ -134,7 +138,7 @@ void requestI2C(const uint8_t cmd)
   else if(cmd == CPS_NOW_ACCUM){
     Serial.println("CPS acumulado actualmente"); 
     sendToSlaveC(R_CPS_NOW_ACUMM); // Solicitud I2C contador de segundos en ATtiny
-    delay(100);
+    delay(10);
 
     requestFromSlave(); // Captura rta de Slave I2C
     filterValue(dataRequest); // Extrae el valor después de la coma
@@ -144,12 +148,36 @@ void requestI2C(const uint8_t cmd)
   else if(cmd == TIME){
     Serial.println("tiempo trancurrido"); 
     sendToSlaveC(R_TIME); // Solicitud I2C contador de segundos en ATtiny
-    delay(100);
+    delay(10);
 
     requestFromSlave(); // Captura rta de Slave I2C
     filterValue(dataRequest); // Extrae el valor después de la coma
     Serial.print("----> TIME (segundos): ");
   }
+  /* I2C segundos transcurridos + CPS*/
+  else if(cmd == CPS_TIME){
+    Serial.println("tiempo trancurrido + CPS"); 
+    sendToSlaveC(R_CPS_TIME); // Solicitud I2C contador de segundos en ATtiny
+    delay(10);
+
+    requestFromSlave(); // Captura rta de Slave I2C
+    filterValue(dataRequest); // Extrae el valor después de la coma
+     //// obs: se puede crear un filter parecido al de coma  para separar cps y time
+    Serial.print("----> CPS_TIME: ");
+  }
+
+  /* I2C segundos transcurridos + CPM*/
+  else if(cmd == CPM_TIME){
+    Serial.println("tiempo trancurrido + CPM"); 
+    sendToSlaveC(R_CPM_TIME); // Solicitud I2C contador de segundos en ATtiny
+    delay(10);
+
+    requestFromSlave(); // Captura rta de Slave I2C
+    filterValue(dataRequest); // Extrae el valor después de la coma
+     //// obs: se puede crear un filter parecido al de coma  para separar cps y time
+    Serial.print("----> CPM_TIME: ");
+  }
   
-  Serial.println(dataRequest);
+  Serial.println(dataRequest); // Envia por terminal
+  sendToAppUart(dataRequest); // Envia a APP
 }
