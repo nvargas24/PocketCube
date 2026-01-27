@@ -162,7 +162,13 @@ class Graph_bar(FigureCanvas):
         self.ax.tick_params(axis='y', colors='0.4') # Cambia el color de los valores en el eje y
 
 class Graph_line(FigureCanvas):
-    def __init__(self):
+    def __init__(self, title, label_x, label_y):
+
+        # Texto para grafico
+        self.title = title
+        self.label_x = label_x
+        self.label_y = label_y
+
         self.xlim_init = 0
         self.xlim_fin = 30
         self.ylim_init = 0
@@ -176,6 +182,7 @@ class Graph_line(FigureCanvas):
         self.fig.subplots_adjust(left=.16, bottom=.15, right=.95, top=.90) #Ajuste de escala de grafica
         super().__init__(self.fig)
 
+
         self.set_graph_style()
 
         # Listas para cargar datos
@@ -184,6 +191,8 @@ class Graph_line(FigureCanvas):
 
         # Crear la línea inicial
         self.line, = self.ax.plot([], [], picker=5)
+
+
 
     def update_graph(self, new_y_value):
         """
@@ -232,9 +241,9 @@ class Graph_line(FigureCanvas):
         matplotlib.rcParams['font.size'] = 10
 
         # Títulos y etiquetas
-        self.ax.set_title("CPM")
-        self.ax.set_xlabel("Time[min]", labelpad=1)
-        self.ax.set_ylabel("Count Pulse", labelpad=1)
+        self.ax.set_title(self.title)
+        self.ax.set_xlabel(self.label_x, labelpad=1)
+        self.ax.set_ylabel(self.label_y, labelpad=1)
         self.ax.tick_params(axis='both', which='both', labelsize=7)
 
         # Límites
@@ -350,8 +359,8 @@ class MainWindow(QMainWindow):
         self.ui.cbox_in_serial.addItems(list_ports)
 
         # Carga de graficos
-        self.graph1 = Graph_bar()
-        self.graph2 = Graph_line()
+        self.graph1 = Graph_line("CPS", "Time[s]", "Count Pulse")
+        self.graph2 = Graph_line("CPM", "Time[min]", "Count Pulse")
 
         self.ui.graph_out1.addWidget(self.graph1)
         self.ui.graph_out2.addWidget(self.graph2)
@@ -445,6 +454,7 @@ class MainWindow(QMainWindow):
             if id_serial == SEND_LINE_APP:
                 self.ui.txt_rta_attiny.setText(f"{value_serial}") # carga en widget
             elif id_serial == SEND_CPM_APP:
+                # ---- Carga en tabla CPM
                 self.count_data_reciv['CPM'] += 1
                 cpm = value_serial.split(" ")[0]
                 time = value_serial.split(" ")[1]
@@ -456,11 +466,14 @@ class MainWindow(QMainWindow):
                     f"{datetime_pc}",
                     f"{cpm}"
                 ]
-
-                self.load_row_table(row_data_cpm, "CPM")
+                
+                self.load_row_table(row_data_cpm, "CPM") 
                 self.ui.table_cpm.scrollToBottom()
+                #---- Actualizo grafico CPM
+                self.graph2.update_graph(int(cpm))
 
             elif id_serial == SEND_CPS_APP:
+                # ---- Carga en tabla CPM
                 self.count_data_reciv['CPS'] += 1
                 cps = value_serial.split(" ")[0]
                 time = value_serial.split(" ")[1]
@@ -475,7 +488,8 @@ class MainWindow(QMainWindow):
 
                 self.load_row_table(row_data_cps, "CPS")
                 self.ui.table_cps.scrollToBottom()
-
+                #---- Actualizo grafico CPS
+                self.graph1.update_graph(int(cps))
 
         #--- Solicitudes para tablas CPM y CPS cada 100ms
         if not self.waiting_response: # Si no estoy esperando respuesta de arduino
@@ -519,9 +533,7 @@ class MainWindow(QMainWindow):
         self.ui.btn_stop.setEnabled(True)
         self.ui.btn_init.setEnabled(False)
         self.ui.btn_export.setEnabled(False)
-        self.ui.btn_accum_CPS.setEnabled(True)
-        self.ui.btn_last_CPM.setEnabled(True)
-        self.ui.btn_time_s.setEnabled(True)
+
 
         self.ui.cbox_in_serial.setEnabled(False)
         self.ui.time_test.setEnabled(False)
@@ -531,7 +543,6 @@ class MainWindow(QMainWindow):
 
 
     def stop(self):
-       
 
         self.obj_data_uart.ser["Master"].close()
         self.timer.stop()
@@ -541,6 +552,12 @@ class MainWindow(QMainWindow):
         self.ui.btn_stop.setEnabled(False)
         self.ui.btn_export.setEnabled(True)
         self.ui.btn_init.setEnabled(True)
+        self.ui.time_test.setEnabled(True)
+
+        # Habilito modo manual
+        self.ui.btn_accum_CPS.setEnabled(True)
+        self.ui.btn_last_CPM.setEnabled(True)
+        self.ui.btn_time_s.setEnabled(True)
 
     def create_csv(self):
         # Exporto CSV
@@ -590,7 +607,7 @@ class MainWindow(QMainWindow):
         self.ui.table_cpm.setRowCount(0)
         self.ui.table_cps.setRowCount(0)
 
-        # Limpio graficos
+        # Limpio graficos ---- VER no se limpian bien
         self.graph1.x_data.clear()
         self.graph1.y_data.clear()
         self.graph2.x_data.clear()
@@ -600,10 +617,13 @@ class MainWindow(QMainWindow):
         self.cont_meas1 = 0
 
         self.ui.btn_export.setEnabled(False)
+
+        # Deshabilito modo manual
         self.ui.btn_accum_CPS.setEnabled(False)
         self.ui.btn_last_CPM.setEnabled(False)
         self.ui.btn_time_s.setEnabled(False)
 
         self.ui.cbox_in_serial.setEnabled(True)
         self.ui.txt_rta_attiny.clear()
-        self.ui.time_test.setEnabled(True)
+
+        
