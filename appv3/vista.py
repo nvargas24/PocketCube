@@ -335,6 +335,12 @@ class MainWindow(QMainWindow):
         self.count1ms = 0
         self.count1s = 0
 
+        # Contador de datos recibido por UART
+        self.count_data_reciv = {
+            'CPS': 0,
+            'CPM':0    
+        } 
+
         # Bandera para controlar espera de respuesta de Arduino   
         self.waiting_response = False  
         
@@ -348,9 +354,9 @@ class MainWindow(QMainWindow):
         self.ui.btn_time_s.clicked.connect(lambda: self.manual_request("TIME_S"))
     
     def load_row_table(self, row_data, table):
-        if table=="cp":
+        if table=="CPM":
             table = self.ui.table_cpm
-        elif table=="cps":
+        elif table=="CPS":
             table = self.ui.table_cps
 
         current_row = table.rowCount()
@@ -375,6 +381,7 @@ class MainWindow(QMainWindow):
         #--- Reseteo contador de ms cada 1 segundo
         self.count1ms += 1
         if self.count1ms >= 1000:
+            self.count1s += 1
             self.count1ms = 0 
         
         ### --- Libera solicitud UART para volver a pedir si supera TIMEOUT
@@ -390,12 +397,12 @@ class MainWindow(QMainWindow):
             self.stop()
 
         #--- Se analiza BUFFER UART por si hay datos
-        if self.count1ms % 100 == 0:
+        #if self.count1ms % 100 == 0:
             #print(f"+++ Escucha habilitado ---- flag: {self.waiting_response}")
-            id_serial, value_serial, request_serial = self.obj_data_uart.reciv_serial("Master")
-            print(f"===========ID serial recibido: {id_serial}, valor: {value_serial}, request:{request_serial}")  
+        id_serial, value_serial, request_serial = self.obj_data_uart.reciv_serial("Master")
+            #print(f"===========ID serial recibido: {id_serial}, valor: {value_serial}, request:{request_serial}")  
             #self.waiting_response = False
-            #print("-------- Despues de habilitar escuchar")
+            #print("----#---- Despues de habilitar escuchar")
 
         #--- Identifico si se recibe algo de algun ID serial    
         if id_serial != None:
@@ -405,24 +412,44 @@ class MainWindow(QMainWindow):
             if id_serial == SEND_LINE_APP:
                 self.ui.txt_rta_attiny.setText(f"{value_serial}") # carga en widget
             elif id_serial == SEND_CPM_APP:
+                self.count_data_reciv['CPM'] += 1
                 cpm = value_serial.split(" ")[0]
                 time = value_serial.split(" ")[1]
-                print("***********test load CPM+TIME")
-                print(f"Cargar a tabla CPM {cpm}")
-                print(f"Cargar a tabla TIME {time}")
-                
+                datetime_pc = self.obj_data_processor.datetime_pc()[TIME_MS_PC]
+
+                row_data_cpm = [
+                    f"{self.count_data_reciv['CPM']}",
+                    f"{time}",
+                    f"{datetime_pc}",
+                    f"{cpm}"
+                ]
+
+                self.load_row_table(row_data_cpm, "CPM")
+                self.ui.table_cpm.scrollToBottom()
+
             elif id_serial == SEND_CPS_APP:
+                self.count_data_reciv['CPS'] += 1
                 cps = value_serial.split(" ")[0]
                 time = value_serial.split(" ")[1]
-                print("***********test load CPS+TIME")
-                print(f"Cargar a tabla CPM {cps}")
-                print(f"Cargar a tabla TIME {time}")
+                datetime_pc = self.obj_data_processor.datetime_pc()[TIME_MS_PC]
+
+                row_data_cps = [
+                    f"{self.count_data_reciv['CPS']}",
+                    f"{time}",
+                    f"{datetime_pc}",
+                    f"{cps}"
+                ]
+
+                self.load_row_table(row_data_cps, "CPS")
+                self.ui.table_cps.scrollToBottom()
+
 
         #--- Solicitudes para tablas CPM y CPS cada 100ms
         if not self.waiting_response: # Si no estoy esperando respuesta de arduino
             if self.count1ms == 500:
                 self.manual_request("CPS_TIME")
-            if self.count1ms == 900:
+                print(f"ms: {self.count1ms}")
+            if (self.count1s %60 == 0):
                 self.manual_request("CPM_TIME")
             
         if self.count1ms == 0: #--- Acciones a realizar cada 1 segundo
@@ -439,6 +466,7 @@ class MainWindow(QMainWindow):
 
 
     def init(self):
+        self.reset_widget()
         # Asigno puertos
         port_m = self.ui.cbox_in_serial.currentText() # Leo puerto de combobox
         port_master = self.obj_data_processor.filter_port(port_m) # Master
@@ -470,7 +498,7 @@ class MainWindow(QMainWindow):
 
 
     def stop(self):
-        self.reset_widget()
+       
 
         self.obj_data_uart.ser["Master"].close()
         self.timer.stop()
@@ -479,6 +507,7 @@ class MainWindow(QMainWindow):
 
         self.ui.btn_stop.setEnabled(False)
         self.ui.btn_export.setEnabled(True)
+        self.ui.btn_init.setEnabled(True)
 
     def create_csv(self):
         # Exporto CSV
@@ -538,7 +567,6 @@ class MainWindow(QMainWindow):
         self.cont_meas1 = 0
 
         self.ui.btn_export.setEnabled(False)
-        self.ui.btn_init.setEnabled(True)
         self.ui.btn_accum_CPS.setEnabled(False)
         self.ui.btn_last_CPM.setEnabled(False)
         self.ui.btn_time_s.setEnabled(False)

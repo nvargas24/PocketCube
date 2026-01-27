@@ -21,17 +21,5 @@ class Controlador():
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     #app.setStyle("Fusion")
-    app.setStyleSheet("""
-        QWidget {
-            background-color: #1E1E1E;
-            color: #000000;        /* Texto negro */
-            font-family: Segoe UI;
-        }
-
-        /* Widgets deshabilitados */
-        QWidget:disabled {
-            color: #B0B0B0;        /* Gris claro */
-        }
-    """)
     # Creao objeto controlador 
     obj_controlador = Controlador()
