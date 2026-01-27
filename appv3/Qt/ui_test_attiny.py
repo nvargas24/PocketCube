@@ -27,10 +27,163 @@ class Ui_MainWindow(object):
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(880, 591)
         font = QFont()
-        font.setPointSize(20)
+        font.setFamilies([u"Segoe UI"])
+        font.setPointSize(10)
         font.setBold(True)
         MainWindow.setFont(font)
-        MainWindow.setStyleSheet(u"background-color: rgb(230, 230, 230);")
+        MainWindow.setStyleSheet(u"/* =========================\n"
+"   BASE\n"
+"   ========================= */\n"
+"QWidget {\n"
+"    background-color: #F3F3F3;\n"
+"    color: #1F1F1F;\n"
+"    font-family: \"Segoe UI\";\n"
+"    font-size: 10pt;\n"
+"}\n"
+"\n"
+"/* =========================\n"
+"   LINE EDIT / TIME EDIT\n"
+"   ========================= */\n"
+"QLineEdit, QTimeEdit {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1px solid #D1D1D1;\n"
+"    border-radius: 6px;\n"
+"    padding: 6px 8px;\n"
+"}\n"
+"\n"
+"QLineEdit:hover, QTimeEdit:hover {\n"
+"    border: 1px solid #A8A8A8;\n"
+"}\n"
+"\n"
+"QLineEdit:focus, QTimeEdit:focus {\n"
+"    border: 2px solid #2563EB;\n"
+"    padding: 5px 7px; /* compensar el borde */\n"
+"}\n"
+"\n"
+"QLineEdit:disabled, QTimeEdit:disabled {\n"
+"    background-color: #E5E5E5;\n"
+"    color: #9A9A9A;\n"
+"}\n"
+"\n"
+"/* =========================\n"
+"   COMBO BOX\n"
+"   ========================= */\n"
+"QComboBox {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1px solid #D1D1D1;\n"
+"    border-radius: 6px;\n"
+"    "
+                        "padding: 6px 30px 6px 8px;\n"
+"}\n"
+"\n"
+"QComboBox:hover {\n"
+"    border: 1px solid #A8A8A8;\n"
+"}\n"
+"\n"
+"QComboBox:focus {\n"
+"    border: 2px solid #2563EB;\n"
+"    padding: 5px 29px 5px 7px;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down {\n"
+"    subcontrol-origin: padding;\n"
+"    subcontrol-position: top right;\n"
+"    width: 24px;\n"
+"    border-left: 1px solid #D1D1D1;\n"
+"}\n"
+"\n"
+"QComboBox::down-arrow {\n"
+"    image: none;\n"
+"    width: 0;\n"
+"    height: 0;\n"
+"    border-left: 5px solid transparent;\n"
+"    border-right: 5px solid transparent;\n"
+"    border-top: 6px solid #4A4A4A;\n"
+"}\n"
+"\n"
+"/* Lista desplegable */\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1px solid #D1D1D1;\n"
+"    selection-background-color: #E8F0FE;\n"
+"    selection-color: #1F1F1F;\n"
+"}\n"
+"\n"
+"/* =========================\n"
+"   PUSH BUTTON\n"
+"   ========================= */\n"
+"QPushButton {\n"
+"    background-color: #798FFC;\n"
+"    color: white;\n"
+"    border: none;\n"
+"    b"
+                        "order-radius: 8px;\n"
+"    padding: 6px 14px;\n"
+"    font-weight: 500;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background-color: #1D4ED8;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: #1E40AF;\n"
+"}\n"
+"\n"
+"QPushButton:disabled {\n"
+"    background-color: #C7C7C7;\n"
+"    color: #8A8A8A;\n"
+"}\n"
+"\n"
+"/* =========================\n"
+"   TABLE\n"
+"   ========================= */\n"
+"QTableView, QTableWidget {\n"
+"    background-color: #FFFFFF;\n"
+"    border: 1px solid #D1D1D1;\n"
+"    border-radius: 8px;\n"
+"    gridline-color: #E0E0E0;\n"
+"}\n"
+"\n"
+"QHeaderView::section {\n"
+"    background-color: #F3F3F3;\n"
+"    color: #1F1F1F;\n"
+"    padding: 6px;\n"
+"    border: none;\n"
+"    border-bottom: 1px solid #D1D1D1;\n"
+"    font-weight: 600;\n"
+"}\n"
+"\n"
+"QTableView::item {\n"
+"    padding: 4px;\n"
+"}\n"
+"\n"
+"QTableView::item:selected {\n"
+"    background-color: #E8F0FE;\n"
+"    color: #1F1F1F;\n"
+"}\n"
+"\n"
+"/* Scrollbar estilo Win 11 */\n"
+"QScrollBar:vertical {\n"
+"    background: t"
+                        "ransparent;\n"
+"    width: 10px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical {\n"
+"    background: #C4C4C4;\n"
+"    border-radius: 5px;\n"
+"}\n"
+"\n"
+"QScrollBar::handle:vertical:hover {\n"
+"    background: #A8A8A8;\n"
+"}\n"
+"\n"
+"QScrollBar::add-line,\n"
+"QScrollBar::sub-line {\n"
+"    height: 0px;\n"
+"}\n"
+"")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayoutWidget_9 = QWidget(self.centralwidget)
@@ -90,10 +243,7 @@ class Ui_MainWindow(object):
 
         self.lcd_date_pc = QLabel(self.verticalLayoutWidget_9)
         self.lcd_date_pc.setObjectName(u"lcd_date_pc")
-        font1 = QFont()
-        font1.setFamilies([u"Courier"])
-        font1.setBold(True)
-        self.lcd_date_pc.setFont(font1)
+        self.lcd_date_pc.setFont(font)
         self.lcd_date_pc.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_5.addWidget(self.lcd_date_pc)
@@ -125,60 +275,64 @@ class Ui_MainWindow(object):
         self.horizontalLayout_18 = QHBoxLayout()
         self.horizontalLayout_18.setObjectName(u"horizontalLayout_18")
         self.horizontalLayout_18.setContentsMargins(-1, -1, -1, 30)
-        self.table_cpm = QTableWidget(self.verticalLayoutWidget_9)
-        if (self.table_cpm.columnCount() < 4):
-            self.table_cpm.setColumnCount(4)
-        font2 = QFont()
-        font2.setPointSize(10)
-        font2.setBold(True)
+        self.table_cps = QTableWidget(self.verticalLayoutWidget_9)
+        if (self.table_cps.columnCount() < 4):
+            self.table_cps.setColumnCount(4)
+        font1 = QFont()
+        font1.setPointSize(10)
+        font1.setBold(True)
         __qtablewidgetitem = QTableWidgetItem()
-        __qtablewidgetitem.setFont(font2);
-        self.table_cpm.setHorizontalHeaderItem(0, __qtablewidgetitem)
-        font3 = QFont()
-        font3.setBold(True)
+        __qtablewidgetitem.setFont(font1);
+        self.table_cps.setHorizontalHeaderItem(0, __qtablewidgetitem)
+        font2 = QFont()
+        font2.setBold(True)
         __qtablewidgetitem1 = QTableWidgetItem()
-        __qtablewidgetitem1.setFont(font3);
-        self.table_cpm.setHorizontalHeaderItem(1, __qtablewidgetitem1)
+        __qtablewidgetitem1.setFont(font2);
+        self.table_cps.setHorizontalHeaderItem(1, __qtablewidgetitem1)
         __qtablewidgetitem2 = QTableWidgetItem()
-        __qtablewidgetitem2.setFont(font2);
-        self.table_cpm.setHorizontalHeaderItem(2, __qtablewidgetitem2)
+        __qtablewidgetitem2.setFont(font1);
+        self.table_cps.setHorizontalHeaderItem(2, __qtablewidgetitem2)
         __qtablewidgetitem3 = QTableWidgetItem()
-        __qtablewidgetitem3.setFont(font2);
-        self.table_cpm.setHorizontalHeaderItem(3, __qtablewidgetitem3)
-        self.table_cpm.setObjectName(u"table_cpm")
+        __qtablewidgetitem3.setFont(font1);
+        self.table_cps.setHorizontalHeaderItem(3, __qtablewidgetitem3)
+        self.table_cps.setObjectName(u"table_cps")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.table_cpm.sizePolicy().hasHeightForWidth())
-        self.table_cpm.setSizePolicy(sizePolicy1)
-        font4 = QFont()
-        font4.setFamilies([u"Segoe UI"])
-        font4.setPointSize(9)
-        self.table_cpm.setFont(font4)
-        self.table_cpm.setStyleSheet(u"background-color: rgb(250, 250, 250);")
-        self.table_cpm.setFrameShape(QFrame.Shape.Box)
-        self.table_cpm.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.table_cpm.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContentsOnFirstShow)
-        self.table_cpm.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.table_cpm.setTabKeyNavigation(True)
-        self.table_cpm.setProperty(u"showDropIndicator", True)
-        self.table_cpm.setAlternatingRowColors(True)
-        self.table_cpm.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.table_cpm.setTextElideMode(Qt.TextElideMode.ElideMiddle)
-        self.table_cpm.setShowGrid(True)
-        self.table_cpm.setGridStyle(Qt.PenStyle.SolidLine)
-        self.table_cpm.setWordWrap(True)
-        self.table_cpm.setCornerButtonEnabled(True)
-        self.table_cpm.setRowCount(0)
-        self.table_cpm.horizontalHeader().setCascadingSectionResizes(False)
-        self.table_cpm.horizontalHeader().setProperty(u"showSortIndicator", False)
-        self.table_cpm.horizontalHeader().setStretchLastSection(True)
-        self.table_cpm.verticalHeader().setVisible(False)
-        self.table_cpm.verticalHeader().setCascadingSectionResizes(False)
-        self.table_cpm.verticalHeader().setProperty(u"showSortIndicator", False)
-        self.table_cpm.verticalHeader().setStretchLastSection(False)
+        sizePolicy1.setHeightForWidth(self.table_cps.sizePolicy().hasHeightForWidth())
+        self.table_cps.setSizePolicy(sizePolicy1)
+        font3 = QFont()
+        font3.setFamilies([u"Segoe UI"])
+        font3.setPointSize(10)
+        self.table_cps.setFont(font3)
+        self.table_cps.setStyleSheet(u"")
+        self.table_cps.setFrameShape(QFrame.Shape.Box)
+        self.table_cps.setFrameShadow(QFrame.Shadow.Sunken)
+        self.table_cps.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.table_cps.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContentsOnFirstShow)
+        self.table_cps.setAutoScrollMargin(5)
+        self.table_cps.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table_cps.setTabKeyNavigation(True)
+        self.table_cps.setProperty(u"showDropIndicator", True)
+        self.table_cps.setDragEnabled(False)
+        self.table_cps.setAlternatingRowColors(True)
+        self.table_cps.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table_cps.setTextElideMode(Qt.TextElideMode.ElideMiddle)
+        self.table_cps.setShowGrid(True)
+        self.table_cps.setGridStyle(Qt.PenStyle.SolidLine)
+        self.table_cps.setSortingEnabled(False)
+        self.table_cps.setWordWrap(True)
+        self.table_cps.setCornerButtonEnabled(True)
+        self.table_cps.setRowCount(0)
+        self.table_cps.horizontalHeader().setCascadingSectionResizes(False)
+        self.table_cps.horizontalHeader().setProperty(u"showSortIndicator", False)
+        self.table_cps.horizontalHeader().setStretchLastSection(True)
+        self.table_cps.verticalHeader().setVisible(False)
+        self.table_cps.verticalHeader().setCascadingSectionResizes(False)
+        self.table_cps.verticalHeader().setProperty(u"showSortIndicator", False)
+        self.table_cps.verticalHeader().setStretchLastSection(False)
 
-        self.horizontalLayout_18.addWidget(self.table_cpm)
+        self.horizontalLayout_18.addWidget(self.table_cps)
 
         self.horizontalLayout_18.setStretch(0, 12)
 
@@ -204,45 +358,46 @@ class Ui_MainWindow(object):
         self.verticalLayout_6.setSpacing(3)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
         self.verticalLayout_6.setContentsMargins(-1, -1, -1, 30)
-        self.table_cps = QTableWidget(self.verticalLayoutWidget_9)
-        if (self.table_cps.columnCount() < 4):
-            self.table_cps.setColumnCount(4)
+        self.table_cpm = QTableWidget(self.verticalLayoutWidget_9)
+        if (self.table_cpm.columnCount() < 4):
+            self.table_cpm.setColumnCount(4)
         __qtablewidgetitem4 = QTableWidgetItem()
-        __qtablewidgetitem4.setFont(font2);
-        self.table_cps.setHorizontalHeaderItem(0, __qtablewidgetitem4)
+        __qtablewidgetitem4.setFont(font1);
+        self.table_cpm.setHorizontalHeaderItem(0, __qtablewidgetitem4)
         __qtablewidgetitem5 = QTableWidgetItem()
-        __qtablewidgetitem5.setFont(font2);
-        self.table_cps.setHorizontalHeaderItem(1, __qtablewidgetitem5)
+        __qtablewidgetitem5.setFont(font1);
+        self.table_cpm.setHorizontalHeaderItem(1, __qtablewidgetitem5)
         __qtablewidgetitem6 = QTableWidgetItem()
-        __qtablewidgetitem6.setFont(font2);
-        self.table_cps.setHorizontalHeaderItem(2, __qtablewidgetitem6)
+        __qtablewidgetitem6.setFont(font1);
+        self.table_cpm.setHorizontalHeaderItem(2, __qtablewidgetitem6)
         __qtablewidgetitem7 = QTableWidgetItem()
-        __qtablewidgetitem7.setFont(font2);
-        self.table_cps.setHorizontalHeaderItem(3, __qtablewidgetitem7)
-        self.table_cps.setObjectName(u"table_cps")
-        self.table_cps.setFont(font4)
-        self.table_cps.setStyleSheet(u"background-color: rgb(250, 250, 250);")
-        self.table_cps.setFrameShape(QFrame.Shape.Box)
-        self.table_cps.setFrameShadow(QFrame.Shadow.Sunken)
-        self.table_cps.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        self.table_cps.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.table_cps.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.table_cps.setTabKeyNavigation(True)
-        self.table_cps.setProperty(u"showDropIndicator", True)
-        self.table_cps.setDragDropOverwriteMode(True)
-        self.table_cps.setAlternatingRowColors(True)
-        self.table_cps.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.table_cps.setTextElideMode(Qt.TextElideMode.ElideMiddle)
-        self.table_cps.setRowCount(0)
-        self.table_cps.horizontalHeader().setVisible(True)
-        self.table_cps.horizontalHeader().setCascadingSectionResizes(True)
-        self.table_cps.horizontalHeader().setDefaultSectionSize(100)
-        self.table_cps.horizontalHeader().setHighlightSections(True)
-        self.table_cps.horizontalHeader().setProperty(u"showSortIndicator", False)
-        self.table_cps.horizontalHeader().setStretchLastSection(True)
-        self.table_cps.verticalHeader().setVisible(False)
+        __qtablewidgetitem7.setFont(font1);
+        self.table_cpm.setHorizontalHeaderItem(3, __qtablewidgetitem7)
+        self.table_cpm.setObjectName(u"table_cpm")
+        self.table_cpm.setFont(font3)
+        self.table_cpm.setStyleSheet(u"")
+        self.table_cpm.setFrameShape(QFrame.Shape.Box)
+        self.table_cpm.setFrameShadow(QFrame.Shadow.Sunken)
+        self.table_cpm.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.table_cpm.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.table_cpm.setAutoScrollMargin(5)
+        self.table_cpm.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table_cpm.setTabKeyNavigation(True)
+        self.table_cpm.setProperty(u"showDropIndicator", True)
+        self.table_cpm.setDragDropOverwriteMode(True)
+        self.table_cpm.setAlternatingRowColors(True)
+        self.table_cpm.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table_cpm.setTextElideMode(Qt.TextElideMode.ElideMiddle)
+        self.table_cpm.setRowCount(0)
+        self.table_cpm.horizontalHeader().setVisible(True)
+        self.table_cpm.horizontalHeader().setCascadingSectionResizes(True)
+        self.table_cpm.horizontalHeader().setDefaultSectionSize(100)
+        self.table_cpm.horizontalHeader().setHighlightSections(True)
+        self.table_cpm.horizontalHeader().setProperty(u"showSortIndicator", False)
+        self.table_cpm.horizontalHeader().setStretchLastSection(True)
+        self.table_cpm.verticalHeader().setVisible(False)
 
-        self.verticalLayout_6.addWidget(self.table_cps)
+        self.verticalLayout_6.addWidget(self.table_cpm)
 
         self.verticalLayout_6.setStretch(0, 5)
 
@@ -266,11 +421,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
         self.label_6 = QLabel(self.verticalLayoutWidget_9)
         self.label_6.setObjectName(u"label_6")
-        font5 = QFont()
-        font5.setFamilies([u"Segoe UI"])
-        font5.setPointSize(10)
-        font5.setBold(True)
-        self.label_6.setFont(font5)
+        self.label_6.setFont(font)
 
         self.horizontalLayout_9.addWidget(self.label_6)
 
@@ -281,10 +432,7 @@ class Ui_MainWindow(object):
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.cbox_in_serial.sizePolicy().hasHeightForWidth())
         self.cbox_in_serial.setSizePolicy(sizePolicy2)
-        font6 = QFont()
-        font6.setFamilies([u"Segoe UI"])
-        font6.setPointSize(10)
-        self.cbox_in_serial.setFont(font6)
+        self.cbox_in_serial.setFont(font3)
         self.cbox_in_serial.setStyleSheet(u"background-color: rgb(255, 255, 255);")
 
         self.horizontalLayout_9.addWidget(self.cbox_in_serial)
@@ -298,7 +446,7 @@ class Ui_MainWindow(object):
         self.groupBox_2.setObjectName(u"groupBox_2")
         self.verticalLayoutWidget_2 = QWidget(self.groupBox_2)
         self.verticalLayoutWidget_2.setObjectName(u"verticalLayoutWidget_2")
-        self.verticalLayoutWidget_2.setGeometry(QRect(10, 20, 241, 161))
+        self.verticalLayoutWidget_2.setGeometry(QRect(10, 20, 241, 165))
         self.verticalLayout_3 = QVBoxLayout(self.verticalLayoutWidget_2)
         self.verticalLayout_3.setSpacing(2)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -307,9 +455,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.label_2 = QLabel(self.verticalLayoutWidget_2)
         self.label_2.setObjectName(u"label_2")
-        font7 = QFont()
-        font7.setPointSize(12)
-        self.label_2.setFont(font7)
+        self.label_2.setFont(font3)
         self.label_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.horizontalLayout_3.addWidget(self.label_2)
@@ -321,7 +467,7 @@ class Ui_MainWindow(object):
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.time_test.sizePolicy().hasHeightForWidth())
         self.time_test.setSizePolicy(sizePolicy3)
-        self.time_test.setFont(font7)
+        self.time_test.setFont(font3)
         self.time_test.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.time_test.setStyleSheet(u"background-color: rgb(255, 255, 255);")
         self.time_test.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -339,10 +485,11 @@ class Ui_MainWindow(object):
         self.btn_init.setObjectName(u"btn_init")
         sizePolicy3.setHeightForWidth(self.btn_init.sizePolicy().hasHeightForWidth())
         self.btn_init.setSizePolicy(sizePolicy3)
-        font8 = QFont()
-        font8.setFamilies([u"Segoe UI"])
-        font8.setPointSize(12)
-        self.btn_init.setFont(font8)
+        font4 = QFont()
+        font4.setFamilies([u"Segoe UI"])
+        font4.setPointSize(10)
+        font4.setWeight(QFont.Medium)
+        self.btn_init.setFont(font4)
 
         self.verticalLayout_3.addWidget(self.btn_init)
 
@@ -371,7 +518,7 @@ class Ui_MainWindow(object):
         self.btn_stop.setEnabled(False)
         sizePolicy3.setHeightForWidth(self.btn_stop.sizePolicy().hasHeightForWidth())
         self.btn_stop.setSizePolicy(sizePolicy3)
-        self.btn_stop.setFont(font8)
+        self.btn_stop.setFont(font4)
 
         self.verticalLayout_3.addWidget(self.btn_stop)
 
@@ -380,7 +527,7 @@ class Ui_MainWindow(object):
         self.btn_export.setEnabled(False)
         sizePolicy3.setHeightForWidth(self.btn_export.sizePolicy().hasHeightForWidth())
         self.btn_export.setSizePolicy(sizePolicy3)
-        self.btn_export.setFont(font8)
+        self.btn_export.setFont(font4)
         self.btn_export.setCheckable(False)
 
         self.verticalLayout_3.addWidget(self.btn_export)
@@ -408,7 +555,7 @@ class Ui_MainWindow(object):
         self.btn_last_CPM.setEnabled(True)
         sizePolicy3.setHeightForWidth(self.btn_last_CPM.sizePolicy().hasHeightForWidth())
         self.btn_last_CPM.setSizePolicy(sizePolicy3)
-        self.btn_last_CPM.setFont(font8)
+        self.btn_last_CPM.setFont(font4)
 
         self.verticalLayout_2.addWidget(self.btn_last_CPM)
 
@@ -416,7 +563,7 @@ class Ui_MainWindow(object):
         self.btn_accum_CPS.setObjectName(u"btn_accum_CPS")
         sizePolicy3.setHeightForWidth(self.btn_accum_CPS.sizePolicy().hasHeightForWidth())
         self.btn_accum_CPS.setSizePolicy(sizePolicy3)
-        self.btn_accum_CPS.setFont(font8)
+        self.btn_accum_CPS.setFont(font4)
 
         self.verticalLayout_2.addWidget(self.btn_accum_CPS)
 
@@ -424,7 +571,7 @@ class Ui_MainWindow(object):
         self.btn_time_s.setObjectName(u"btn_time_s")
         sizePolicy3.setHeightForWidth(self.btn_time_s.sizePolicy().hasHeightForWidth())
         self.btn_time_s.setSizePolicy(sizePolicy3)
-        self.btn_time_s.setFont(font8)
+        self.btn_time_s.setFont(font4)
 
         self.verticalLayout_2.addWidget(self.btn_time_s)
 
@@ -433,9 +580,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_9.setObjectName(u"verticalLayout_9")
         self.label = QLabel(self.verticalLayoutWidget)
         self.label.setObjectName(u"label")
-        font9 = QFont()
-        font9.setPointSize(10)
-        self.label.setFont(font9)
+        self.label.setFont(font3)
 
         self.verticalLayout_9.addWidget(self.label)
 
@@ -444,9 +589,7 @@ class Ui_MainWindow(object):
         self.txt_rta_attiny.setEnabled(False)
         sizePolicy1.setHeightForWidth(self.txt_rta_attiny.sizePolicy().hasHeightForWidth())
         self.txt_rta_attiny.setSizePolicy(sizePolicy1)
-        font10 = QFont()
-        font10.setPointSize(8)
-        self.txt_rta_attiny.setFont(font10)
+        self.txt_rta_attiny.setFont(font3)
         self.txt_rta_attiny.setStyleSheet(u"background-color: rgb(255, 255, 255);")
 
         self.verticalLayout_9.addWidget(self.txt_rta_attiny)
@@ -488,21 +631,21 @@ class Ui_MainWindow(object):
         self.img_logo1.setText("")
         self.img_logo2.setText("")
         self.lcd_date_pc.setText("")
-        ___qtablewidgetitem = self.table_cpm.horizontalHeaderItem(0)
+        ___qtablewidgetitem = self.table_cps.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"#", None));
-        ___qtablewidgetitem1 = self.table_cpm.horizontalHeaderItem(1)
+        ___qtablewidgetitem1 = self.table_cps.horizontalHeaderItem(1)
         ___qtablewidgetitem1.setText(QCoreApplication.translate("MainWindow", u"Seg.", None));
-        ___qtablewidgetitem2 = self.table_cpm.horizontalHeaderItem(2)
+        ___qtablewidgetitem2 = self.table_cps.horizontalHeaderItem(2)
         ___qtablewidgetitem2.setText(QCoreApplication.translate("MainWindow", u"Datetime", None));
-        ___qtablewidgetitem3 = self.table_cpm.horizontalHeaderItem(3)
+        ___qtablewidgetitem3 = self.table_cps.horizontalHeaderItem(3)
         ___qtablewidgetitem3.setText(QCoreApplication.translate("MainWindow", u"CPS", None));
-        ___qtablewidgetitem4 = self.table_cps.horizontalHeaderItem(0)
+        ___qtablewidgetitem4 = self.table_cpm.horizontalHeaderItem(0)
         ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"#", None));
-        ___qtablewidgetitem5 = self.table_cps.horizontalHeaderItem(1)
+        ___qtablewidgetitem5 = self.table_cpm.horizontalHeaderItem(1)
         ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"Min", None));
-        ___qtablewidgetitem6 = self.table_cps.horizontalHeaderItem(2)
+        ___qtablewidgetitem6 = self.table_cpm.horizontalHeaderItem(2)
         ___qtablewidgetitem6.setText(QCoreApplication.translate("MainWindow", u"Datetime", None));
-        ___qtablewidgetitem7 = self.table_cps.horizontalHeaderItem(3)
+        ___qtablewidgetitem7 = self.table_cpm.horizontalHeaderItem(3)
         ___qtablewidgetitem7.setText(QCoreApplication.translate("MainWindow", u"CPM", None));
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"Input:", None))
         self.groupBox_2.setTitle(QCoreApplication.translate("MainWindow", u"Ensayos", None))

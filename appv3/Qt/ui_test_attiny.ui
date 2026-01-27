@@ -12,7 +12,8 @@
   </property>
   <property name="font">
    <font>
-    <pointsize>20</pointsize>
+    <family>Segoe UI</family>
+    <pointsize>10</pointsize>
     <bold>true</bold>
    </font>
   </property>
@@ -20,7 +21,156 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(230, 230, 230);</string>
+   <string notr="true">/* =========================
+   BASE
+   ========================= */
+QWidget {
+    background-color: #F3F3F3;
+    color: #1F1F1F;
+    font-family: &quot;Segoe UI&quot;;
+    font-size: 10pt;
+}
+
+/* =========================
+   LINE EDIT / TIME EDIT
+   ========================= */
+QLineEdit, QTimeEdit {
+    background-color: #FFFFFF;
+    border: 1px solid #D1D1D1;
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+
+QLineEdit:hover, QTimeEdit:hover {
+    border: 1px solid #A8A8A8;
+}
+
+QLineEdit:focus, QTimeEdit:focus {
+    border: 2px solid #2563EB;
+    padding: 5px 7px; /* compensar el borde */
+}
+
+QLineEdit:disabled, QTimeEdit:disabled {
+    background-color: #E5E5E5;
+    color: #9A9A9A;
+}
+
+/* =========================
+   COMBO BOX
+   ========================= */
+QComboBox {
+    background-color: #FFFFFF;
+    border: 1px solid #D1D1D1;
+    border-radius: 6px;
+    padding: 6px 30px 6px 8px;
+}
+
+QComboBox:hover {
+    border: 1px solid #A8A8A8;
+}
+
+QComboBox:focus {
+    border: 2px solid #2563EB;
+    padding: 5px 29px 5px 7px;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 24px;
+    border-left: 1px solid #D1D1D1;
+}
+
+QComboBox::down-arrow {
+    image: none;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #4A4A4A;
+}
+
+/* Lista desplegable */
+QComboBox QAbstractItemView {
+    background-color: #FFFFFF;
+    border: 1px solid #D1D1D1;
+    selection-background-color: #E8F0FE;
+    selection-color: #1F1F1F;
+}
+
+/* =========================
+   PUSH BUTTON
+   ========================= */
+QPushButton {
+    background-color: #798FFC;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-weight: 500;
+}
+
+QPushButton:hover {
+    background-color: #1D4ED8;
+}
+
+QPushButton:pressed {
+    background-color: #1E40AF;
+}
+
+QPushButton:disabled {
+    background-color: #C7C7C7;
+    color: #8A8A8A;
+}
+
+/* =========================
+   TABLE
+   ========================= */
+QTableView, QTableWidget {
+    background-color: #FFFFFF;
+    border: 1px solid #D1D1D1;
+    border-radius: 8px;
+    gridline-color: #E0E0E0;
+}
+
+QHeaderView::section {
+    background-color: #F3F3F3;
+    color: #1F1F1F;
+    padding: 6px;
+    border: none;
+    border-bottom: 1px solid #D1D1D1;
+    font-weight: 600;
+}
+
+QTableView::item {
+    padding: 4px;
+}
+
+QTableView::item:selected {
+    background-color: #E8F0FE;
+    color: #1F1F1F;
+}
+
+/* Scrollbar estilo Win 11 */
+QScrollBar:vertical {
+    background: transparent;
+    width: 10px;
+}
+
+QScrollBar::handle:vertical {
+    background: #C4C4C4;
+    border-radius: 5px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #A8A8A8;
+}
+
+QScrollBar::add-line,
+QScrollBar::sub-line {
+    height: 0px;
+}
+</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="verticalLayoutWidget_9">
@@ -132,7 +282,8 @@
           <widget class="QLabel" name="lcd_date_pc">
            <property name="font">
             <font>
-             <family>Courier</family>
+             <family>Segoe UI</family>
+             <pointsize>10</pointsize>
              <bold>true</bold>
             </font>
            </property>
@@ -168,7 +319,7 @@
                 <number>30</number>
                </property>
                <item>
-                <widget class="QTableWidget" name="table_cpm">
+                <widget class="QTableWidget" name="table_cps">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                    <horstretch>0</horstretch>
@@ -178,20 +329,26 @@
                  <property name="font">
                   <font>
                    <family>Segoe UI</family>
-                   <pointsize>9</pointsize>
+                   <pointsize>10</pointsize>
                   </font>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">background-color: rgb(250, 250, 250);</string>
+                  <string notr="true"/>
                  </property>
                  <property name="frameShape">
                   <enum>QFrame::Shape::Box</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Shadow::Sunken</enum>
                  </property>
                  <property name="horizontalScrollBarPolicy">
                   <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
                  </property>
                  <property name="sizeAdjustPolicy">
                   <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContentsOnFirstShow</enum>
+                 </property>
+                 <property name="autoScrollMargin">
+                  <number>5</number>
                  </property>
                  <property name="editTriggers">
                   <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
@@ -201,6 +358,9 @@
                  </property>
                  <property name="showDropIndicator" stdset="0">
                   <bool>true</bool>
+                 </property>
+                 <property name="dragEnabled">
+                  <bool>false</bool>
                  </property>
                  <property name="alternatingRowColors">
                   <bool>true</bool>
@@ -216,6 +376,9 @@
                  </property>
                  <property name="gridStyle">
                   <enum>Qt::PenStyle::SolidLine</enum>
+                 </property>
+                 <property name="sortingEnabled">
+                  <bool>false</bool>
                  </property>
                  <property name="wordWrap">
                   <bool>true</bool>
@@ -312,15 +475,15 @@
               <number>30</number>
              </property>
              <item>
-              <widget class="QTableWidget" name="table_cps">
+              <widget class="QTableWidget" name="table_cpm">
                <property name="font">
                 <font>
                  <family>Segoe UI</family>
-                 <pointsize>9</pointsize>
+                 <pointsize>10</pointsize>
                 </font>
                </property>
                <property name="styleSheet">
-                <string notr="true">background-color: rgb(250, 250, 250);</string>
+                <string notr="true"/>
                </property>
                <property name="frameShape">
                 <enum>QFrame::Shape::Box</enum>
@@ -333,6 +496,9 @@
                </property>
                <property name="horizontalScrollBarPolicy">
                 <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="autoScrollMargin">
+                <number>5</number>
                </property>
                <property name="editTriggers">
                 <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
@@ -487,7 +653,7 @@
               <x>10</x>
               <y>20</y>
               <width>241</width>
-              <height>161</height>
+              <height>165</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,1,1,4,1,1">
@@ -500,7 +666,8 @@
                 <widget class="QLabel" name="label_2">
                  <property name="font">
                   <font>
-                   <pointsize>12</pointsize>
+                   <family>Segoe UI</family>
+                   <pointsize>10</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -521,7 +688,8 @@
                  </property>
                  <property name="font">
                   <font>
-                   <pointsize>12</pointsize>
+                   <family>Segoe UI</family>
+                   <pointsize>10</pointsize>
                   </font>
                  </property>
                  <property name="layoutDirection">
@@ -554,7 +722,8 @@
                <property name="font">
                 <font>
                  <family>Segoe UI</family>
-                 <pointsize>12</pointsize>
+                 <pointsize>10</pointsize>
+                 <fontweight>Medium</fontweight>
                 </font>
                </property>
                <property name="text">
@@ -611,7 +780,8 @@
                <property name="font">
                 <font>
                  <family>Segoe UI</family>
-                 <pointsize>12</pointsize>
+                 <pointsize>10</pointsize>
+                 <fontweight>Medium</fontweight>
                 </font>
                </property>
                <property name="text">
@@ -633,7 +803,8 @@
                <property name="font">
                 <font>
                  <family>Segoe UI</family>
-                 <pointsize>12</pointsize>
+                 <pointsize>10</pointsize>
+                 <fontweight>Medium</fontweight>
                 </font>
                </property>
                <property name="text">
@@ -680,7 +851,8 @@
                <property name="font">
                 <font>
                  <family>Segoe UI</family>
-                 <pointsize>12</pointsize>
+                 <pointsize>10</pointsize>
+                 <fontweight>Medium</fontweight>
                 </font>
                </property>
                <property name="text">
@@ -699,7 +871,8 @@
                <property name="font">
                 <font>
                  <family>Segoe UI</family>
-                 <pointsize>12</pointsize>
+                 <pointsize>10</pointsize>
+                 <fontweight>Medium</fontweight>
                 </font>
                </property>
                <property name="text">
@@ -718,7 +891,8 @@
                <property name="font">
                 <font>
                  <family>Segoe UI</family>
-                 <pointsize>12</pointsize>
+                 <pointsize>10</pointsize>
+                 <fontweight>Medium</fontweight>
                 </font>
                </property>
                <property name="text">
@@ -735,6 +909,7 @@
                 <widget class="QLabel" name="label">
                  <property name="font">
                   <font>
+                   <family>Segoe UI</family>
                    <pointsize>10</pointsize>
                   </font>
                  </property>
@@ -756,7 +931,8 @@
                  </property>
                  <property name="font">
                   <font>
-                   <pointsize>8</pointsize>
+                   <family>Segoe UI</family>
+                   <pointsize>10</pointsize>
                   </font>
                  </property>
                  <property name="styleSheet">
