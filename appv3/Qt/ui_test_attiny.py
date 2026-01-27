@@ -455,6 +455,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.label_2 = QLabel(self.verticalLayoutWidget_2)
         self.label_2.setObjectName(u"label_2")
+        sizePolicy1.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
+        self.label_2.setSizePolicy(sizePolicy1)
         self.label_2.setFont(font3)
         self.label_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -462,16 +464,17 @@ class Ui_MainWindow(object):
 
         self.time_test = QTimeEdit(self.verticalLayoutWidget_2)
         self.time_test.setObjectName(u"time_test")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.time_test.sizePolicy().hasHeightForWidth())
-        self.time_test.setSizePolicy(sizePolicy3)
+        sizePolicy1.setHeightForWidth(self.time_test.sizePolicy().hasHeightForWidth())
+        self.time_test.setSizePolicy(sizePolicy1)
         self.time_test.setFont(font3)
         self.time_test.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.time_test.setAutoFillBackground(False)
         self.time_test.setStyleSheet(u"background-color: rgb(255, 255, 255);")
+        self.time_test.setWrapping(False)
+        self.time_test.setFrame(True)
         self.time_test.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.time_test.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.UpDownArrows)
+        self.time_test.setProperty(u"showGroupSeparator", False)
         self.time_test.setCalendarPopup(False)
 
         self.horizontalLayout_3.addWidget(self.time_test)
@@ -483,6 +486,9 @@ class Ui_MainWindow(object):
 
         self.btn_init = QPushButton(self.verticalLayoutWidget_2)
         self.btn_init.setObjectName(u"btn_init")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.btn_init.sizePolicy().hasHeightForWidth())
         self.btn_init.setSizePolicy(sizePolicy3)
         font4 = QFont()
@@ -533,11 +539,11 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.addWidget(self.btn_export)
 
         self.verticalLayout_3.setStretch(0, 1)
-        self.verticalLayout_3.setStretch(1, 1)
-        self.verticalLayout_3.setStretch(2, 1)
+        self.verticalLayout_3.setStretch(1, 3)
+        self.verticalLayout_3.setStretch(2, 3)
         self.verticalLayout_3.setStretch(3, 4)
-        self.verticalLayout_3.setStretch(4, 1)
-        self.verticalLayout_3.setStretch(5, 1)
+        self.verticalLayout_3.setStretch(4, 3)
+        self.verticalLayout_3.setStretch(5, 3)
 
         self.verticalLayout.addWidget(self.groupBox_2)
 
@@ -607,7 +613,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.groupBox)
 
         self.verticalLayout.setStretch(0, 1)
-        self.verticalLayout.setStretch(1, 11)
+        self.verticalLayout.setStretch(1, 12)
         self.verticalLayout.setStretch(2, 12)
 
         self.horizontalLayout_16.addLayout(self.verticalLayout)
@@ -642,7 +648,7 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem4 = self.table_cpm.horizontalHeaderItem(0)
         ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"#", None));
         ___qtablewidgetitem5 = self.table_cpm.horizontalHeaderItem(1)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"Min", None));
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"Seg.", None));
         ___qtablewidgetitem6 = self.table_cpm.horizontalHeaderItem(2)
         ___qtablewidgetitem6.setText(QCoreApplication.translate("MainWindow", u"Datetime", None));
         ___qtablewidgetitem7 = self.table_cpm.horizontalHeaderItem(3)

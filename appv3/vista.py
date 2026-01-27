@@ -16,6 +16,7 @@ from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QApplication, QDial
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib.ticker import AutoMinorLocator
 
 from Qt.ui_test_attiny import *
 
@@ -163,9 +164,9 @@ class Graph_bar(FigureCanvas):
 class Graph_line(FigureCanvas):
     def __init__(self):
         self.xlim_init = 0
-        self.xlim_fin = 15
-        self.ylim_init = -1
-        self.ylim_fin = 1
+        self.xlim_fin = 30
+        self.ylim_init = 0
+        self.ylim_fin = 100
 
         # Inicializo grilla
         self.grid_lines_v = []
@@ -218,7 +219,7 @@ class Graph_line(FigureCanvas):
         """
         Metodo que asigna estilo al grafico
         """
-        # Eliminar las líneas de la grilla existentes
+        # Eliminar grillas previas
         for line in self.grid_lines_v:
             line.remove()
         for line in self.grid_lines_h:
@@ -227,39 +228,72 @@ class Graph_line(FigureCanvas):
         self.grid_lines_v.clear()
         self.grid_lines_h.clear()
 
-        # Establece nombres de ejes y tamanio
+        # Fuente
         matplotlib.rcParams['font.size'] = 10
+
+        # Títulos y etiquetas
         self.ax.set_title("CPM")
         self.ax.set_xlabel("Time[min]", labelpad=1)
         self.ax.set_ylabel("Count Pulse", labelpad=1)
         self.ax.tick_params(axis='both', which='both', labelsize=7)
-   
-        # Establecer límites del eje X e Y
+
+        # Límites
         self.ax.set_xlim(self.xlim_init, self.xlim_fin)
         self.ax.set_ylim(self.ylim_init, self.ylim_fin)
 
-        # Creo grilla
-        step_value_x = round((self.xlim_fin-self.xlim_init)/20)
-        step_value_y = round((self.ylim_fin-self.ylim_init)/10)
+        # Forzar cálculo de ticks
+        self.fig.canvas.draw_idle()
 
-        for i in range(self.xlim_init, self.xlim_fin, step_value_x):
-            line = self.ax.axvline(i, color='grey', linestyle='--', linewidth=0.25)
+        # ===============================
+        # Líneas verticales (MAJOR ticks)
+        # ===============================
+        for x in self.ax.get_xticks():
+            line = self.ax.axvline(
+                x,
+                color='grey',
+                linestyle='--',
+                linewidth=0.35,
+                zorder=0
+            )
             self.grid_lines_v.append(line)
 
-        #for j in range(self.ylim_init, self.ylim_fin, step_value_y):   
-        #    line = self.ax.axhline(j, color='grey', linestyle='--', linewidth=0.25)
-        #    self.grid_lines_h.append(line)
+        # ===============================
+        # Líneas verticales auxiliares (MINOR ticks)
+        # ===============================
+        self.ax.xaxis.set_minor_locator(AutoMinorLocator(2))  # 1 línea intermedia
 
+        for x in self.ax.xaxis.get_minorticklocs():
+            line = self.ax.axvline(
+                x,
+                color='grey',
+                linestyle=':',
+                linewidth=0.2,
+                zorder=0
+            )
+            self.grid_lines_v.append(line)
 
-        # set colores bordes
-        self.ax.spines['bottom'].set_color('0.7')  # Eje x
-        self.ax.spines['left'].set_color('0.7')   # Eje y
-        self.ax.spines['top'].set_visible(False)    # Oculta el borde superior
-        self.ax.spines['right'].set_visible(False)  # Oculta el borde derecho
-        
-        # set colores ejes
-        self.ax.tick_params(axis='x', colors='0.4')  # Cambia el color de los valores en el eje x
-        self.ax.tick_params(axis='y', colors='0.4') # Cambia el color de los valores en el eje y
+        # ===============================
+        # Líneas horizontales (ticks Y)
+        # ===============================
+        for y in self.ax.get_yticks():
+            line = self.ax.axhline(
+                y,
+                color='grey',
+                linestyle='--',
+                linewidth=0.25,
+                zorder=0
+            )
+            self.grid_lines_h.append(line)
+
+        # Bordes
+        self.ax.spines['bottom'].set_color('0.7')
+        self.ax.spines['left'].set_color('0.7')
+        self.ax.spines['top'].set_visible(False)
+        self.ax.spines['right'].set_visible(False)
+
+        # Colores de ejes
+        self.ax.tick_params(axis='x', colors='0.4')
+        self.ax.tick_params(axis='y', colors='0.4')
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -287,19 +321,18 @@ class MainWindow(QMainWindow):
         #self.ui.table_serial.setVerticalScrollMode(QTableWidget.ScrollPerItem)
         
         # Ajuste de ancho de columna segun contenido
-        self.ui.table_cpm.resizeColumnsToContents()
-        self.ui.table_cps.resizeColumnsToContents()
+        #self.ui.table_cpm.resizeColumnsToContents()
+        #self.ui.table_cps.resizeColumnsToContents()
         
-        
-        self.ui.table_cpm.setColumnWidth(0, 10)  # Tamaño para la primera columna
-        self.ui.table_cpm.setColumnWidth(1, 10)  # Tamaño para la segunda columna
-        self.ui.table_cpm.setColumnWidth(2, 140)  # Tamaño para la tercera columna
-        self.ui.table_cpm.setColumnWidth(3, 40)  # Tamaño para la cuarta columna
+        self.ui.table_cpm.setColumnWidth(0, 40)  # Tamaño para la primera columna
+        self.ui.table_cpm.setColumnWidth(1, 40)  # Tamaño para la segunda columna
+        self.ui.table_cpm.setColumnWidth(2, 120)  # Tamaño para la tercera columna
+        self.ui.table_cpm.setColumnWidth(3, 10)  # Tamaño para la cuarta columna
 
-        self.ui.table_cps.setColumnWidth(0, 10)  # Tamaño para la primera columna
-        self.ui.table_cps.setColumnWidth(1, 10)  # Tamaño para la segunda columna
-        self.ui.table_cps.setColumnWidth(2, 140)  # Tamaño para la tercera columna
-        self.ui.table_cps.setColumnWidth(3, 40)  # Tamaño para la cuarta columna
+        self.ui.table_cps.setColumnWidth(0, 50)  # Tamaño para la primera columna
+        self.ui.table_cps.setColumnWidth(1, 50)  # Tamaño para la segunda columna
+        self.ui.table_cps.setColumnWidth(2, 100)  # Tamaño para la tercera columna
+        self.ui.table_cps.setColumnWidth(3, 1)  # Tamaño para la cuarta columna
         
         # Ajuste de alto de fila segun contenido
         self.ui.table_cpm.resizeRowsToContents()
