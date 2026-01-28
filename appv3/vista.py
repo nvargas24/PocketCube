@@ -261,7 +261,7 @@ class MainWindow(QMainWindow):
         self.count1s = 0
 
         #Listado de puertos COM disponibles
-
+        self.ports_enabled = []
 
         # Contador de datos recibido por UART
         self.count_data_reciv = {
@@ -280,6 +280,10 @@ class MainWindow(QMainWindow):
         self.ui.btn_accum_CPS.clicked.connect(lambda: self.manual_request("CPS"))
         self.ui.btn_last_CPM.clicked.connect(lambda: self.manual_request("CPM"))
         self.ui.btn_time_s.clicked.connect(lambda: self.manual_request("TIME_S"))
+
+
+        self.read_port_enabled()
+
     
     def load_row_table(self, row_data, table):
         if table=="CPM":
@@ -404,18 +408,31 @@ class MainWindow(QMainWindow):
         """
         Lee los puertos disponibles y carga en la lista para mostra en comboBox
         """
-        self.ui.cbox_in_serial.clear()
-        # Carga de puertos disponibles en combobox
-        list_ports = self.obj_data_uart.list_port_com()
+        list_ports_now = set(self.obj_data_uart.list_port_com())
+        ports_prev = set(self.ports_enabled)
 
-        #print(f"Puertos COM disponibles: {list_ports}")
-        self.ui.cbox_in_serial.addItems(list_ports)
+        # Puertos nuevos
+        ports_added = list_ports_now - ports_prev
+
+        # Puertos removidos
+        ports_removed = ports_prev - list_ports_now
+
+        # --- Agregar solo los nuevos
+        for port in ports_added:
+            self.ui.cbox_in_serial.addItem(port)
+
+        # --- Eliminar los que ya no existen
+        for port in ports_removed:
+            index = self.ui.cbox_in_serial.findText(port)
+            if index != -1:
+                self.ui.cbox_in_serial.removeItem(index)
+
+        # --- Actualizar estado interno
+        self.ports_enabled = list_ports_now
 
     def send_request(self, cmd):
-        self.manual_request(cmd)
+        self.auto_query_request(cmd)
         self.waiting_response = True
-        self.pending_request = cmd
-        self.last_request_time = time.time()
 
     def init(self):
         self.reset_widget()
@@ -424,6 +441,7 @@ class MainWindow(QMainWindow):
         port_m = self.ui.cbox_in_serial.currentText() # Leo puerto de combobox
         port_master = self.obj_data_processor.filter_port(port_m) # Master     
         self.obj_data_uart.init_serial(port_master, "Master") #Master es el Arduino
+
         self.timer.stop() # Se libera recurso ya que se selecciono un puerto
 
         # Ingreso durancion de ensayo [hh]:[mm] y en segundos (para temporizador)
@@ -447,7 +465,7 @@ class MainWindow(QMainWindow):
         self.timer.start(1)  # Intervalo de 1 milisegundo
 
     def stop(self):
-        self.obj_data_uart.ser["Master"].close() # Se libera recurso de puerto serial 
+        
         self.timer.stop()
         self.timer_port.start() # Se vuelve a analizar puertos diponibles
 
@@ -488,7 +506,12 @@ class MainWindow(QMainWindow):
             self.obj_data_uart.send_serial("Master", CMD_I2C, TIME)
             self.waiting_response = True
             self.obj_data_uart.register_request_time("last")
-        elif mode == "CPS_TIME":
+        
+    def auto_query_request(self, mode):
+        """
+        Envia solicitud automatica por uart a Arduino
+        """
+        if mode == "CPS_TIME":
             self.obj_data_uart.send_serial("Master", CMD_I2C, CPS_TIME)
             self.waiting_response = True
             self.obj_data_uart.register_request_time("last")
@@ -496,6 +519,7 @@ class MainWindow(QMainWindow):
             self.obj_data_uart.send_serial("Master", CMD_I2C, CPM_TIME)
             self.waiting_response = True
             self.obj_data_uart.register_request_time("last")
+
 
     def exit(self):
         QApplication.quit()  # Cierra la aplicación
@@ -529,4 +553,4 @@ class MainWindow(QMainWindow):
         self.ui.cbox_in_serial.setEnabled(True)
         self.ui.txt_rta_attiny.clear()
 
-        
+        self.obj_data_uart.ser["Master"].close() # Se libera recurso de puerto serial 
