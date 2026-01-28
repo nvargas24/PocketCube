@@ -46,121 +46,6 @@ SEND_CPS_APP = 8 # id cargar en datos CPS
 SEND_CPM_APP = 9 # id cargar en datos CPM
 SEND_LINE_APP = 7 # id para cargar qline de solictudes manuales
 
-class Graph_bar(FigureCanvas):
-    def __init__(self):
-        self.xlim_init = 1
-        self.xlim_fin = 15
-        self.ylim_init = -1
-        self.ylim_fin = 6
-
-        # Inicializo grilla
-        self.grid_lines_v = []
-        self.grid_lines_h = []
-
-        self.fig, self.ax = plt.subplots(1, dpi=82, figsize=(12,12), sharey=True, facecolor="none")
-        self.fig.subplots_adjust(left=.16, bottom=.15, right=.95, top=.90) #Ajuste de escala de grafica
-        super().__init__(self.fig)
-
-        self.set_graph_style()
-
-        # Listas para cargar datos
-        self.x_data = []
-        self.y_data = []
-
-        # Crear la línea inicial
-        self.bar = self.ax.bar([], [], picker=5)
-
-    def update_graph(self, new_y_value, interval_time):
-        """
-        Metodo para actualizar grafico
-        """
-        if self.x_data:
-            # Reseteo al llega al limite de intervalo
-            if self.x_data[-1] == interval_time:
-                self.x_data.clear()
-                self.y_data.clear() 
-                self.ylim_init = -1
-                self.ylim_fin = 6
-
-        # Generar nuevo valor de datos
-        if self.x_data:
-            next_x = self.x_data[-1] + 1 # Agrego nueva pos en x en la lista
-        else:
-            next_x = self.xlim_init
-
-        self.x_data.append(next_x)
-        self.y_data.append(new_y_value)
-
-        #print(f"x_data: {self.x_data}\ny_data: {self.y_data}")
-
-        # Actualizar datos de la línea
-        self.ax.clear()  # Limpiar el gráfico actual
-
-        self.xlim_fin = interval_time+1 # ajusto eje x segun config user
-
-        if self.ylim_fin < new_y_value:
-            self.ylim_fin = new_y_value+ round(new_y_value*0.1)
-
-        self.set_graph_style()  # Reaplicar el estilo después de limpiar
-        self.bars = self.ax.bar(self.x_data, self.y_data, picker=5)  # Dibujar nuevas barras
-
-        # Ajustar los límites si es necesario
-        #if next_x >= self.xlim_fin:
-        #    self.xlim_fin = next_x+1
-
-        self.draw()
-
-    def set_graph_style(self):
-        """
-        Metodo que asigna estilo al grafico
-        """
-        # Eliminar las líneas de la grilla existentes
-        for line in self.grid_lines_v:
-            line.remove()
-        for line in self.grid_lines_h:
-            line.remove()
-
-        self.grid_lines_v.clear()
-        self.grid_lines_h.clear()
-
-        # Establece nombres de ejes y tamanio
-        matplotlib.rcParams['font.size'] = 10
-        self.ax.set_title("CPS") #####VER-----
-        self.ax.set_xlabel("Time[s]", labelpad=1)
-        self.ax.set_ylabel("Count Pulse", labelpad=1)
-        self.ax.tick_params(axis='both', which='both', labelsize=7)
-   
-        # Establecer límites del eje X e Y
-        self.ax.set_xlim(self.xlim_init-1, self.xlim_fin)
-        self.ax.set_ylim(self.ylim_init, self.ylim_fin)
-
-        # Creo grilla
-        per_div = 1
-        #if self.xlim_fin > 50:
-        #    per_div = 1/20
-
-        step_value_x = round((self.xlim_fin-self.xlim_init)/((self.xlim_fin-self.xlim_init))*per_div)
-        step_value_y = round((self.ylim_fin-self.ylim_init)/10)
-
-        for i in range(self.xlim_init, self.xlim_fin, step_value_x):
-            line = self.ax.axvline(i, color='grey', linestyle='--', linewidth=0.25)
-            self.grid_lines_v.append(line)
-
-        for j in range(self.ylim_init, self.ylim_fin, step_value_y):   
-            line = self.ax.axhline(j, color='grey', linestyle='--', linewidth=0.25)
-            self.grid_lines_h.append(line)
-
-
-        # set colores bordes
-        self.ax.spines['bottom'].set_color('0.7')  # Eje x
-        self.ax.spines['left'].set_color('0.7')   # Eje y
-        self.ax.spines['top'].set_visible(False)    # Oculta el borde superior
-        self.ax.spines['right'].set_visible(False)  # Oculta el borde derecho
-        
-        # set colores ejes
-        self.ax.tick_params(axis='x', colors='0.4')  # Cambia el color de los valores en el eje x
-        self.ax.tick_params(axis='y', colors='0.4') # Cambia el color de los valores en el eje y
-
 class Graph_line(FigureCanvas):
     def __init__(self, title, label_x, label_y):
 
@@ -351,13 +236,6 @@ class MainWindow(QMainWindow):
         self.obj_data_processor = DataProcessor()
         self.obj_file = ManagerFile()
 
-        # Carga de puertos disponibles en combobox
-        list_ports = self.obj_data_uart.list_port_com()
-        #list_ports.insert(0, " ")
-
-        print(f"Puertos COM disponibles: {list_ports}")
-        self.ui.cbox_in_serial.addItems(list_ports)
-
         # Carga de graficos
         self.graph1 = Graph_line("CPS", "Time[s]", "Count Pulse")
         self.graph2 = Graph_line("CPM", "Time[min]", "Count Pulse")
@@ -373,9 +251,17 @@ class MainWindow(QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_data)
 
+        # Qtimer exclusivo para leer puertos
+        self.timer_port = QTimer()
+        self.timer_port.timeout.connect(self.read_port_enabled)
+        self.timer_port.start(3000)
+
         ## Contadores para segundos y ms una vez iniciado el QTIMER
         self.count1ms = 0
         self.count1s = 0
+
+        #Listado de puertos COM disponibles
+
 
         # Contador de datos recibido por UART
         self.count_data_reciv = {
@@ -495,7 +381,7 @@ class MainWindow(QMainWindow):
 
         #--- Solicitudes para tablas CPM y CPS cada 100ms
         if not self.waiting_response:
-            print("+++ count1segundos:", self.count1s, "  count1ms:", self.count1ms)
+            #print("+++ count1segundos:", self.count1s, "  count1ms:", self.count1ms)
             # CPS cada 1 segundo
             if self.count1ms == 500:
                 self.send_request("CPS_TIME")
@@ -514,6 +400,16 @@ class MainWindow(QMainWindow):
 
             self.ui.lcd_time_duration.display(f"{h_d_test:02d}:{min_d_test:02d}:{s_d_test:02d}")
 
+    def read_port_enabled(self):
+        """
+        Lee los puertos disponibles y carga en la lista para mostra en comboBox
+        """
+        self.ui.cbox_in_serial.clear()
+        # Carga de puertos disponibles en combobox
+        list_ports = self.obj_data_uart.list_port_com()
+
+        #print(f"Puertos COM disponibles: {list_ports}")
+        self.ui.cbox_in_serial.addItems(list_ports)
 
     def send_request(self, cmd):
         self.manual_request(cmd)
@@ -523,12 +419,12 @@ class MainWindow(QMainWindow):
 
     def init(self):
         self.reset_widget()
-        # Asigno puertos
-        port_m = self.ui.cbox_in_serial.currentText() # Leo puerto de combobox
-        port_master = self.obj_data_processor.filter_port(port_m) # Master
-        
+
         # Inicializo puerto serial
+        port_m = self.ui.cbox_in_serial.currentText() # Leo puerto de combobox
+        port_master = self.obj_data_processor.filter_port(port_m) # Master     
         self.obj_data_uart.init_serial(port_master, "Master") #Master es el Arduino
+        self.timer.stop() # Se libera recurso ya que se selecciono un puerto
 
         # Ingreso durancion de ensayo [hh]:[mm] y en segundos (para temporizador)
         time_duration_test = self.ui.time_test.time()
@@ -550,11 +446,10 @@ class MainWindow(QMainWindow):
         # Inicio QTimer
         self.timer.start(1)  # Intervalo de 1 milisegundo
 
-
     def stop(self):
-
-        self.obj_data_uart.ser["Master"].close()
+        self.obj_data_uart.ser["Master"].close() # Se libera recurso de puerto serial 
         self.timer.stop()
+        self.timer_port.start() # Se vuelve a analizar puertos diponibles
 
         self.ui.lcd_time_duration.display(f"{0:02d}:{0:02d}:{0:02d}")
 
@@ -581,7 +476,6 @@ class MainWindow(QMainWindow):
         """
         Envia solicitud manual por uart a Arduino
         """
-        print(f"============= Solicitud de *{mode}* ---- flag: {self.waiting_response}")
         if mode == "CPS":
             self.obj_data_uart.send_serial("Master", CMD_I2C, CPS_NOW_ACCUM)
             self.waiting_response = True
