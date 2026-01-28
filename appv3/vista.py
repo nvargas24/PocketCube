@@ -260,8 +260,9 @@ class MainWindow(QMainWindow):
         self.count1ms = 0
         self.count1s = 0
 
-        #Listado de puertos COM disponibles
-        self.ports_enabled = []
+        # Lectura de puerto
+        self.ports_enabled = []  #Listado de puertos COM disponibles
+        self.port_select_cbox = None # Puerto seleccionado en combobox
 
         # Contador de datos recibido por UART
         self.count_data_reciv = {
@@ -430,6 +431,10 @@ class MainWindow(QMainWindow):
         # --- Actualizar estado interno
         self.ports_enabled = list_ports_now
 
+        port = self.ui.cbox_in_serial.currentText() # Leo puerto de combobox
+        if port:
+            self.port_select_cbox = self.obj_data_processor.filter_port(port) # Filtro d cbox en COM
+
     def send_request(self, cmd):
         self.auto_query_request(cmd)
         self.waiting_response = True
@@ -438,9 +443,11 @@ class MainWindow(QMainWindow):
         self.reset_widget()
 
         # Inicializo puerto serial
-        port_m = self.ui.cbox_in_serial.currentText() # Leo puerto de combobox
-        port_master = self.obj_data_processor.filter_port(port_m) # Master     
-        self.obj_data_uart.init_serial(port_master, "Master") #Master es el Arduino
+        if self.port_select_cbox:
+            self.obj_data_uart.init_serial(self.port_select_cbox, "Master") #Master es el Arduino
+        else:
+            print("No se selecciono puerto COM")
+            return
 
         self.timer.stop() # Se libera recurso ya que se selecciono un puerto
 
@@ -553,4 +560,7 @@ class MainWindow(QMainWindow):
         self.ui.cbox_in_serial.setEnabled(True)
         self.ui.txt_rta_attiny.clear()
 
-        self.obj_data_uart.ser["Master"].close() # Se libera recurso de puerto serial 
+        # Cierro puerto serial si estaba abierto
+        if self.obj_data_uart.ser["Master"] != None:
+            self.obj_data_uart.ser["Master"].close() # Se libera recurso de puerto serial 
+        self.obj_data_uart.ser["Master"] = None
