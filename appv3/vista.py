@@ -425,6 +425,8 @@ class MainWindow(QMainWindow):
         if self.count1ms >= 1000:
             self.count1s += 1
             self.count1ms = 0 
+            if self.count1s >= 60:
+                self.count1s = 0
         
         ### --- Libera solicitud UART para volver a pedir si supera TIMEOUT
         if self.obj_data_uart.flag_timeout(TIMEOUT):
@@ -492,12 +494,15 @@ class MainWindow(QMainWindow):
                 self.graph1.update_graph(int(cps))
 
         #--- Solicitudes para tablas CPM y CPS cada 100ms
-        if not self.waiting_response: # Si no estoy esperando respuesta de arduino
+        if not self.waiting_response:
+            print("+++ count1segundos:", self.count1s, "  count1ms:", self.count1ms)
+            # CPS cada 1 segundo
             if self.count1ms == 500:
-                self.manual_request("CPS_TIME")
-                print(f"ms: {self.count1ms}")
-            if (self.count1s %60 == 0):
-                self.manual_request("CPM_TIME")
+                self.send_request("CPS_TIME")
+
+            # CPM una sola vez por minuto
+            elif self.count1s == 0:
+                self.send_request("CPM_TIME")
             
         if self.count1ms == 0: #--- Acciones a realizar cada 1 segundo
             ##---- Reloj de ensayo
@@ -510,7 +515,11 @@ class MainWindow(QMainWindow):
             self.ui.lcd_time_duration.display(f"{h_d_test:02d}:{min_d_test:02d}:{s_d_test:02d}")
 
 
-
+    def send_request(self, cmd):
+        self.manual_request(cmd)
+        self.waiting_response = True
+        self.pending_request = cmd
+        self.last_request_time = time.time()
 
     def init(self):
         self.reset_widget()
