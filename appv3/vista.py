@@ -11,7 +11,7 @@ __version__ = "0.0.1"
 # Librerias para graficos
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon, QPixmap
-from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QApplication, QDialog
+from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QApplication
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
@@ -197,7 +197,6 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Datalogger Carga útil - Grupo SyCE UTN-FRH")
 
         self.setFixedSize(900, 600)
-        #self.setWindowIcon(QIcon(".\Imagenes\logotipo_simple_utn_haedo.png"))
 
         # Cargo icono a app
         self.setWindowIcon(QIcon(r'./Imagenes/logo_utn.png'))
@@ -209,14 +208,6 @@ class MainWindow(QMainWindow):
         # Ajustar el tamaño del QLabel al tamaño de la imagen
         self.ui.img_logo1.setScaledContents(True)
         self.ui.img_logo2.setScaledContents(True)
-
-        # Habilitar el autoscroll
-        #self.ui.table_serial.setAutoScroll(True)
-        #self.ui.table_serial.setVerticalScrollMode(QTableWidget.ScrollPerItem)
-        
-        # Ajuste de ancho de columna segun contenido
-        #self.ui.table_cpm.resizeColumnsToContents()
-        #self.ui.table_cps.resizeColumnsToContents()
         
         self.ui.table_cpm.setColumnWidth(0, 40)  # Tamaño para la primera columna
         self.ui.table_cpm.setColumnWidth(1, 40)  # Tamaño para la segunda columna
@@ -256,11 +247,6 @@ class MainWindow(QMainWindow):
         self.timer_port.timeout.connect(self.read_port_enabled)
         self.timer_port.start(3000)
 
-
-        #QTimer para modo manual
-        self.timer_manual = QTimer()
-        self.timer_manual.timeout.connect(self.enabled_reciv_uart)
-
         ## Contadores para segundos y ms una vez iniciado el QTIMER
         self.count1ms = 0
         self.count1s = 0
@@ -295,9 +281,14 @@ class MainWindow(QMainWindow):
         self.read_port_enabled()
 
         self.timer.start(10)
-        
-    
+         
     def load_row_table(self, row_data, table):
+        """
+        Carga una fila en la tabla seleccionada
+        
+        :param row_data: fila a cargar (lista de strings)
+        :param table: macro de tabla a cargar ("CPM" o "CPS")
+        """
         if table=="CPM":
             table = self.ui.table_cpm
         elif table=="CPS":
@@ -318,11 +309,12 @@ class MainWindow(QMainWindow):
         Actualiza datos en widgets cada 1 ms 
         OBS.: Se dispara en 'self.init' y se finaliza con 'self.stop'(donde se resetea todos los widgets)
         """
+        #--- Inicializo variables de recepcion UART
         id_serial = None
         value_serial = None
         request_serial = None
 
-        #--- Reseteo contador de ms cada 1 segundo
+        #--- Contadores de tiempo
         self.count1ms += 1
         if self.count1ms >= 1000:
             self.count1s += 1
@@ -330,7 +322,7 @@ class MainWindow(QMainWindow):
             if self.count1s >= 60:
                 self.count1s = 0
         
-        ### --- Libera solicitud UART para volver a pedir si supera TIMEOUT
+        ## --- Libera solicitud UART para volver a pedir si supera TIMEOUT
         if self.obj_data_uart.flag_timeout(TIMEOUT):
             self.waiting_response = False
        
@@ -442,9 +434,7 @@ class MainWindow(QMainWindow):
 
             # Inicio serial para el modo manual - hasta oprimir init -> cierra y vuelve a abrir el puerto
             if self.obj_data_uart.ser["Master"] == None:
-                print("INICIO SERIAL")
                 self.obj_data_uart.init_serial(self.port_select_cbox, "Master") #Master es el Arduino
-                self.timer_manual.start(1)
 
     def enabled_reciv_uart(self):
         # Escucho UART por si se envia algo, en el modo manual
@@ -454,10 +444,18 @@ class MainWindow(QMainWindow):
             self.ui.txt_rta_attiny.setText(f"{value_serial}") # carga en widget
 
     def send_request(self, cmd):
+        """
+        Envia solicitud automatica por uart a Arduino
+        
+        :param cmd: Macro de comando a enviar ("CPS_TIME" o "CPM_TIME")
+        """
         self.auto_query_request(cmd)
         self.waiting_response = True
 
     def init(self):
+        """
+        Callback de QTbtn "Iniciar" para iniciar ensayo
+        """
         self.reset_widget()
         self.flag_mode_ensayo = True
 
@@ -491,6 +489,9 @@ class MainWindow(QMainWindow):
         self.timer.start(1)  # Intervalo de 1 milisegundo
 
     def stop(self):
+        """
+        Callback de QTbtn "Finalizar" para detener ensayo
+        """
         self.read_port_enabled()
         self.flag_mode_ensayo = False
 
@@ -514,7 +515,9 @@ class MainWindow(QMainWindow):
         #self.timer.start(10) ### ver donde ponerlo y su cierre antes de un auto
 
     def create_csv(self):
-        # Exporto CSV
+        """
+        Crea archivo CSV con datos acumulados
+        """
         self.obj_file.export_csv_df(self.obj_file.df_acumulado_cp, "CountPulse")
         self.obj_file.export_csv_df(self.obj_file.df_acumulado_cps, "CPS")
 
@@ -525,6 +528,7 @@ class MainWindow(QMainWindow):
     def manual_request(self, mode):
         """
         Envia solicitud manual por uart a Arduino
+        :param mode: Macro de comando a enviar ("CPS", "CPM" o "TIME_S")
         """
         if mode == "CPS":
             self.obj_data_uart.send_serial("Master", CMD_I2C, CPS_NOW_ACCUM)
@@ -539,6 +543,7 @@ class MainWindow(QMainWindow):
     def auto_query_request(self, mode):
         """
         Envia solicitud automatica por uart a Arduino
+        :param mode: Macro de comando a enviar ("CPS_TIME" o "CPM_TIME")
         """
         if mode == "CPS_TIME":
             self.obj_data_uart.send_serial("Master", CMD_I2C, CPS_TIME)
@@ -549,9 +554,11 @@ class MainWindow(QMainWindow):
             self.waiting_response = True
             self.obj_data_uart.register_request_time("last")
 
-
     def exit(self):
-        QApplication.quit()  # Cierra la aplicación
+        """
+        Cierra la aplicación
+        """
+        QApplication.quit()
 
     def reset_widget(self):
         """
@@ -587,7 +594,9 @@ class MainWindow(QMainWindow):
             self.obj_data_uart.ser["Master"].close() # Se libera recurso de puerto serial 
         self.obj_data_uart.ser["Master"] = None
 
+        # indico que salgo del modo manual
+        self.flag_mode_manual = False
 
-        self.flag_mode_manual = False # indico que salgo del modo manual
-
-        self.timer_manual.stop()
+        # Reseteo contadores de datos recibidos
+        self.count_data_reciv['CPM'] = 0
+        self.count_data_reciv['CPS'] = 0
