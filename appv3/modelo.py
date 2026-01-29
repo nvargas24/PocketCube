@@ -155,7 +155,7 @@ class ManagerFile():
             file_path = url_log_folder / name_file
 
             # Exporta el DataFrame al archivo CSV
-            df.to_csv(file_path, index=False)
+            df.to_csv(file_path, sep=';', index=False, encoding='utf-8')
             print(f"DataFrame exportado con éxito a {name_file}")
         except Exception as e:
             print(f"Error al exportar el DataFrame: {e}")
@@ -227,7 +227,7 @@ class ManagerDataUart(DataProcessor):
             time.sleep(0.01)
             #ser.close()
         except ValueError as e:
-            print(f"Error en {port_name}/n")
+            print(f"Error en send serial: {port_name}/n")
             print(e)
 
     def reciv_serial(self, port_name):
@@ -243,7 +243,7 @@ class ManagerDataUart(DataProcessor):
                 id_serial, value = self.extract_value(linea)
 
         except serial.SerialException as e:
-            print(f"Error en {port_name}/n")
+            print(f"Error en reciv_serial: {port_name}/n")
             print(e)
 
         return id_serial, value, linea

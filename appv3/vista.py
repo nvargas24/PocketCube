@@ -267,6 +267,9 @@ class MainWindow(QMainWindow):
         self.waiting_response = False  
         self.flag_mode_ensayo = False
 
+        # Bandera para saber si desconecta dispositivo
+        self.flag_connect_com_enabled = False
+
         # Callback de botones
         self.ui.btn_init.clicked.connect(self.init)
         self.ui.btn_stop.clicked.connect(self.stop)
@@ -334,7 +337,10 @@ class MainWindow(QMainWindow):
             self.stop()
 
         #--- Se analiza BUFFER UART por si hay datos
-        id_serial, value_serial, request_serial = self.obj_data_uart.reciv_serial("Master")
+        if self.obj_data_uart.ser["Master"] != None and self.flag_connect_com_enabled:
+            id_serial, value_serial, request_serial = self.obj_data_uart.reciv_serial("Master")
+
+            #print("cbox:", self.port_select_cbox, "=== flag:", self.flag_connect_com_enabled)
 
         #--- Identifico si se recibe algo de algun ID serial    
         if id_serial != None:
@@ -390,7 +396,7 @@ class MainWindow(QMainWindow):
             elif self.count1s == 59:
                 self.send_request("CPM_TIME")
             
-        if self.count1ms == 0: #--- Acciones a realizar cada 1 segundo
+        if self.count1ms == 0 and self.flag_mode_ensayo: #--- Acciones a realizar cada 1 segundo
             ##---- Reloj de ensayo
             self.duration_test_seconds -= 1
 
@@ -429,11 +435,19 @@ class MainWindow(QMainWindow):
         port = self.ui.cbox_in_serial.currentText() # Leo puerto de combobox
         
         if port:
+            #print("///////////// dispositivo conectado")
+            self.flag_connect_com_enabled = True
             self.port_select_cbox = self.obj_data_processor.filter_port(port) # Filtro d cbox en COM
 
             # Inicio serial para el modo manual - hasta oprimir init -> cierra y vuelve a abrir el puerto
             if self.obj_data_uart.ser["Master"] == None:
                 self.obj_data_uart.init_serial(self.port_select_cbox, "Master") #Master es el Arduino
+        else:
+            self.flag_connect_com_enabled = False
+            #print("********Sin dispositivo conectado")
+            self.obj_data_uart.ser["Master"] = None
+        #print("***********Master port: ",self.obj_data_uart.ser["Master"])
+        #print("//////////port:", port, " /////// flag:", self.flag_connect_com_enabled)
 
     def send_request(self, cmd):
         """
@@ -585,9 +599,6 @@ class MainWindow(QMainWindow):
         if self.obj_data_uart.ser["Master"] != None:
             self.obj_data_uart.ser["Master"].close() # Se libera recurso de puerto serial 
         self.obj_data_uart.ser["Master"] = None
-
-        # indico que salgo del modo manual
-        self.flag_mode_manual = False
 
         # Reseteo contadores de datos recibidos
         self.count_data_reciv['CPM'] = 0
