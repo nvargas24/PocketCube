@@ -24,7 +24,7 @@ from Qt.ui_test_attiny import *
 from modelo import *
 
 # Tiempo de espera para proxima solicitud - si no se recibe respuesta
-TIMEOUT = 3.0 
+TIMEOUT = 2
 
 # Extraccion de datetime
 TIME_MS_PC = 1
@@ -319,6 +319,7 @@ class MainWindow(QMainWindow):
         if self.count1ms >= 1000:
             self.count1s += 1
             self.count1ms = 0 
+            print("+++ count1segundos:", self.count1s, "  count1ms:", self.count1ms, "++++ envio")
             if self.count1s >= 60:
                 self.count1s = 0
         
@@ -382,13 +383,12 @@ class MainWindow(QMainWindow):
 
         #--- Solicitudes para tablas CPM y CPS cada 100ms
         if not self.waiting_response and self.flag_mode_ensayo:
-            print("+++ count1segundos:", self.count1s, "  count1ms:", self.count1ms, "++++ envio")
-            # CPS cada 1 segundo
-            if self.count1ms == 500:
+             # CPS cada 1 segundo
+            if self.count1ms == 999:
                 self.send_request("CPS_TIME")
 
             # CPM una sola vez por minuto
-            elif self.count1s == 0:
+            elif self.count1s == 59:
                 self.send_request("CPM_TIME")
             
         if self.count1ms == 0: #--- Acciones a realizar cada 1 segundo
@@ -600,3 +600,7 @@ class MainWindow(QMainWindow):
         # Reseteo contadores de datos recibidos
         self.count_data_reciv['CPM'] = 0
         self.count_data_reciv['CPS'] = 0
+
+        ## Reseteo contadores para segundos y ms una vez iniciado el QTIMER
+        self.count1ms = 0
+        self.count1s = 0
