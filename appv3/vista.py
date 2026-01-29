@@ -280,7 +280,7 @@ class MainWindow(QMainWindow):
         
         # Bandera para controlar espera de respuesta de Arduino   
         self.waiting_response = False  
-        self.flag_mode_manual = False
+        self.flag_mode_ensayo = False
 
         # Callback de botones
         self.ui.btn_init.clicked.connect(self.init)
@@ -343,17 +343,10 @@ class MainWindow(QMainWindow):
             self.stop()
 
         #--- Se analiza BUFFER UART por si hay datos
-        #if self.count1ms % 100 == 0:
-            #print(f"+++ Escucha habilitado ---- flag: {self.waiting_response}")
         id_serial, value_serial, request_serial = self.obj_data_uart.reciv_serial("Master")
-            #print(f"===========ID serial recibido: {id_serial}, valor: {value_serial}, request:{request_serial}")  
-            #self.waiting_response = False
-            #print("----#---- Despues de habilitar escuchar")
 
         #--- Identifico si se recibe algo de algun ID serial    
         if id_serial != None:
-            #print(f"****** Identificado para cargar en widgets ---- flag: {self.waiting_response}")
-            #print(f"Datos serial de {id_serial}:{value_serial}")
             self.waiting_response = False  # Reseteo bandera de espera de respuesta
             if id_serial == SEND_LINE_APP:
                 self.ui.txt_rta_attiny.setText(f"{value_serial}") # carga en widget
@@ -396,8 +389,8 @@ class MainWindow(QMainWindow):
                 self.graph1.update_graph(int(cps))
 
         #--- Solicitudes para tablas CPM y CPS cada 100ms
-        if not self.waiting_response:
-            #print("+++ count1segundos:", self.count1s, "  count1ms:", self.count1ms)
+        if not self.waiting_response and self.flag_mode_ensayo:
+            print("+++ count1segundos:", self.count1s, "  count1ms:", self.count1ms, "++++ envio")
             # CPS cada 1 segundo
             if self.count1ms == 500:
                 self.send_request("CPS_TIME")
@@ -466,7 +459,8 @@ class MainWindow(QMainWindow):
 
     def init(self):
         self.reset_widget()
-                    #######################################ver buffer de UART se pone lento e ensayo, luego de consultas manuales.
+        self.flag_mode_ensayo = True
+
         # Inicializo puerto serial
         if self.port_select_cbox:
             self.obj_data_uart.init_serial(self.port_select_cbox, "Master") #Master es el Arduino
@@ -497,7 +491,9 @@ class MainWindow(QMainWindow):
         self.timer.start(1)  # Intervalo de 1 milisegundo
 
     def stop(self):
-        
+        self.read_port_enabled()
+        self.flag_mode_ensayo = False
+
         self.timer.stop()
         self.timer.start(10) ### ver donde ponerlo y su cierre antes de un auto
 
