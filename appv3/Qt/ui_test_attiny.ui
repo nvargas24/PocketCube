@@ -632,7 +632,7 @@ QScrollBar::sub-line {
           </layout>
          </item>
          <item>
-          <widget class="QGroupBox" name="groupBox_2">
+          <widget class="QGroupBox" name="gbox_ensayo">
            <property name="title">
             <string>Ensayos</string>
            </property>
@@ -827,7 +827,10 @@ QScrollBar::sub-line {
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="groupBox">
+          <widget class="QGroupBox" name="gbox_manual">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="title">
             <string>Consulta manual</string>
            </property>
@@ -847,7 +850,7 @@ QScrollBar::sub-line {
              <item>
               <widget class="QPushButton" name="btn_last_CPM">
                <property name="enabled">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Expanding">

@@ -439,9 +439,9 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout_9)
 
-        self.groupBox_2 = QGroupBox(self.verticalLayoutWidget_9)
-        self.groupBox_2.setObjectName(u"groupBox_2")
-        self.verticalLayoutWidget_2 = QWidget(self.groupBox_2)
+        self.gbox_ensayo = QGroupBox(self.verticalLayoutWidget_9)
+        self.gbox_ensayo.setObjectName(u"gbox_ensayo")
+        self.verticalLayoutWidget_2 = QWidget(self.gbox_ensayo)
         self.verticalLayoutWidget_2.setObjectName(u"verticalLayoutWidget_2")
         self.verticalLayoutWidget_2.setGeometry(QRect(10, 20, 241, 165))
         self.verticalLayout_3 = QVBoxLayout(self.verticalLayoutWidget_2)
@@ -542,11 +542,11 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setStretch(4, 3)
         self.verticalLayout_3.setStretch(5, 3)
 
-        self.verticalLayout.addWidget(self.groupBox_2)
+        self.verticalLayout.addWidget(self.gbox_ensayo)
 
-        self.groupBox = QGroupBox(self.verticalLayoutWidget_9)
-        self.groupBox.setObjectName(u"groupBox")
-        self.verticalLayoutWidget = QWidget(self.groupBox)
+        self.gbox_manual = QGroupBox(self.verticalLayoutWidget_9)
+        self.gbox_manual.setObjectName(u"gbox_manual")
+        self.verticalLayoutWidget = QWidget(self.gbox_manual)
         self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
         self.verticalLayoutWidget.setGeometry(QRect(10, 30, 241, 156))
         self.verticalLayout_2 = QVBoxLayout(self.verticalLayoutWidget)
@@ -607,7 +607,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setStretch(2, 1)
         self.verticalLayout_2.setStretch(3, 4)
 
-        self.verticalLayout.addWidget(self.groupBox)
+        self.verticalLayout.addWidget(self.gbox_manual)
 
         self.verticalLayout.setStretch(0, 1)
         self.verticalLayout.setStretch(1, 12)
@@ -649,12 +649,12 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem6 = self.table_cpm.horizontalHeaderItem(2)
         ___qtablewidgetitem6.setText(QCoreApplication.translate("MainWindow", u"\u00daltimo CPM", None));
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"Input:", None))
-        self.groupBox_2.setTitle(QCoreApplication.translate("MainWindow", u"Ensayos", None))
+        self.gbox_ensayo.setTitle(QCoreApplication.translate("MainWindow", u"Ensayos", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Duraci\u00f3n:", None))
         self.btn_init.setText(QCoreApplication.translate("MainWindow", u"Iniciar", None))
         self.btn_stop.setText(QCoreApplication.translate("MainWindow", u"Forzar finalizar", None))
         self.btn_export.setText(QCoreApplication.translate("MainWindow", u"Exportar", None))
-        self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"Consulta manual", None))
+        self.gbox_manual.setTitle(QCoreApplication.translate("MainWindow", u"Consulta manual", None))
         self.btn_last_CPM.setText(QCoreApplication.translate("MainWindow", u"\u00daltimo CPM", None))
         self.btn_accum_CPS.setText(QCoreApplication.translate("MainWindow", u"CPS actual", None))
         self.btn_time_s.setText(QCoreApplication.translate("MainWindow", u"TIME", None))

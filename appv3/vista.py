@@ -280,7 +280,8 @@ class MainWindow(QMainWindow):
         self.ui.btn_time_s.clicked.connect(lambda: self.manual_request("TIME_S"))
 
         self.read_port_enabled()
-
+        self.ui.gbox_manual.setEnabled(False)
+        self.ui.btn_export.setEnabled(False)
         self.timer.start(10)
          
     def load_row_table(self, row_data, table):
@@ -310,6 +311,10 @@ class MainWindow(QMainWindow):
         Actualiza datos en widgets cada 1 ms 
         OBS.: Se dispara en 'self.init' y se finaliza con 'self.stop'(donde se resetea todos los widgets)
         """
+        #--- Finaliza ensayo en caso de desconexion de USB
+        if not self.flag_connect_com_enabled:
+            self.stop()
+
         #--- Inicializo variables de recepcion UART
         id_serial = None
         value_serial = None
@@ -320,7 +325,7 @@ class MainWindow(QMainWindow):
         if self.count1ms >= 1000:
             self.count1s += 1
             self.count1ms = 0 
-            print("+++ count1segundos:", self.count1s, "  count1ms:", self.count1ms, "++++ envio")
+            #print("+++ count1segundos:", self.count1s, "  count1ms:", self.count1ms, "++++ envio")
             if self.count1s >= 60:
                 self.count1s = 0
         
@@ -437,6 +442,11 @@ class MainWindow(QMainWindow):
         if port:
             #print("///////////// dispositivo conectado")
             self.flag_connect_com_enabled = True
+
+            # Solo se habilita Qbtn de modo manual, si esta en modo ensayo
+            if not self.flag_mode_ensayo:
+                self.ui.gbox_manual.setEnabled(True)
+            
             self.port_select_cbox = self.obj_data_processor.filter_port(port) # Filtro d cbox en COM
 
             # Inicio serial para el modo manual - hasta oprimir init -> cierra y vuelve a abrir el puerto
@@ -444,6 +454,7 @@ class MainWindow(QMainWindow):
                 self.obj_data_uart.init_serial(self.port_select_cbox, "Master") #Master es el Arduino
         else:
             self.flag_connect_com_enabled = False
+            self.ui.gbox_manual.setEnabled(False)
             #print("********Sin dispositivo conectado")
             self.obj_data_uart.ser["Master"] = None
         #print("***********Master port: ",self.obj_data_uart.ser["Master"])
@@ -502,23 +513,20 @@ class MainWindow(QMainWindow):
         self.flag_mode_ensayo = False
 
         self.timer.stop()
-        self.timer.start(10) ### ver donde ponerlo y su cierre antes de un auto
+        self.timer.start(10)
 
         self.timer_port.start() # Se vuelve a analizar puertos diponibles
 
         self.ui.lcd_time_duration.display(f"{0:02d}:{0:02d}:{0:02d}")
 
         self.ui.btn_stop.setEnabled(False)
-        self.ui.btn_export.setEnabled(True)
+
+        # Se verifica tener datos en df cps (que se carga cada 1seg) para habilitar Qbtn "exportar"
+        if not self.obj_file.df_acumulado_cps.empty:
+            self.ui.btn_export.setEnabled(True)
+
         self.ui.btn_init.setEnabled(True)
         self.ui.time_test.setEnabled(True)
-
-        # Habilito modo manual
-        self.ui.btn_accum_CPS.setEnabled(True)
-        self.ui.btn_last_CPM.setEnabled(True)
-        self.ui.btn_time_s.setEnabled(True)
-
-        #self.timer.start(10) ### ver donde ponerlo y su cierre antes de un auto
 
     def create_csv(self):
         """
@@ -588,9 +596,7 @@ class MainWindow(QMainWindow):
         self.ui.btn_export.setEnabled(False)
 
         # Deshabilito modo manual
-        self.ui.btn_accum_CPS.setEnabled(False)
-        self.ui.btn_last_CPM.setEnabled(False)
-        self.ui.btn_time_s.setEnabled(False)
+        self.ui.gbox_manual.setEnabled(False)
 
         self.ui.cbox_in_serial.setEnabled(True)
         self.ui.txt_rta_attiny.clear()
