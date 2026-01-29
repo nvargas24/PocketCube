@@ -558,17 +558,6 @@ QScrollBar::sub-line {
                </column>
                <column>
                 <property name="text">
-                 <string>Seg.</string>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                  <bold>true</bold>
-                 </font>
-                </property>
-               </column>
-               <column>
-                <property name="text">
                  <string>Datetime</string>
                 </property>
                 <property name="font">
@@ -580,7 +569,7 @@ QScrollBar::sub-line {
                </column>
                <column>
                 <property name="text">
-                 <string>CPM</string>
+                 <string>Último CPM</string>
                 </property>
                 <property name="font">
                  <font>

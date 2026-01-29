@@ -359,8 +359,8 @@ class Ui_MainWindow(object):
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
         self.verticalLayout_6.setContentsMargins(-1, -1, -1, 30)
         self.table_cpm = QTableWidget(self.verticalLayoutWidget_9)
-        if (self.table_cpm.columnCount() < 4):
-            self.table_cpm.setColumnCount(4)
+        if (self.table_cpm.columnCount() < 3):
+            self.table_cpm.setColumnCount(3)
         __qtablewidgetitem4 = QTableWidgetItem()
         __qtablewidgetitem4.setFont(font1);
         self.table_cpm.setHorizontalHeaderItem(0, __qtablewidgetitem4)
@@ -370,9 +370,6 @@ class Ui_MainWindow(object):
         __qtablewidgetitem6 = QTableWidgetItem()
         __qtablewidgetitem6.setFont(font1);
         self.table_cpm.setHorizontalHeaderItem(2, __qtablewidgetitem6)
-        __qtablewidgetitem7 = QTableWidgetItem()
-        __qtablewidgetitem7.setFont(font1);
-        self.table_cpm.setHorizontalHeaderItem(3, __qtablewidgetitem7)
         self.table_cpm.setObjectName(u"table_cpm")
         self.table_cpm.setFont(font3)
         self.table_cpm.setStyleSheet(u"")
@@ -648,11 +645,9 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem4 = self.table_cpm.horizontalHeaderItem(0)
         ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"#", None));
         ___qtablewidgetitem5 = self.table_cpm.horizontalHeaderItem(1)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"Seg.", None));
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"Datetime", None));
         ___qtablewidgetitem6 = self.table_cpm.horizontalHeaderItem(2)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("MainWindow", u"Datetime", None));
-        ___qtablewidgetitem7 = self.table_cpm.horizontalHeaderItem(3)
-        ___qtablewidgetitem7.setText(QCoreApplication.translate("MainWindow", u"CPM", None));
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("MainWindow", u"\u00daltimo CPM", None));
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"Input:", None))
         self.groupBox_2.setTitle(QCoreApplication.translate("MainWindow", u"Ensayos", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Duraci\u00f3n:", None))

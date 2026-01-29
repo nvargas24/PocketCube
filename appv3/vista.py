@@ -210,9 +210,8 @@ class MainWindow(QMainWindow):
         self.ui.img_logo2.setScaledContents(True)
         
         self.ui.table_cpm.setColumnWidth(0, 40)  # Tamaño para la primera columna
-        self.ui.table_cpm.setColumnWidth(1, 40)  # Tamaño para la segunda columna
-        self.ui.table_cpm.setColumnWidth(2, 120)  # Tamaño para la tercera columna
-        self.ui.table_cpm.setColumnWidth(3, 10)  # Tamaño para la cuarta columna
+        self.ui.table_cpm.setColumnWidth(1, 120)  # Tamaño para la segunda columna
+        self.ui.table_cpm.setColumnWidth(2, 10)  # Tamaño para la tercera columna
 
         self.ui.table_cps.setColumnWidth(0, 50)  # Tamaño para la primera columna
         self.ui.table_cps.setColumnWidth(1, 50)  # Tamaño para la segunda columna
@@ -228,8 +227,8 @@ class MainWindow(QMainWindow):
         self.obj_file = ManagerFile()
 
         # Carga de graficos
-        self.graph1 = Graph_line("CPS", "Time[s]", "Count Pulse")
-        self.graph2 = Graph_line("CPM", "Time[min]", "Count Pulse")
+        self.graph1 = Graph_line("CPS", "Muestra", "Count Pulse")
+        self.graph2 = Graph_line("CPM", "Muestra", "Count Pulse")
 
         self.ui.graph_out1.addWidget(self.graph1)
         self.ui.graph_out2.addWidget(self.graph2)
@@ -276,7 +275,6 @@ class MainWindow(QMainWindow):
         self.ui.btn_accum_CPS.clicked.connect(lambda: self.manual_request("CPS"))
         self.ui.btn_last_CPM.clicked.connect(lambda: self.manual_request("CPM"))
         self.ui.btn_time_s.clicked.connect(lambda: self.manual_request("TIME_S"))
-
 
         self.read_port_enabled()
 
@@ -347,20 +345,19 @@ class MainWindow(QMainWindow):
                 # ---- Carga en tabla CPM
                 self.count_data_reciv['CPM'] += 1
                 cpm = value_serial.split(" ")[0]
-                time = value_serial.split(" ")[1]
                 datetime_pc = self.obj_data_processor.datetime_pc()[TIME_MS_PC]
 
                 row_data_cpm = [
                     f"{self.count_data_reciv['CPM']}",
-                    f"{time}",
                     f"{datetime_pc}",
                     f"{cpm}"
                 ]
-                
                 self.load_row_table(row_data_cpm, "CPM") 
                 self.ui.table_cpm.scrollToBottom()
                 #---- Actualizo grafico CPM
                 self.graph2.update_graph(int(cpm))
+                #---- Actualizo df para cargar en archivo
+                self.obj_file.load_df(row_data_cpm, "CPM")
 
             elif id_serial == SEND_CPS_APP:
                 # ---- Carga en tabla CPM
@@ -380,6 +377,8 @@ class MainWindow(QMainWindow):
                 self.ui.table_cps.scrollToBottom()
                 #---- Actualizo grafico CPS
                 self.graph1.update_graph(int(cps))
+                #---- Actualizo df para cargar en archivo
+                self.obj_file.load_df(row_data_cps, "CPS")
 
         #--- Solicitudes para tablas CPM y CPS cada 100ms
         if not self.waiting_response and self.flag_mode_ensayo:
@@ -435,13 +434,6 @@ class MainWindow(QMainWindow):
             # Inicio serial para el modo manual - hasta oprimir init -> cierra y vuelve a abrir el puerto
             if self.obj_data_uart.ser["Master"] == None:
                 self.obj_data_uart.init_serial(self.port_select_cbox, "Master") #Master es el Arduino
-
-    def enabled_reciv_uart(self):
-        # Escucho UART por si se envia algo, en el modo manual
-        id_serial, value_serial, request_serial = self.obj_data_uart.reciv_serial("Master")
-        self.waiting_response = False  # Reseteo bandera de espera de respuesta
-        if id_serial == SEND_LINE_APP:
-            self.ui.txt_rta_attiny.setText(f"{value_serial}") # carga en widget
 
     def send_request(self, cmd):
         """
@@ -518,11 +510,11 @@ class MainWindow(QMainWindow):
         """
         Crea archivo CSV con datos acumulados
         """
-        self.obj_file.export_csv_df(self.obj_file.df_acumulado_cp, "CountPulse")
+        self.obj_file.export_csv_df(self.obj_file.df_acumulado_cpm, "CPM")
         self.obj_file.export_csv_df(self.obj_file.df_acumulado_cps, "CPS")
 
         # Vacio Dataframe para nueva carga
-        self.obj_file.clear_df(self.obj_file.df_acumulado_cp)
+        self.obj_file.clear_df(self.obj_file.df_acumulado_cpm)
         self.obj_file.clear_df(self.obj_file.df_acumulado_cps)
 
     def manual_request(self, mode):

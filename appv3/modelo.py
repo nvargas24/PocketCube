@@ -121,21 +121,25 @@ class DataProcessor():
         datetime_now = now.strftime("%Y-%m-%d %H:%M:%S")
 
         return date, time, datetime_now
-
-
         
 class ManagerFile():
     def __init__(self):
-        self.df_acumulado_cp = pd.DataFrame(columns=['Time', 'Intervalo', 'RTC', 'Count Pulse'])
-        self.df_acumulado_cps = pd.DataFrame(columns=['Intervalo', 'RTC', 'CPS'])
+        self.df_acumulado_cpm = pd.DataFrame(columns=['#', 'Datetime', 'last CPM'])
+        self.df_acumulado_cps = pd.DataFrame(columns=['#', 'Seg.ATtiny', 'Datetime', 'CPS'])
 
     def load_df(self, data, id_name):
-        if id_name == "cp":
-            df_temporal1 = pd.DataFrame([data], columns=['Time', 'Intervalo', 'RTC', 'Count Pulse'])
-            self.df_acumulado_cp = pd.concat([self.df_acumulado_cp, df_temporal1], ignore_index=True)
-        if id_name == "cps":
-            df_temporal2 = pd.DataFrame([data], columns=['Intervalo', 'RTC', 'CPS'])
-            self.df_acumulado_cps = pd.concat([self.df_acumulado_cps, df_temporal2], ignore_index=True)
+        """
+        Carga dataframe para los archivos .csv
+        
+        :param data: dataframe
+        :param id_name: nombre de archivo a guardar ('CPM' o 'CPS')
+        """
+        if id_name == "CPM":
+            df_temporal1 = pd.DataFrame([data], columns=['#', 'Datetime', 'last CPM'])
+            self.df_acumulado_cpm = pd.concat([self.df_acumulado_cpm, df_temporal1], ignore_index=True) #concatena anterior df con actual frame CPM
+        if id_name == "CPS":
+            df_temporal2 = pd.DataFrame([data], columns=['#', 'Seg.ATtiny', 'Datetime', 'CPS'])
+            self.df_acumulado_cps = pd.concat([self.df_acumulado_cps, df_temporal2], ignore_index=True) #concatena anterior df con actual frame CPS
 
     def export_csv_df(self, df, id_name):
         datetime_now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
