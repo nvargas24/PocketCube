@@ -256,6 +256,11 @@ class MainWindow(QMainWindow):
         self.timer_port.timeout.connect(self.read_port_enabled)
         self.timer_port.start(3000)
 
+
+        #QTimer para modo manual
+        self.timer_manual = QTimer()
+        self.timer_manual.timeout.connect(self.enabled_reciv_uart)
+
         ## Contadores para segundos y ms una vez iniciado el QTIMER
         self.count1ms = 0
         self.count1s = 0
@@ -270,9 +275,13 @@ class MainWindow(QMainWindow):
             'CPM':0    
         } 
 
+        # Duracion de ensayo en segundos
+        self.duration_test_seconds = 0
+        
         # Bandera para controlar espera de respuesta de Arduino   
         self.waiting_response = False  
-        
+        self.flag_mode_manual = False
+
         # Callback de botones
         self.ui.btn_init.clicked.connect(self.init)
         self.ui.btn_stop.clicked.connect(self.stop)
@@ -285,6 +294,8 @@ class MainWindow(QMainWindow):
 
         self.read_port_enabled()
 
+        self.timer.start(10)
+        
     
     def load_row_table(self, row_data, table):
         if table=="CPM":
@@ -432,8 +443,22 @@ class MainWindow(QMainWindow):
         self.ports_enabled = list_ports_now
 
         port = self.ui.cbox_in_serial.currentText() # Leo puerto de combobox
+        
         if port:
             self.port_select_cbox = self.obj_data_processor.filter_port(port) # Filtro d cbox en COM
+
+            # Inicio serial para el modo manual - hasta oprimir init -> cierra y vuelve a abrir el puerto
+            if self.obj_data_uart.ser["Master"] == None:
+                print("INICIO SERIAL")
+                self.obj_data_uart.init_serial(self.port_select_cbox, "Master") #Master es el Arduino
+                self.timer_manual.start(1)
+
+    def enabled_reciv_uart(self):
+        # Escucho UART por si se envia algo, en el modo manual
+        id_serial, value_serial, request_serial = self.obj_data_uart.reciv_serial("Master")
+        self.waiting_response = False  # Reseteo bandera de espera de respuesta
+        if id_serial == SEND_LINE_APP:
+            self.ui.txt_rta_attiny.setText(f"{value_serial}") # carga en widget
 
     def send_request(self, cmd):
         self.auto_query_request(cmd)
@@ -441,7 +466,7 @@ class MainWindow(QMainWindow):
 
     def init(self):
         self.reset_widget()
-
+                    #######################################ver buffer de UART se pone lento e ensayo, luego de consultas manuales.
         # Inicializo puerto serial
         if self.port_select_cbox:
             self.obj_data_uart.init_serial(self.port_select_cbox, "Master") #Master es el Arduino
@@ -474,6 +499,8 @@ class MainWindow(QMainWindow):
     def stop(self):
         
         self.timer.stop()
+        self.timer.start(10) ### ver donde ponerlo y su cierre antes de un auto
+
         self.timer_port.start() # Se vuelve a analizar puertos diponibles
 
         self.ui.lcd_time_duration.display(f"{0:02d}:{0:02d}:{0:02d}")
@@ -487,6 +514,8 @@ class MainWindow(QMainWindow):
         self.ui.btn_accum_CPS.setEnabled(True)
         self.ui.btn_last_CPM.setEnabled(True)
         self.ui.btn_time_s.setEnabled(True)
+
+        #self.timer.start(10) ### ver donde ponerlo y su cierre antes de un auto
 
     def create_csv(self):
         # Exporto CSV
@@ -504,15 +533,12 @@ class MainWindow(QMainWindow):
         if mode == "CPS":
             self.obj_data_uart.send_serial("Master", CMD_I2C, CPS_NOW_ACCUM)
             self.waiting_response = True
-            self.obj_data_uart.register_request_time("last")
         elif mode == "CPM":
             self.obj_data_uart.send_serial("Master", CMD_I2C, CPM)
             self.waiting_response = True
-            self.obj_data_uart.register_request_time("last")
         elif mode == "TIME_S":
             self.obj_data_uart.send_serial("Master", CMD_I2C, TIME)
             self.waiting_response = True
-            self.obj_data_uart.register_request_time("last")
         
     def auto_query_request(self, mode):
         """
@@ -564,3 +590,8 @@ class MainWindow(QMainWindow):
         if self.obj_data_uart.ser["Master"] != None:
             self.obj_data_uart.ser["Master"].close() # Se libera recurso de puerto serial 
         self.obj_data_uart.ser["Master"] = None
+
+
+        self.flag_mode_manual = False # indico que salgo del modo manual
+
+        self.timer_manual.stop()
